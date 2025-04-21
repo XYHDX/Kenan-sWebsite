@@ -12,7 +12,7 @@ interface Stat {
   icon: React.ReactNode;
 }
 
-interface Update {
+interface Update { 
   section: string;
   date: string;
   status: string;
