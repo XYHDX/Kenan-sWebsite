@@ -75,7 +75,7 @@ const ProfileEditor = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                     placeholder="Your full name"
                   />
                 </div>
@@ -91,7 +91,7 @@ const ProfileEditor = () => {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   placeholder="Your professional title"
                 />
               </div>
@@ -110,7 +110,7 @@ const ProfileEditor = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                     placeholder="Your email address"
                   />
                 </div>
@@ -130,7 +130,7 @@ const ProfileEditor = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                     placeholder="Your phone number"
                   />
                 </div>
@@ -150,7 +150,7 @@ const ProfileEditor = () => {
                     name="location"
                     value={formData.location}
                     onChange={handleChange}
-                    className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                     placeholder="Your location"
                   />
                 </div>
@@ -165,7 +165,7 @@ const ProfileEditor = () => {
                 <div className="flex flex-col items-center">
                   <div className="relative w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-md mb-4">
                     <Image
-                      src="/images/profile-placeholder.jpg"
+                      src="/images/profile-pic.png"
                       alt="Profile"
                       fill
                       className="object-cover"
@@ -190,7 +190,7 @@ const ProfileEditor = () => {
                   rows={8}
                   value={formData.summary}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   placeholder="Write a brief professional summary"
                 ></textarea>
               </div>

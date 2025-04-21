@@ -32,7 +32,7 @@ const ExperiencePreview = () => {
     <section className="py-12 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold">Experience Highlights</h2>
+          <h2 className="text-3xl font-bold text-blue-600">Experience Highlights</h2>
           <Link 
             href="/experience" 
             className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"

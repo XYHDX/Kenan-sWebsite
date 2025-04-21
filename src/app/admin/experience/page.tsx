@@ -154,7 +154,7 @@ const ExperienceEditor = () => {
 
       {isEditing ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold mb-4">
+          <h2 className="text-xl font-semibold mb-4 text-gray-900">
             {editingExperience.id && experiences.some(exp => exp.id === editingExperience.id) 
               ? 'Edit Experience' 
               : 'Add New Experience'}
@@ -171,9 +171,10 @@ const ExperienceEditor = () => {
                   name="organization"
                   value={editingExperience.organization}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800 !important"
                   placeholder="Organization name"
                   required
+                  style={{color: '#1f2937'}}
                 />
               </div>
 
@@ -187,9 +188,10 @@ const ExperienceEditor = () => {
                   name="position"
                   value={editingExperience.position}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800 !important"
                   placeholder="Your position"
                   required
+                  style={{color: '#1f2937'}}
                 />
               </div>
             </div>
@@ -204,9 +206,10 @@ const ExperienceEditor = () => {
                 name="period"
                 value={editingExperience.period}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800 !important"
                 placeholder="e.g., January 2020 - Present"
                 required
+                style={{color: '#1f2937'}}
               />
             </div>
 
@@ -220,9 +223,10 @@ const ExperienceEditor = () => {
                     type="text"
                     value={responsibility}
                     onChange={(e) => handleResponsibilityChange(index, e.target.value)}
-                    className="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800 !important"
                     placeholder="Describe your responsibility"
                     required
+                    style={{color: '#1f2937'}}
                   />
                   {editingExperience.responsibilities.length > 1 && (
                     <button
@@ -248,7 +252,7 @@ const ExperienceEditor = () => {
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-gray-800"
               >
                 Cancel
               </button>

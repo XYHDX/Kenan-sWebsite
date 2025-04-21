@@ -1,53 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Trophy, Calendar, MapPin, Plus, Save, Trash2, Edit } from 'lucide-react';
+import Image from 'next/image';
+
+interface Achievement {
+  id: number;
+  title: string;
+  competition: string;
+  location: string;
+  year: string;
+  description: string;
+}
 
 const AchievementsEditor = () => {
-  // In a real implementation, this data would come from an API
-  const [achievements, setAchievements] = useState([
-    {
-      id: 1,
-      title: '1st Place',
-      competition: 'Annual Robotic Competition (ARC)',
-      location: 'Syria',
-      year: '2024',
-      description: 'Recognized for innovative robotics design and exceptional performance in the competition.'
-    },
-    {
-      id: 2,
-      title: '3rd Place',
-      competition: 'World Robotic Olympiad (WRO)',
-      location: 'Syria, Future Innovators Category',
-      year: '2024',
-      description: 'Awarded for creative problem-solving and technical implementation in the Future Innovators category.'
-    },
-    {
-      id: 3,
-      title: 'Coach',
-      competition: 'World Robotic Olympiad (WRO)',
-      location: 'RoboMission Senior Team',
-      year: '2023',
-      description: 'Successfully coached and mentored the senior team, developing their technical and strategic skills for the competition.'
-    },
-    {
-      id: 4,
-      title: 'Participant',
-      competition: 'Future Science Challenge',
-      location: 'UAE',
-      year: '2024',
-      description: 'Represented Syria in this international science and technology challenge, showcasing innovative solutions.'
-    }
-  ]);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
 
-  const [editingAchievement, setEditingAchievement] = useState<any>(null);
+  useEffect(() => {
+    const fetchAchievements = async () => {
+      const response = await fetch('/api/achievements');
+      const data: Achievement[] = await response.json();
+      setAchievements(data);
+    };
+    fetchAchievements();
+  }, []);
+
+  const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
 
-  const handleEdit = (achievement: any) => {
-    setEditingAchievement({...achievement});
+  const handleEdit = (achievement: Achievement) => {
+    setEditingAchievement(achievement);
     setIsEditing(true);
   };
 
@@ -86,19 +71,16 @@ const AchievementsEditor = () => {
     setSaveMessage('');
 
     try {
-      // In a real implementation, this would make an API call to save the data
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (achievements.some(achievement => achievement.id === editingAchievement.id)) {
-        // Update existing achievement
-        setAchievements(achievements.map(achievement => 
-          achievement.id === editingAchievement.id ? editingAchievement : achievement
-        ));
-      } else {
-        // Add new achievement
-        setAchievements([...achievements, editingAchievement]);
+      if (editingAchievement) {
+        if (achievements.some(achievement => achievement.id === editingAchievement.id)) {
+          setAchievements(achievements.map(achievement => 
+            achievement.id === editingAchievement.id ? editingAchievement : achievement
+          ));
+        } else {
+          setAchievements([...achievements, editingAchievement]);
+        }
       }
-      
       setIsEditing(false);
       setSaveMessage('Achievement saved successfully!');
     } catch (err) {
@@ -132,7 +114,7 @@ const AchievementsEditor = () => {
       {isEditing ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-xl font-semibold mb-4">
-            {editingAchievement.id && achievements.some(achievement => achievement.id === editingAchievement.id) 
+            {editingAchievement?.id && achievements.some(achievement => achievement.id === editingAchievement.id) 
               ? 'Edit Achievement' 
               : 'Add New Achievement'}
           </h2>
@@ -146,11 +128,12 @@ const AchievementsEditor = () => {
                   type="text"
                   id="title"
                   name="title"
-                  value={editingAchievement.title}
+                  value={editingAchievement?.title}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   placeholder="e.g., 1st Place, Finalist, Participant"
                   required
+                  style={{color: '#1f2937'}}
                 />
               </div>
 
@@ -162,11 +145,12 @@ const AchievementsEditor = () => {
                   type="text"
                   id="competition"
                   name="competition"
-                  value={editingAchievement.competition}
+                  value={editingAchievement?.competition}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   placeholder="Competition or event name"
                   required
+                  style={{color: '#1f2937'}}
                 />
               </div>
             </div>
@@ -180,11 +164,12 @@ const AchievementsEditor = () => {
                   type="text"
                   id="location"
                   name="location"
-                  value={editingAchievement.location}
+                  value={editingAchievement?.location}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   placeholder="Location or category"
                   required
+                  style={{color: '#1f2937'}}
                 />
               </div>
 
@@ -196,11 +181,12 @@ const AchievementsEditor = () => {
                   type="text"
                   id="year"
                   name="year"
-                  value={editingAchievement.year}
+                  value={editingAchievement?.year}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   placeholder="e.g., 2024"
                   required
+                  style={{color: '#1f2937'}}
                 />
               </div>
             </div>
@@ -213,11 +199,12 @@ const AchievementsEditor = () => {
                 id="description"
                 name="description"
                 rows={4}
-                value={editingAchievement.description}
+                value={editingAchievement?.description}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                 placeholder="Describe your achievement"
                 required
+                style={{color: '#1f2937'}}
               ></textarea>
             </div>
 
@@ -225,7 +212,8 @@ const AchievementsEditor = () => {
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-gray-800"
+                style={{color: '#1f2937'}}
               >
                 Cancel
               </button>
@@ -252,7 +240,12 @@ const AchievementsEditor = () => {
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="md:w-1/4 flex flex-col items-center justify-center">
                   <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                    <Trophy size={36} className="text-blue-600" />
+                    <Image
+                      src="/images/profile-pic.png"
+                      alt="Profile"
+                      fill
+                      className="object-cover"
+                    />
                   </div>
                   <h2 className="text-xl font-bold text-center text-gray-900">{achievement.title}</h2>
                 </div>

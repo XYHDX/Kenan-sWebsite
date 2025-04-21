@@ -45,7 +45,7 @@ const AchievementsPage = () => {
       <Header />
       <main className="flex-grow py-12 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-12">Competitions & Achievements</h1>
+          <h1 className="text-4xl font-bold text-center mb-12 text-blue-600">Competitions & Achievements</h1>
           
           <div className="space-y-8">
             {achievements.map((achievement) => (

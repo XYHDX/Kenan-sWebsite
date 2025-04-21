@@ -37,7 +37,7 @@ const SkillsPage = () => {
           
           {/* Programming Skills */}
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-6">Programming Languages</h2>
+            <h2 className="text-2xl font-semibold mb-6 text-gray-200">Programming Languages</h2>
             <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 md:p-8">
               <div className="space-y-6">
                 {programmingSkills.map((skill) => (
@@ -60,7 +60,7 @@ const SkillsPage = () => {
           
           {/* Robotics Skills */}
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-6">Robotics Platforms</h2>
+            <h2 className="text-2xl font-semibold mb-6 text-gray-200">Robotics Platforms</h2>
             <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 md:p-8">
               <div className="space-y-6">
                 {roboticsSkills.map((skill) => (
@@ -83,7 +83,7 @@ const SkillsPage = () => {
           
           {/* Networking Skills */}
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-6">Networking</h2>
+            <h2 className="text-2xl font-semibold mb-6 text-gray-200">Networking</h2>
             <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 md:p-8">
               <div className="space-y-6">
                 {networkingSkills.map((skill) => (
@@ -106,7 +106,7 @@ const SkillsPage = () => {
           
           {/* Other Skills */}
           <section>
-            <h2 className="text-2xl font-semibold mb-6">Other Skills</h2>
+            <h2 className="text-2xl font-semibold mb-6 text-gray-200">Other Skills</h2>
             <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 md:p-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {otherSkills.map((skill, index) => (

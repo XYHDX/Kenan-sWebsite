@@ -178,7 +178,7 @@ const EducationEditor = () => {
       {/* Education Section */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold flex items-center">
+          <h2 className="text-xl font-semibold flex items-center text-gray-800">
             <GraduationCap size={20} className="mr-2 text-blue-600" />
             Education
           </h2>
@@ -205,9 +205,10 @@ const EducationEditor = () => {
                   name="degree"
                   value={education.degree}
                   onChange={handleEducationChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   placeholder="Your degree"
                   required
+                  style={{color: '#1f2937'}}
                 />
               </div>
 
@@ -221,9 +222,10 @@ const EducationEditor = () => {
                   name="institution"
                   value={education.institution}
                   onChange={handleEducationChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   placeholder="Institution name"
                   required
+                  style={{color: '#1f2937'}}
                 />
               </div>
             </div>
@@ -238,9 +240,10 @@ const EducationEditor = () => {
                 name="period"
                 value={education.period}
                 onChange={handleEducationChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                 placeholder="e.g., 2016 - 2024"
                 required
+                style={{color: '#1f2937'}}
               />
             </div>
 
@@ -254,9 +257,10 @@ const EducationEditor = () => {
                 name="project"
                 value={education.project}
                 onChange={handleEducationChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                 placeholder="Your project title"
                 required
+                style={{color: '#1f2937'}}
               />
             </div>
 
@@ -270,9 +274,10 @@ const EducationEditor = () => {
                     type="text"
                     value={detail}
                     onChange={(e) => handleDetailChange(index, e.target.value)}
-                    className="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                     placeholder="Describe your project detail"
                     required
+                    style={{color: '#1f2937'}}
                   />
                   {education.details.length > 1 && (
                     <button
@@ -298,7 +303,8 @@ const EducationEditor = () => {
               <button
                 type="button"
                 onClick={() => setIsEditingEducation(false)}
-                className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-gray-800"
+                style={{color: '#1f2937'}}
               >
                 Cancel
               </button>
@@ -342,7 +348,7 @@ const EducationEditor = () => {
       {/* Certifications Section */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold flex items-center">
+          <h2 className="text-xl font-semibold flex items-center text-gray-800">
             <Award size={20} className="mr-2 text-blue-600" />
             Certifications
           </h2>
@@ -369,9 +375,10 @@ const EducationEditor = () => {
                   name="title"
                   value={editingCertification.title}
                   onChange={handleCertificationChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   placeholder="Certification title"
                   required
+                  style={{color: '#1f2937'}}
                 />
               </div>
 
@@ -385,8 +392,9 @@ const EducationEditor = () => {
                   name="organization"
                   value={editingCertification.organization}
                   onChange={handleCertificationChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   placeholder="Organization name"
+                  style={{color: '#1f2937'}}
                   required
                 />
               </div>
@@ -402,9 +410,10 @@ const EducationEditor = () => {
                 name="year"
                 value={editingCertification.year}
                 onChange={handleCertificationChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                 placeholder="e.g., 2023"
                 required
+                style={{color: '#1f2937'}}
               />
             </div>
 
@@ -412,7 +421,8 @@ const EducationEditor = () => {
               <button
                 type="button"
                 onClick={() => setIsEditingCertification(false)}
-                className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-gray-800"
+                style={{color: '#1f2937'}}
               >
                 Cancel
               </button>

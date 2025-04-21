@@ -1,23 +1,55 @@
 'use client';
 
-import { useState } from 'react';
+import React from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Clock, Users, Eye, ArrowUp } from 'lucide-react';
 import Link from 'next/link';
 
+interface Stat {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+}
+
+interface Update {
+  section: string;
+  date: string;
+  status: string;
+}
+
 const AdminDashboard = () => {
-  // In a real implementation, this data would come from an API
-  const stats = [
-    { title: 'Last Updated', value: 'April 9, 2025', icon: <Clock size={24} className="text-blue-600" /> },
+  const [stats, setStats] = useState<Stat[]>([
+    { title: 'Last Updated', value: 'April 9, 2025', icon: <Clock size={24} className="text-gray-600" /> },
     { title: 'Total Sections', value: '7', icon: <Users size={24} className="text-green-600" /> },
     { title: 'Site Views', value: '0', icon: <Eye size={24} className="text-purple-600" /> },
-  ];
-
-  const recentUpdates = [
+  ]);
+  
+  const [recentUpdates, setRecentUpdates] = useState<Update[]>([
     { section: 'Profile', date: 'April 9, 2025', status: 'Created' },
     { section: 'Experience', date: 'April 9, 2025', status: 'Created' },
     { section: 'Education', date: 'April 9, 2025', status: 'Created' },
-  ];
+  ]);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        // Fetch stats and updates from an API
+        // Example:
+        // const statsResponse = await fetch('/api/stats');
+        // const statsData = await statsResponse.json();
+        // setStats(statsData);
+
+        // const updatesResponse = await fetch('/api/updates');
+        // const updatesData = await updatesResponse.json();
+        // setRecentUpdates(updatesData);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        // Keep using the default data if the API call fails
+      }
+    };
+    fetchDashboardData();
+  }, []);
 
   return (
     <AdminLayout activePage="dashboard">
@@ -42,7 +74,7 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Quick Actions */}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
+          <h2 className="text-lg font-medium text-gray-900 mb-4 text-gray-800">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link 
               href="/admin/profile" 
@@ -77,7 +109,7 @@ const AdminDashboard = () => {
 
         {/* Recent Updates */}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Recent Updates</h2>
+          <h2 className="text-lg font-medium text-gray-900 mb-4 text-gray-800">Recent Updates</h2>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">

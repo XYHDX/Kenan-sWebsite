@@ -205,9 +205,10 @@ const SkillsEditor = () => {
                 name="name"
                 value={editingSkill.name}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                 placeholder="Skill name"
                 required
+                style={{color: '#1f2937'}}
               />
             </div>
 
@@ -242,7 +243,8 @@ const SkillsEditor = () => {
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-gray-800"
+                style={{color: '#1f2937'}}
               >
                 Cancel
               </button>
@@ -264,7 +266,7 @@ const SkillsEditor = () => {
           {/* Programming Skills */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold flex items-center">
+              <h2 className="text-xl font-semibold flex items-center text-gray-800">
                 <BarChart size={20} className="mr-2 text-blue-600" />
                 Programming Languages
               </h2>
@@ -281,7 +283,7 @@ const SkillsEditor = () => {
           {/* Robotics Skills */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold flex items-center">
+              <h2 className="text-xl font-semibold flex items-center text-gray-800">
                 <BarChart size={20} className="mr-2 text-blue-600" />
                 Robotics Platforms
               </h2>
@@ -298,7 +300,7 @@ const SkillsEditor = () => {
           {/* Networking Skills */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold flex items-center">
+              <h2 className="text-xl font-semibold flex items-center text-gray-800">
                 <BarChart size={20} className="mr-2 text-blue-600" />
                 Networking
               </h2>
@@ -315,7 +317,7 @@ const SkillsEditor = () => {
           {/* Other Skills */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold flex items-center">
+              <h2 className="text-xl font-semibold flex items-center text-gray-800 ">
                 <CheckCircle size={20} className="mr-2 text-blue-600" />
                 Other Skills
               </h2>
