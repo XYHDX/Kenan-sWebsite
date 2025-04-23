@@ -31,6 +31,7 @@ const ContactEditor = () => {
   const [saveMessage, setSaveMessage] = useState('');
 
   useEffect(() => {
+    // We disable exhaustive-deps because defaultContactData is constant and doesn't need to be re-tracked.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const savedData = getFromLocalStorage<ContactFormData>(STORAGE_KEYS.CONTACT, defaultContactData);
     setFormData(savedData);
