@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Trophy, Calendar, MapPin, Plus, Save, Trash2, Edit } from 'lucide-react';
-import Image from 'next/image';
-import { saveToLocalStorage, getFromLocalStorage, STORAGE_KEYS } from '@/lib/localStorage'; // Import storage functions
+import { saveToLocalStorage, getFromLocalStorage, STORAGE_KEYS } from '@/lib/localStorage';
 
 interface Achievement {
   id: number;
@@ -15,7 +14,6 @@ interface Achievement {
   description: string;
 }
 
-// Define default achievements (or leave empty)
 const defaultAchievements: Achievement[] = [
   {
     id: 1,
@@ -25,21 +23,12 @@ const defaultAchievements: Achievement[] = [
     year: '2024',
     description: 'Led a team to victory in the national robotics competition.'
   },
-  // Add more defaults if needed
 ];
 
 const AchievementsEditor = () => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
 
-  // Load data from local storage on mount
   useEffect(() => {
-    // Remove API fetch
-    // const fetchAchievements = async () => {
-    //   const response = await fetch('/api/achievements');
-    //   const data: Achievement[] = await response.json();
-    //   setAchievements(data);
-    // };
-    // fetchAchievements();
     const savedAchievements = getFromLocalStorage<Achievement[]>(STORAGE_KEYS.ACHIEVEMENTS, defaultAchievements);
     setAchievements(savedAchievements);
   }, []);
@@ -56,7 +45,7 @@ const AchievementsEditor = () => {
 
   const handleNew = () => {
     setEditingAchievement({
-      id: Date.now(), // Temporary ID
+      id: Date.now(),
       title: '',
       competition: '',
       location: '',
@@ -70,8 +59,7 @@ const AchievementsEditor = () => {
     if (window.confirm('Are you sure you want to delete this achievement?')) {
       const updatedAchievements = achievements.filter(achievement => achievement.id !== id);
       setAchievements(updatedAchievements);
-      console.log('[Admin Delete] Saving Achievements:', updatedAchievements); // Log before saving
-      saveToLocalStorage(STORAGE_KEYS.ACHIEVEMENTS, updatedAchievements); // Save to LS
+      saveToLocalStorage(STORAGE_KEYS.ACHIEVEMENTS, updatedAchievements);
       setSaveMessage('Achievement deleted successfully!');
       setTimeout(() => setSaveMessage(''), 3000);
     }
@@ -92,28 +80,26 @@ const AchievementsEditor = () => {
 
     try {
       let updatedAchievements;
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       if (editingAchievement) {
         if (achievements.some(achievement => achievement.id === editingAchievement.id)) {
-          // Update existing
-          updatedAchievements = achievements.map(achievement => 
+          updatedAchievements = achievements.map(achievement =>
             achievement.id === editingAchievement.id ? editingAchievement : achievement
           );
         } else {
-          // Add new
           updatedAchievements = [...achievements, editingAchievement];
         }
-        
-        // Update state and save to localStorage
+
         setAchievements(updatedAchievements);
-        console.log('[Admin Save] Saving Achievements:', updatedAchievements); // Log before saving
         saveToLocalStorage(STORAGE_KEYS.ACHIEVEMENTS, updatedAchievements);
       }
-      
+
       setIsEditing(false);
       setSaveMessage('Achievement saved successfully!');
     } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const error = err;
       setSaveMessage('An error occurred while saving. Please try again.');
     } finally {
       setIsSaving(false);
@@ -144,8 +130,8 @@ const AchievementsEditor = () => {
       {isEditing ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-xl font-semibold mb-4">
-            {editingAchievement?.id && achievements.some(achievement => achievement.id === editingAchievement.id) 
-              ? 'Edit Achievement' 
+            {editingAchievement?.id && achievements.some(achievement => achievement.id === editingAchievement.id)
+              ? 'Edit Achievement'
               : 'Add New Achievement'}
           </h2>
           <form onSubmit={handleSubmit}>
@@ -163,7 +149,7 @@ const AchievementsEditor = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   placeholder="e.g., 1st Place, Finalist, Participant"
                   required
-                  style={{color: '#1f2937'}}
+                  style={{ color: '#1f2937' }}
                 />
               </div>
 
@@ -180,7 +166,7 @@ const AchievementsEditor = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   placeholder="Competition or event name"
                   required
-                  style={{color: '#1f2937'}}
+                  style={{ color: '#1f2937' }}
                 />
               </div>
             </div>
@@ -199,7 +185,7 @@ const AchievementsEditor = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   placeholder="Location or category"
                   required
-                  style={{color: '#1f2937'}}
+                  style={{ color: '#1f2937' }}
                 />
               </div>
 
@@ -216,7 +202,7 @@ const AchievementsEditor = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                   placeholder="e.g., 2024"
                   required
-                  style={{color: '#1f2937'}}
+                  style={{ color: '#1f2937' }}
                 />
               </div>
             </div>
@@ -234,7 +220,7 @@ const AchievementsEditor = () => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
                 placeholder="Describe your achievement"
                 required
-                style={{color: '#1f2937'}}
+                style={{ color: '#1f2937' }}
               ></textarea>
             </div>
 
@@ -243,7 +229,7 @@ const AchievementsEditor = () => {
                 type="button"
                 onClick={() => setIsEditing(false)}
                 className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-gray-800"
-                style={{color: '#1f2937'}}
+                style={{ color: '#1f2937' }}
               >
                 Cancel
               </button>
@@ -263,8 +249,8 @@ const AchievementsEditor = () => {
       ) : (
         <div className="space-y-6">
           {achievements.map((achievement) => (
-            <div 
-              key={achievement.id} 
+            <div
+              key={achievement.id}
               className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex flex-col md:flex-row gap-6">
@@ -274,24 +260,24 @@ const AchievementsEditor = () => {
                   </div>
                   <h2 className="text-xl font-bold text-center text-gray-900 dark:text-white">{achievement.title}</h2>
                 </div>
-                
+
                 <div className="md:w-3/4">
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">{achievement.competition}</h3>
-                  
+
                   <div className="flex flex-wrap gap-4 mb-4">
                     <div className="flex items-center text-gray-600">
                       <MapPin size={16} className="mr-1" />
                       <span>{achievement.location}</span>
                     </div>
-                    
+
                     <div className="flex items-center text-gray-600">
                       <Calendar size={16} className="mr-1" />
                       <span>{achievement.year}</span>
                     </div>
                   </div>
-                  
+
                   <p className="text-gray-700 mb-4">{achievement.description}</p>
-                  
+
                   <div className="flex space-x-2">
                     <button
                       onClick={() => handleEdit(achievement)}

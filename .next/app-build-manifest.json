@@ -11,15 +11,35 @@
       "static/chunks/main-app.js",
       "static/chunks/app/page.js"
     ],
+    "/achievements/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/achievements/page.js"
+    ],
+    "/admin/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/page.js"
+    ],
+    "/admin/achievements/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/achievements/page.js"
+    ],
+    "/admin/contact/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/contact/page.js"
+    ],
+    "/contact/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/contact/page.js"
+    ],
     "/skills/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/skills/page.js"
-    ],
-    "/about/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/about/page.js"
     ]
   }
 }

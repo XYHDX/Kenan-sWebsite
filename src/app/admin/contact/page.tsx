@@ -16,7 +16,6 @@ interface ContactFormData {
 }
 
 const ContactEditor = () => {
-  // Default contact data
   const defaultContactData: ContactFormData = {
     email: 'yahyademeriah@gmail.com',
     phone: '+971 58 127 7542',
@@ -27,13 +26,12 @@ const ContactEditor = () => {
     emailNotifications: true
   };
 
-  // Get data from localStorage or use defaults
   const [formData, setFormData] = useState<ContactFormData>(defaultContactData);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
 
-  // Load data on initial render
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const savedData = getFromLocalStorage<ContactFormData>(STORAGE_KEYS.CONTACT, defaultContactData);
     setFormData(savedData);
   }, []);
@@ -52,14 +50,12 @@ const ContactEditor = () => {
     setSaveMessage('');
 
     try {
-      // In a real implementation, this would make an API call to save the data
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Save to localStorage for persistence
       saveToLocalStorage(STORAGE_KEYS.CONTACT, formData);
-      
       setSaveMessage('Contact information updated successfully!');
     } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const error = err;
       setSaveMessage('An error occurred while saving. Please try again.');
     } finally {
       setIsSaving(false);
@@ -199,7 +195,7 @@ const ContactEditor = () => {
                     Show contact form on website
                   </label>
                 </div>
-                
+
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -235,4 +231,4 @@ const ContactEditor = () => {
   );
 };
 
-export default ContactEditor; 
+export default ContactEditor;
