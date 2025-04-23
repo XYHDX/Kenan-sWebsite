@@ -1,12 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { GraduationCap, Calendar, Award, Plus, Save, Trash2, Edit } from 'lucide-react';
+import { saveToLocalStorage, getFromLocalStorage, STORAGE_KEYS } from '@/lib/localStorage';
+
+// Define types
+interface Certification {
+  id: string | number;
+  title: string;
+  organization: string;
+  year: string | number;
+}
+
+interface Education {
+  degree: string;
+  institution: string;
+  period: string;
+  project: string;
+  details: string[];
+}
 
 const EducationEditor = () => {
-  // In a real implementation, this data would come from an API
-  const [education, setEducation] = useState({
+  // Default data
+  const defaultEducation: Education = {
     degree: 'Bachelor of Engineering',
     institution: 'Syrian Private University',
     period: '2016 - 2024',
@@ -15,9 +32,9 @@ const EducationEditor = () => {
       'Developed an automated system for waste classification and sorting, utilizing object detection',
       'Integrated a mechanical sorting mechanism, achieving a 40% efficiency improvement in waste segregation'
     ]
-  });
+  };
 
-  const [certifications, setCertifications] = useState([
+  const defaultCertifications: Certification[] = [
     {
       id: 1,
       title: 'Take the Lead Program',
@@ -42,13 +59,25 @@ const EducationEditor = () => {
       organization: 'NGO Egypt',
       year: '2018'
     }
-  ]);
+  ];
 
+  // State
+  const [education, setEducation] = useState<Education>(defaultEducation);
+  const [certifications, setCertifications] = useState<Certification[]>(defaultCertifications);
   const [isEditingEducation, setIsEditingEducation] = useState(false);
-  const [editingCertification, setEditingCertification] = useState<any>(null);
+  const [editingCertification, setEditingCertification] = useState<Certification | null>(null);
   const [isEditingCertification, setIsEditingCertification] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+
+  // Load data on mount
+  useEffect(() => {
+    const savedEducation = getFromLocalStorage<Education>(STORAGE_KEYS.EDUCATION, defaultEducation);
+    setEducation(savedEducation);
+
+    const savedCertifications = getFromLocalStorage<Certification[]>(STORAGE_KEYS.CERTIFICATIONS, defaultCertifications);
+    setCertifications(savedCertifications);
+  }, []);
 
   // Education form handlers
   const handleEducationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -90,8 +119,12 @@ const EducationEditor = () => {
     setSaveMessage('');
 
     try {
-      // In a real implementation, this would make an API call to save the data
+      // Save to localStorage
+      saveToLocalStorage(STORAGE_KEYS.EDUCATION, education);
+      
+      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
       setIsEditingEducation(false);
       setSaveMessage('Education updated successfully!');
     } catch (err) {
@@ -102,7 +135,7 @@ const EducationEditor = () => {
   };
 
   // Certification handlers
-  const handleEditCertification = (certification: any) => {
+  const handleEditCertification = (certification: Certification) => {
     setEditingCertification({...certification});
     setIsEditingCertification(true);
   };
@@ -117,10 +150,11 @@ const EducationEditor = () => {
     setIsEditingCertification(true);
   };
 
-  const handleDeleteCertification = async (id: number) => {
+  const handleDeleteCertification = async (id: number | string) => {
     if (window.confirm('Are you sure you want to delete this certification?')) {
-      // In a real implementation, this would make an API call to delete the data
-      setCertifications(certifications.filter(cert => cert.id !== id));
+      const updatedCertifications = certifications.filter(cert => cert.id !== id);
+      setCertifications(updatedCertifications);
+      saveToLocalStorage(STORAGE_KEYS.CERTIFICATIONS, updatedCertifications);
       setSaveMessage('Certification deleted successfully!');
       setTimeout(() => setSaveMessage(''), 3000);
     }
@@ -140,18 +174,24 @@ const EducationEditor = () => {
     setSaveMessage('');
 
     try {
-      // In a real implementation, this would make an API call to save the data
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      let updatedCertifications;
       
-      if (certifications.some(cert => cert.id === editingCertification.id)) {
+      if (certifications.some(cert => cert.id === editingCertification?.id)) {
         // Update existing certification
-        setCertifications(certifications.map(cert => 
-          cert.id === editingCertification.id ? editingCertification : cert
-        ));
+        updatedCertifications = certifications.map(cert => 
+          cert.id === editingCertification?.id ? editingCertification : cert
+        );
       } else {
         // Add new certification
-        setCertifications([...certifications, editingCertification]);
+        updatedCertifications = [...certifications, editingCertification!];
       }
+      
+      // Save to localStorage
+      setCertifications(updatedCertifications);
+      saveToLocalStorage(STORAGE_KEYS.CERTIFICATIONS, updatedCertifications);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       setIsEditingCertification(false);
       setSaveMessage('Certification saved successfully!');
@@ -362,7 +402,7 @@ const EducationEditor = () => {
           )}
         </div>
 
-        {isEditingCertification ? (
+        {isEditingCertification && editingCertification ? (
           <form onSubmit={saveCertification} className="mb-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>

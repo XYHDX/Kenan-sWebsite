@@ -1,4 +1,4 @@
-'use client';
+// 'use client'; // Removed - Component is static
 
 const ProfessionalSummary = () => {
   return (

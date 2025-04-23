@@ -1,11 +1,30 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { GraduationCap, Calendar, Award } from 'lucide-react';
+import { getFromLocalStorage, setupStorageListener, STORAGE_KEYS } from '@/lib/localStorage';
+
+// Define types
+interface Certification {
+  id: string | number;
+  title: string;
+  organization: string;
+  year: string | number;
+}
+
+interface Education {
+  degree: string;
+  institution: string;
+  period: string;
+  project: string;
+  details: string[];
+}
 
 const EducationPage = () => {
-  const education = {
+  // Default data
+  const defaultEducation: Education = {
     degree: 'Bachelor of Engineering',
     institution: 'Syrian Private University',
     period: '2016 - 2024',
@@ -16,7 +35,7 @@ const EducationPage = () => {
     ]
   };
 
-  const certifications = [
+  const defaultCertifications: Certification[] = [
     {
       id: 1,
       title: 'Take the Lead Program',
@@ -48,6 +67,49 @@ const EducationPage = () => {
       year: '2018'
     }
   ];
+
+  // State for data
+  const [education, setEducation] = useState<Education>(defaultEducation);
+  const [certifications, setCertifications] = useState<Certification[]>(defaultCertifications);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load data on initial render and listen for changes
+  useEffect(() => {
+    // Load education data
+    const savedEducation = getFromLocalStorage<Education>(STORAGE_KEYS.EDUCATION, defaultEducation);
+    setEducation(savedEducation);
+
+    // Load certifications data
+    const savedCertifications = getFromLocalStorage<Certification[]>(STORAGE_KEYS.CERTIFICATIONS, defaultCertifications);
+    setCertifications(savedCertifications);
+    
+    setIsLoading(false);
+
+    // Set up listeners for changes in localStorage
+    const educationCleanup = setupStorageListener(STORAGE_KEYS.EDUCATION, () => {
+      const updatedEducation = getFromLocalStorage<Education>(STORAGE_KEYS.EDUCATION, defaultEducation);
+      setEducation(updatedEducation);
+    });
+
+    const certificationsCleanup = setupStorageListener(STORAGE_KEYS.CERTIFICATIONS, () => {
+      const updatedCertifications = getFromLocalStorage<Certification[]>(STORAGE_KEYS.CERTIFICATIONS, defaultCertifications);
+      setCertifications(updatedCertifications);
+    });
+
+    // Clean up listeners
+    return () => {
+      educationCleanup();
+      certificationsCleanup();
+    };
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

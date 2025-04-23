@@ -3,85 +3,76 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Trophy, Calendar, MapPin } from 'lucide-react';
+import useLocalStorage from '@/hooks/useLocalStorage';
+import { STORAGE_KEYS } from '@/lib/localStorage';
+
+interface Achievement {
+  id: number | string;
+  title: string;
+  competition: string;
+  location: string;
+  year: string;
+  description?: string;
+}
+
+const defaultAchievements: Achievement[] = [];
 
 const AchievementsPage = () => {
-  const achievements = [
-    {
-      id: 1,
-      title: '1st Place',
-      competition: 'Annual Robotic Competition (ARC)',
-      location: 'Syria',
-      year: '2024',
-      description: 'Recognized for innovative robotics design and exceptional performance in the competition.'
-    },
-    {
-      id: 2,
-      title: '3rd Place',
-      competition: 'World Robotic Olympiad (WRO)',
-      location: 'Syria, Future Innovators Category',
-      year: '2024',
-      description: 'Awarded for creative problem-solving and technical implementation in the Future Innovators category.'
-    },
-    {
-      id: 3,
-      title: 'Coach',
-      competition: 'World Robotic Olympiad (WRO)',
-      location: 'RoboMission Senior Team',
-      year: '2023',
-      description: 'Successfully coached and mentored the senior team, developing their technical and strategic skills for the competition.'
-    },
-    {
-      id: 4,
-      title: 'Participant',
-      competition: 'Future Science Challenge',
-      location: 'UAE',
-      year: '2024',
-      description: 'Represented Syria in this international science and technology challenge, showcasing innovative solutions.'
-    }
-  ];
+  const [achievements, _, isLoading] = useLocalStorage<Achievement[]>(
+    STORAGE_KEYS.ACHIEVEMENTS, 
+    defaultAchievements
+  );
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col dark:bg-gray-900 dark:text-white">
       <Header />
-      <main className="flex-grow py-12 bg-gray-50">
+      <main className="flex-grow py-12 bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-12 text-blue-600">Competitions & Achievements</h1>
+          <h1 className="text-4xl font-bold text-center mb-12 text-blue-600 dark:text-blue-400">Competitions & Achievements</h1>
           
-          <div className="space-y-8">
-            {achievements.map((achievement) => (
-              <div 
-                key={achievement.id} 
-                className="bg-white rounded-lg shadow-md border border-gray-200 p-6 md:p-8 hover:shadow-lg transition-shadow"
-              >
-                <div className="flex flex-col md:flex-row gap-6">
-                  <div className="md:w-1/4 flex flex-col items-center justify-center">
-                    <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                      <Trophy size={36} className="text-blue-600" />
+          {isLoading ? (
+            <div className="text-center text-gray-500 dark:text-gray-400 text-xl py-10">
+              Loading achievements...
+            </div>
+          ) : achievements.length === 0 ? (
+            <div className="text-center text-gray-500 dark:text-gray-400 text-xl py-10">No achievements have been added yet.</div>
+          ) : (
+            <div className="space-y-8">
+              {achievements.map((achievement) => (
+                <div 
+                  key={achievement.id} 
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 md:p-8 hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="md:w-1/4 flex flex-col items-center justify-center">
+                      <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-4">
+                        <Trophy size={36} className="text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <h2 className="text-xl font-bold text-center text-gray-900 dark:text-white">{achievement.title}</h2>
                     </div>
-                    <h2 className="text-xl font-bold text-center text-gray-900">{achievement.title}</h2>
-                  </div>
-                  
-                  <div className="md:w-3/4">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{achievement.competition}</h3>
                     
-                    <div className="flex flex-wrap gap-4 mb-4">
-                      <div className="flex items-center text-gray-600">
-                        <MapPin size={16} className="mr-1" />
-                        <span>{achievement.location}</span>
+                    <div className="md:w-3/4">
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{achievement.competition}</h3>
+                      
+                      <div className="flex flex-wrap gap-4 mb-4">
+                        <div className="flex items-center text-gray-600 dark:text-gray-400">
+                          <MapPin size={16} className="mr-1" />
+                          <span>{achievement.location}</span>
+                        </div>
+                        
+                        <div className="flex items-center text-gray-600 dark:text-gray-400">
+                          <Calendar size={16} className="mr-1" />
+                          <span>{achievement.year}</span>
+                        </div>
                       </div>
                       
-                      <div className="flex items-center text-gray-600">
-                        <Calendar size={16} className="mr-1" />
-                        <span>{achievement.year}</span>
-                      </div>
+                      <p className="text-gray-700 dark:text-gray-300">{achievement.description || 'No description provided.'}</p>
                     </div>
-                    
-                    <p className="text-gray-700">{achievement.description}</p>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </main>
       <Footer />

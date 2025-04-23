@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Briefcase, Calendar, Plus, Save, Trash2, Edit } from 'lucide-react';
+import { saveToLocalStorage, getFromLocalStorage, STORAGE_KEYS } from '@/lib/localStorage';
 
 const ExperienceEditor = () => {
-  // In a real implementation, this data would come from an API
-  const [experiences, setExperiences] = useState([
+  // Define default data (can be empty or placeholder)
+  const defaultExperiences = [
     {
       id: 1,
       organization: 'Syrian Private University',
@@ -17,32 +18,22 @@ const ExperienceEditor = () => {
         'Mentor junior projects, guiding students in project design, implementation, and technical presentation'
       ]
     },
-    {
-      id: 2,
-      organization: 'RoboTronics (Robotics & PCB Design)',
-      position: 'Co-founder & Chief Technology Officer (CTO)',
-      period: '2024 - Present',
-      responsibilities: [
-        'Spearheaded the launch of Syria\'s first solar panel cleaning robot, enhancing renewable energy maintenance solutions',
-        'Managed the design and production of PCBs and 3D printed parts, optimizing manufacturing processes for efficiency and cost-effectiveness'
-      ]
-    },
-    {
-      id: 3,
-      organization: 'SEE (Syrian Engineers Expo)',
-      position: 'Co-founder & IT Coordinator',
-      period: '2024 - Present',
-      responsibilities: [
-        'Collaborated with UI/UX and development teams to deliver optimal functionality and user-centric design',
-        'Coordinated with front-end and back-end developers to enhance platform stability, security, and user experience'
-      ]
-    }
-  ]);
+    // Add more default experiences if needed, or leave empty
+  ];
+  
+  // In a real implementation, this data would come from an API or local storage
+  const [experiences, setExperiences] = useState<any[]>([]); // Initialize with empty array
 
   const [editingExperience, setEditingExperience] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+
+  // Load data on mount
+  useEffect(() => {
+    const savedExperiences = getFromLocalStorage<any[]>(STORAGE_KEYS.EXPERIENCE, defaultExperiences);
+    setExperiences(savedExperiences);
+  }, []);
 
   const handleEdit = (experience: any) => {
     setEditingExperience({...experience});
@@ -63,7 +54,9 @@ const ExperienceEditor = () => {
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this experience?')) {
       // In a real implementation, this would make an API call to delete the data
-      setExperiences(experiences.filter(exp => exp.id !== id));
+      const updatedExperiences = experiences.filter(exp => exp.id !== id);
+      setExperiences(updatedExperiences);
+      saveToLocalStorage(STORAGE_KEYS.EXPERIENCE, updatedExperiences); // Save after delete
       setSaveMessage('Experience deleted successfully!');
       setTimeout(() => setSaveMessage(''), 3000);
     }
@@ -108,20 +101,25 @@ const ExperienceEditor = () => {
     setSaveMessage('');
 
     try {
+      let updatedExperiences;
       // In a real implementation, this would make an API call to save the data
       // For now, we'll simulate a successful save
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       if (experiences.some(exp => exp.id === editingExperience.id)) {
         // Update existing experience
-        setExperiences(experiences.map(exp => 
+        updatedExperiences = experiences.map(exp => 
           exp.id === editingExperience.id ? editingExperience : exp
-        ));
+        );
       } else {
         // Add new experience
-        setExperiences([...experiences, editingExperience]);
+        updatedExperiences = [...experiences, editingExperience];
       }
       
+      // Update state and save to localStorage
+      setExperiences(updatedExperiences);
+      saveToLocalStorage(STORAGE_KEYS.EXPERIENCE, updatedExperiences);
+
       setIsEditing(false);
       setSaveMessage('Experience saved successfully!');
     } catch (err) {

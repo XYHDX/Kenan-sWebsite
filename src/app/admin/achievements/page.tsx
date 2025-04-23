@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Trophy, Calendar, MapPin, Plus, Save, Trash2, Edit } from 'lucide-react';
 import Image from 'next/image';
+import { saveToLocalStorage, getFromLocalStorage, STORAGE_KEYS } from '@/lib/localStorage'; // Import storage functions
 
 interface Achievement {
   id: number;
@@ -14,16 +15,33 @@ interface Achievement {
   description: string;
 }
 
+// Define default achievements (or leave empty)
+const defaultAchievements: Achievement[] = [
+  {
+    id: 1,
+    title: '1st Place',
+    competition: 'First Lego League Arabia',
+    location: 'Sharjah, UAE',
+    year: '2024',
+    description: 'Led a team to victory in the national robotics competition.'
+  },
+  // Add more defaults if needed
+];
+
 const AchievementsEditor = () => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
 
+  // Load data from local storage on mount
   useEffect(() => {
-    const fetchAchievements = async () => {
-      const response = await fetch('/api/achievements');
-      const data: Achievement[] = await response.json();
-      setAchievements(data);
-    };
-    fetchAchievements();
+    // Remove API fetch
+    // const fetchAchievements = async () => {
+    //   const response = await fetch('/api/achievements');
+    //   const data: Achievement[] = await response.json();
+    //   setAchievements(data);
+    // };
+    // fetchAchievements();
+    const savedAchievements = getFromLocalStorage<Achievement[]>(STORAGE_KEYS.ACHIEVEMENTS, defaultAchievements);
+    setAchievements(savedAchievements);
   }, []);
 
   const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
@@ -50,8 +68,10 @@ const AchievementsEditor = () => {
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this achievement?')) {
-      // In a real implementation, this would make an API call to delete the data
-      setAchievements(achievements.filter(achievement => achievement.id !== id));
+      const updatedAchievements = achievements.filter(achievement => achievement.id !== id);
+      setAchievements(updatedAchievements);
+      console.log('[Admin Delete] Saving Achievements:', updatedAchievements); // Log before saving
+      saveToLocalStorage(STORAGE_KEYS.ACHIEVEMENTS, updatedAchievements); // Save to LS
       setSaveMessage('Achievement deleted successfully!');
       setTimeout(() => setSaveMessage(''), 3000);
     }
@@ -71,16 +91,26 @@ const AchievementsEditor = () => {
     setSaveMessage('');
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      let updatedAchievements;
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
+
       if (editingAchievement) {
         if (achievements.some(achievement => achievement.id === editingAchievement.id)) {
-          setAchievements(achievements.map(achievement => 
+          // Update existing
+          updatedAchievements = achievements.map(achievement => 
             achievement.id === editingAchievement.id ? editingAchievement : achievement
-          ));
+          );
         } else {
-          setAchievements([...achievements, editingAchievement]);
+          // Add new
+          updatedAchievements = [...achievements, editingAchievement];
         }
+        
+        // Update state and save to localStorage
+        setAchievements(updatedAchievements);
+        console.log('[Admin Save] Saving Achievements:', updatedAchievements); // Log before saving
+        saveToLocalStorage(STORAGE_KEYS.ACHIEVEMENTS, updatedAchievements);
       }
+      
       setIsEditing(false);
       setSaveMessage('Achievement saved successfully!');
     } catch (err) {
@@ -239,15 +269,10 @@ const AchievementsEditor = () => {
             >
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="md:w-1/4 flex flex-col items-center justify-center">
-                  <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                    <Image
-                      src="/images/profile-pic.png"
-                      alt="Profile"
-                      fill
-                      className="object-cover"
-                    />
+                  <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-4">
+                    <Trophy size={36} className="text-blue-600 dark:text-blue-400" />
                   </div>
-                  <h2 className="text-xl font-bold text-center text-gray-900">{achievement.title}</h2>
+                  <h2 className="text-xl font-bold text-center text-gray-900 dark:text-white">{achievement.title}</h2>
                 </div>
                 
                 <div className="md:w-3/4">

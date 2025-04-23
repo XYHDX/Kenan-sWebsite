@@ -1,39 +1,77 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { BarChart, CheckCircle, Plus, Save, Trash2, Edit } from 'lucide-react';
+import { saveToLocalStorage, getFromLocalStorage, STORAGE_KEYS } from '@/lib/localStorage';
+
+// Define types (optional but recommended)
+interface Skill {
+  id: string | number;
+  name: string;
+  level?: number; // Optional for 'other' skills
+}
+
+interface SkillsData {
+  programming: Skill[];
+  robotics: Skill[];
+  networking: Skill[];
+  other: Skill[];
+}
 
 const SkillsEditor = () => {
-  // In a real implementation, this data would come from an API
-  const [programmingSkills, setProgrammingSkills] = useState([
-    { id: 1, name: 'Python', level: 80 },
-    { id: 2, name: 'C/C++', level: 70 }
-  ]);
+  // Default data structure
+  const defaultSkills: SkillsData = {
+    programming: [
+      { id: 1, name: 'Python', level: 80 },
+      { id: 2, name: 'C/C++', level: 70 }
+    ],
+    robotics: [
+      { id: 1, name: 'ROS', level: 90 },
+      { id: 2, name: 'Arduino', level: 100 },
+      { id: 3, name: 'Raspberry Pi', level: 80 },
+      { id: 4, name: 'Robo Analyzer', level: 70 }
+    ],
+    networking: [
+      { id: 1, name: 'Cisco Networking (CCNA)', level: 80 },
+      { id: 2, name: 'Packet tracer', level: 80 }
+    ],
+    other: [
+      { id: 1, name: 'Troubleshooting & Diagnostics' },
+      { id: 2, name: 'Cross-functional Collaboration' },
+      { id: 3, name: 'Problem Solving & Critical Thinking' }
+    ]
+  };
 
-  const [roboticsSkills, setRoboticsSkills] = useState([
-    { id: 1, name: 'ROS', level: 90 },
-    { id: 2, name: 'Arduino', level: 100 },
-    { id: 3, name: 'Raspberry Pi', level: 80 },
-    { id: 4, name: 'Robo Analyzer', level: 70 }
-  ]);
-
-  const [networkingSkills, setNetworkingSkills] = useState([
-    { id: 1, name: 'Cisco Networking (CCNA)', level: 80 },
-    { id: 2, name: 'Packet tracer', level: 80 }
-  ]);
-
-  const [otherSkills, setOtherSkills] = useState([
-    { id: 1, name: 'Troubleshooting & Diagnostics' },
-    { id: 2, name: 'Cross-functional Collaboration' },
-    { id: 3, name: 'Problem Solving & Critical Thinking' }
-  ]);
+  // State for each category
+  const [programmingSkills, setProgrammingSkills] = useState<Skill[]>([]);
+  const [roboticsSkills, setRoboticsSkills] = useState<Skill[]>([]);
+  const [networkingSkills, setNetworkingSkills] = useState<Skill[]>([]);
+  const [otherSkills, setOtherSkills] = useState<Skill[]>([]);
 
   const [editingSkill, setEditingSkill] = useState<any>(null);
   const [editingCategory, setEditingCategory] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+
+  // Load data on mount
+  useEffect(() => {
+    const savedSkills = getFromLocalStorage<SkillsData>(STORAGE_KEYS.SKILLS, defaultSkills);
+    setProgrammingSkills(savedSkills.programming || []);
+    setRoboticsSkills(savedSkills.robotics || []);
+    setNetworkingSkills(savedSkills.networking || []);
+    setOtherSkills(savedSkills.other || []);
+  }, []);
+
+  // Helper to save all skills
+  const saveAllSkills = (updatedSkills: SkillsData) => {
+    saveToLocalStorage(STORAGE_KEYS.SKILLS, updatedSkills);
+    setProgrammingSkills(updatedSkills.programming);
+    setRoboticsSkills(updatedSkills.robotics);
+    setNetworkingSkills(updatedSkills.networking);
+    setOtherSkills(updatedSkills.other);
+  };
 
   const handleEdit = (skill: any, category: string) => {
     setEditingSkill({...skill});
@@ -51,19 +89,22 @@ const SkillsEditor = () => {
     setIsEditing(true);
   };
 
-  const handleDelete = async (id: number, category: string) => {
+  const handleDelete = async (id: number | string, category: string) => {
     if (window.confirm('Are you sure you want to delete this skill?')) {
-      // In a real implementation, this would make an API call to delete the data
+      let updatedSkills = { programming: programmingSkills, robotics: roboticsSkills, networking: networkingSkills, other: otherSkills };
+
       if (category === 'programming') {
-        setProgrammingSkills(programmingSkills.filter(skill => skill.id !== id));
+        updatedSkills.programming = programmingSkills.filter(skill => skill.id !== id);
       } else if (category === 'robotics') {
-        setRoboticsSkills(roboticsSkills.filter(skill => skill.id !== id));
+        updatedSkills.robotics = roboticsSkills.filter(skill => skill.id !== id);
       } else if (category === 'networking') {
-        setNetworkingSkills(networkingSkills.filter(skill => skill.id !== id));
+        updatedSkills.networking = networkingSkills.filter(skill => skill.id !== id);
       } else if (category === 'other') {
-        setOtherSkills(otherSkills.filter(skill => skill.id !== id));
+        updatedSkills.other = otherSkills.filter(skill => skill.id !== id);
       }
       
+      saveAllSkills(updatedSkills);
+
       setSaveMessage('Skill deleted successfully!');
       setTimeout(() => setSaveMessage(''), 3000);
     }
@@ -83,43 +124,52 @@ const SkillsEditor = () => {
     setSaveMessage('');
 
     try {
-      // In a real implementation, this would make an API call to save the data
+      // Simulate save delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      let currentSkills = { programming: programmingSkills, robotics: roboticsSkills, networking: networkingSkills, other: otherSkills };
+      let updatedCategorySkills: Skill[];
+
       if (editingCategory === 'programming') {
-        if (programmingSkills.some(skill => skill.id === editingSkill.id)) {
-          setProgrammingSkills(programmingSkills.map(skill => 
+        if (currentSkills.programming.some(skill => skill.id === editingSkill.id)) {
+          updatedCategorySkills = currentSkills.programming.map(skill => 
             skill.id === editingSkill.id ? editingSkill : skill
-          ));
+          );
         } else {
-          setProgrammingSkills([...programmingSkills, editingSkill]);
+          updatedCategorySkills = [...currentSkills.programming, editingSkill];
         }
+        currentSkills.programming = updatedCategorySkills;
       } else if (editingCategory === 'robotics') {
-        if (roboticsSkills.some(skill => skill.id === editingSkill.id)) {
-          setRoboticsSkills(roboticsSkills.map(skill => 
+        if (currentSkills.robotics.some(skill => skill.id === editingSkill.id)) {
+          updatedCategorySkills = currentSkills.robotics.map(skill => 
             skill.id === editingSkill.id ? editingSkill : skill
-          ));
+          );
         } else {
-          setRoboticsSkills([...roboticsSkills, editingSkill]);
+          updatedCategorySkills = [...currentSkills.robotics, editingSkill];
         }
+        currentSkills.robotics = updatedCategorySkills;
       } else if (editingCategory === 'networking') {
-        if (networkingSkills.some(skill => skill.id === editingSkill.id)) {
-          setNetworkingSkills(networkingSkills.map(skill => 
+        if (currentSkills.networking.some(skill => skill.id === editingSkill.id)) {
+          updatedCategorySkills = currentSkills.networking.map(skill => 
             skill.id === editingSkill.id ? editingSkill : skill
-          ));
+          );
         } else {
-          setNetworkingSkills([...networkingSkills, editingSkill]);
+          updatedCategorySkills = [...currentSkills.networking, editingSkill];
         }
+        currentSkills.networking = updatedCategorySkills;
       } else if (editingCategory === 'other') {
-        if (otherSkills.some(skill => skill.id === editingSkill.id)) {
-          setOtherSkills(otherSkills.map(skill => 
+        if (currentSkills.other.some(skill => skill.id === editingSkill.id)) {
+          updatedCategorySkills = currentSkills.other.map(skill => 
             skill.id === editingSkill.id ? editingSkill : skill
-          ));
+          );
         } else {
-          setOtherSkills([...otherSkills, editingSkill]);
+          updatedCategorySkills = [...currentSkills.other, editingSkill];
         }
+        currentSkills.other = updatedCategorySkills;
       }
       
+      saveAllSkills(currentSkills);
+
       setIsEditing(false);
       setSaveMessage('Skill saved successfully!');
     } catch (err) {
