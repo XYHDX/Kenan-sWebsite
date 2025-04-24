@@ -19,13 +19,15 @@ interface Update {
 }
 
 const AdminDashboard = () => {
-  const [stats, setStats] = useState<Stat[]>([
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [stats, _setStats] = useState<Stat[]>([
     { title: 'Last Updated', value: 'April 9, 2025', icon: <Clock size={24} className="text-gray-600" /> },
     { title: 'Total Sections', value: '7', icon: <Users size={24} className="text-green-600" /> },
     { title: 'Site Views', value: '0', icon: <Eye size={24} className="text-purple-600" /> },
   ]);
   
-  const [recentUpdates, setRecentUpdates] = useState<Update[]>([
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [recentUpdates, _setRecentUpdates] = useState<Update[]>([
     { section: 'Profile', date: 'April 9, 2025', status: 'Created' },
     { section: 'Experience', date: 'April 9, 2025', status: 'Created' },
     { section: 'Education', date: 'April 9, 2025', status: 'Created' },

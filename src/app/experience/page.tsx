@@ -18,6 +18,7 @@ interface Experience {
 const defaultExperiences: Experience[] = [];
 
 const ExperiencePage = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [experiences, _, isLoading] = useLocalStorage<Experience[]>(
     STORAGE_KEYS.EXPERIENCE, 
     defaultExperiences
@@ -28,7 +29,7 @@ const ExperiencePage = () => {
       <Header />
       <main className="flex-grow py-12 bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-12 text-blue-600 dark:text-blue-400">Professional Experience</h1>
+          <h1 className="text-4xl font-bold text-center mb-12 text-primary dark:text-primary">Professional Experience</h1>
           
           {isLoading ? (
             <div className="space-y-8">
@@ -63,7 +64,7 @@ const ExperiencePage = () => {
                   <div className="flex flex-col md:flex-row gap-6">
                     <div className="md:w-1/3">
                       <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{exp.organization}</h2>
-                      <h3 className="text-blue-600 dark:text-blue-400 font-medium mb-2">{exp.position}</h3>
+                      <h3 className="text-primary dark:text-primary font-medium mb-2">{exp.position}</h3>
                       <div className="flex items-center text-gray-500 dark:text-gray-400 mb-4">
                         <Calendar size={16} className="mr-2" />
                         <span>{exp.period}</span>
@@ -72,7 +73,7 @@ const ExperiencePage = () => {
                     
                     <div className="md:w-2/3">
                       <h4 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center">
-                        <Briefcase size={18} className="mr-2 text-blue-600 dark:text-blue-400" />
+                        <Briefcase size={18} className="mr-2 text-primary dark:text-primary" />
                         Responsibilities
                       </h4>
                       <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">

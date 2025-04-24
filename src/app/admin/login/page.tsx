@@ -111,7 +111,7 @@ const LoginPage = () => {
           setError(`Invalid email or password. ${MAX_LOGIN_ATTEMPTS - newAttempts} attempts remaining.`);
         }
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred during login. Please try again.');
     } finally {
       setIsLoading(false);

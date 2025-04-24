@@ -19,37 +19,37 @@ interface SkillsData {
   other: Skill[];
 }
 
-const SkillsEditor = () => {
-  // Default data structure
-  const defaultSkills: SkillsData = {
-    programming: [
-      { id: 1, name: 'Python', level: 80 },
-      { id: 2, name: 'C/C++', level: 70 }
-    ],
-    robotics: [
-      { id: 1, name: 'ROS', level: 90 },
-      { id: 2, name: 'Arduino', level: 100 },
-      { id: 3, name: 'Raspberry Pi', level: 80 },
-      { id: 4, name: 'Robo Analyzer', level: 70 }
-    ],
-    networking: [
-      { id: 1, name: 'Cisco Networking (CCNA)', level: 80 },
-      { id: 2, name: 'Packet tracer', level: 80 }
-    ],
-    other: [
-      { id: 1, name: 'Troubleshooting & Diagnostics' },
-      { id: 2, name: 'Cross-functional Collaboration' },
-      { id: 3, name: 'Problem Solving & Critical Thinking' }
-    ]
-  };
+// Moved outside the component
+const defaultSkills: SkillsData = {
+  programming: [
+    { id: 1, name: 'Python', level: 80 },
+    { id: 2, name: 'C/C++', level: 70 }
+  ],
+  robotics: [
+    { id: 1, name: 'ROS', level: 90 },
+    { id: 2, name: 'Arduino', level: 100 },
+    { id: 3, name: 'Raspberry Pi', level: 80 },
+    { id: 4, name: 'Robo Analyzer', level: 70 }
+  ],
+  networking: [
+    { id: 1, name: 'Cisco Networking (CCNA)', level: 80 },
+    { id: 2, name: 'Packet tracer', level: 80 }
+  ],
+  other: [
+    { id: 1, name: 'Troubleshooting & Diagnostics' },
+    { id: 2, name: 'Cross-functional Collaboration' },
+    { id: 3, name: 'Problem Solving & Critical Thinking' }
+  ]
+};
 
+const SkillsEditor = () => {
   // State for each category
   const [programmingSkills, setProgrammingSkills] = useState<Skill[]>([]);
   const [roboticsSkills, setRoboticsSkills] = useState<Skill[]>([]);
   const [networkingSkills, setNetworkingSkills] = useState<Skill[]>([]);
   const [otherSkills, setOtherSkills] = useState<Skill[]>([]);
 
-  const [editingSkill, setEditingSkill] = useState<any>(null);
+  const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
   const [editingCategory, setEditingCategory] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -73,7 +73,7 @@ const SkillsEditor = () => {
     setOtherSkills(updatedSkills.other);
   };
 
-  const handleEdit = (skill: any, category: string) => {
+  const handleEdit = (skill: Skill, category: string) => {
     setEditingSkill({...skill});
     setEditingCategory(category);
     setIsEditing(true);
@@ -91,7 +91,7 @@ const SkillsEditor = () => {
 
   const handleDelete = async (id: number | string, category: string) => {
     if (window.confirm('Are you sure you want to delete this skill?')) {
-      let updatedSkills = { programming: programmingSkills, robotics: roboticsSkills, networking: networkingSkills, other: otherSkills };
+      const updatedSkills = { programming: programmingSkills, robotics: roboticsSkills, networking: networkingSkills, other: otherSkills };
 
       if (category === 'programming') {
         updatedSkills.programming = programmingSkills.filter(skill => skill.id !== id);
@@ -112,8 +112,8 @@ const SkillsEditor = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setEditingSkill((prev: any) => ({
-      ...prev,
+    setEditingSkill((prev) => ({
+      ...prev!,
       [name]: name === 'level' ? parseInt(value) : value
     }));
   };
@@ -124,46 +124,55 @@ const SkillsEditor = () => {
     setSaveMessage('');
 
     try {
+      // Ensure editingSkill is not null before saving
+      if (!editingSkill) {
+        setSaveMessage('Error: No skill selected for saving.');
+        setIsSaving(false);
+        return;
+      }
+      // Assign to a new const for type narrowing
+      const skillToSave = editingSkill;
+
       // Simulate save delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      let currentSkills = { programming: programmingSkills, robotics: roboticsSkills, networking: networkingSkills, other: otherSkills };
+      const currentSkills = { programming: programmingSkills, robotics: roboticsSkills, networking: networkingSkills, other: otherSkills };
       let updatedCategorySkills: Skill[];
 
       if (editingCategory === 'programming') {
-        if (currentSkills.programming.some(skill => skill.id === editingSkill.id)) {
+        if (currentSkills.programming.some(skill => skill.id === skillToSave.id)) {
           updatedCategorySkills = currentSkills.programming.map(skill => 
-            skill.id === editingSkill.id ? editingSkill : skill
+            skill.id === skillToSave.id ? skillToSave : skill
           );
         } else {
-          updatedCategorySkills = [...currentSkills.programming, editingSkill];
+          updatedCategorySkills = [...currentSkills.programming, skillToSave];
         }
         currentSkills.programming = updatedCategorySkills;
       } else if (editingCategory === 'robotics') {
-        if (currentSkills.robotics.some(skill => skill.id === editingSkill.id)) {
+        if (currentSkills.robotics.some(skill => skill.id === skillToSave.id)) {
           updatedCategorySkills = currentSkills.robotics.map(skill => 
-            skill.id === editingSkill.id ? editingSkill : skill
+            skill.id === skillToSave.id ? skillToSave : skill
           );
         } else {
-          updatedCategorySkills = [...currentSkills.robotics, editingSkill];
+          updatedCategorySkills = [...currentSkills.robotics, skillToSave];
         }
         currentSkills.robotics = updatedCategorySkills;
       } else if (editingCategory === 'networking') {
-        if (currentSkills.networking.some(skill => skill.id === editingSkill.id)) {
+        if (currentSkills.networking.some(skill => skill.id === skillToSave.id)) {
           updatedCategorySkills = currentSkills.networking.map(skill => 
-            skill.id === editingSkill.id ? editingSkill : skill
+            skill.id === skillToSave.id ? skillToSave : skill
           );
         } else {
-          updatedCategorySkills = [...currentSkills.networking, editingSkill];
+          updatedCategorySkills = [...currentSkills.networking, skillToSave];
         }
         currentSkills.networking = updatedCategorySkills;
       } else if (editingCategory === 'other') {
-        if (currentSkills.other.some(skill => skill.id === editingSkill.id)) {
+        if (currentSkills.other.some(skill => skill.id === skillToSave.id)) {
           updatedCategorySkills = currentSkills.other.map(skill => 
-            skill.id === editingSkill.id ? editingSkill : skill
+            skill.id === skillToSave.id ? skillToSave : skill
           );
         } else {
-          updatedCategorySkills = [...currentSkills.other, editingSkill];
+          updatedCategorySkills = [...currentSkills.other, skillToSave];
         }
         currentSkills.other = updatedCategorySkills;
       }
@@ -172,14 +181,14 @@ const SkillsEditor = () => {
 
       setIsEditing(false);
       setSaveMessage('Skill saved successfully!');
-    } catch (err) {
+    } catch {
       setSaveMessage('An error occurred while saving. Please try again.');
     } finally {
       setIsSaving(false);
     }
   };
 
-  const renderSkillList = (skills: any[], category: string) => (
+  const renderSkillList = (skills: Skill[], category: string) => (
     <div className="space-y-4">
       {skills.map((skill) => (
         <div key={skill.id} className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
@@ -233,16 +242,14 @@ const SkillsEditor = () => {
         </div>
       )}
 
-      {isEditing ? (
+      {isEditing && editingSkill ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">
-            {editingSkill.id && 
-              ((editingCategory === 'programming' && programmingSkills.some(skill => skill.id === editingSkill.id)) ||
-               (editingCategory === 'robotics' && roboticsSkills.some(skill => skill.id === editingSkill.id)) ||
-               (editingCategory === 'networking' && networkingSkills.some(skill => skill.id === editingSkill.id)) ||
-               (editingCategory === 'other' && otherSkills.some(skill => skill.id === editingSkill.id)))
-              ? 'Edit Skill' 
-              : 'Add New Skill'}
+            { ( (editingCategory === 'programming' && programmingSkills.some(skill => skill.id === editingSkill.id)) ||
+                (editingCategory === 'robotics' && roboticsSkills.some(skill => skill.id === editingSkill.id)) ||
+                (editingCategory === 'networking' && networkingSkills.some(skill => skill.id === editingSkill.id)) ||
+                (editingCategory === 'other' && otherSkills.some(skill => skill.id === editingSkill.id))
+              ) ? 'Edit Skill' : 'Add New Skill'}
           </h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-6">

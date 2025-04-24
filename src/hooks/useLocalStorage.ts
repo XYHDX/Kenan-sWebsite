@@ -32,7 +32,7 @@ export function useLocalStorage<T>(
         initializedRef.current = true;
       }
     }
-  }, []);
+  }, [key, defaultValue]);
 
   // Listen for changes to this key in localStorage from other components
   useEffect(() => {

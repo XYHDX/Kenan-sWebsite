@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Mail, Phone, MapPin, Linkedin, Github } from 'lucide-react';
-import { getFromLocalStorage, STORAGE_KEYS } from '@/lib/localStorage';
+import { STORAGE_KEYS } from '@/lib/localStorage';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { navLinks } from '@/config/navigation';
 
@@ -26,6 +25,7 @@ const Footer = () => {
   };
 
   // Use our custom hook to get contact data
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [contactData, _, isLoading] = useLocalStorage<ContactData>(
     STORAGE_KEYS.CONTACT, 
     defaultContactData
@@ -36,7 +36,7 @@ const Footer = () => {
   }
 
   return (
-    <footer className="bg-gray-900 text-white py-12">
+    <footer className="bg-gray-900 dark:bg-gray-950 text-white py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Contact Information */}
@@ -44,19 +44,19 @@ const Footer = () => {
             <h3 className="text-xl font-semibold mb-4">Contact</h3>
             <ul className="space-y-3">
               <li className="flex items-center">
-                <Mail size={18} className="mr-3 text-blue-400" />
+                <Mail size={18} className="mr-3 text-blue-500" />
                 <a href={`mailto:${contactData.email}`} className="hover:text-blue-400 transition-colors">
                   {contactData.email}
                 </a>
               </li>
               <li className="flex items-center">
-                <Phone size={18} className="mr-3 text-blue-400" />
+                <Phone size={18} className="mr-3 text-blue-500" />
                 <a href={`tel:${contactData.phone}`} className="hover:text-blue-400 transition-colors">
                   {contactData.phone}
                 </a>
               </li>
               <li className="flex items-start">
-                <MapPin size={18} className="mr-3 mt-1 text-blue-400" />
+                <MapPin size={18} className="mr-3 mt-1 text-blue-500" />
                 <span>{contactData.location}</span>
               </li>
             </ul>
@@ -93,7 +93,7 @@ const Footer = () => {
                 href={contactData.githubUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="bg-gray-800 hover:bg-gray-700 p-3 rounded-full transition-colors"
+                className="bg-gray-800 hover:bg-blue-600 p-3 rounded-full transition-colors"
                 aria-label="GitHub"
               >
                 <Github size={20} />

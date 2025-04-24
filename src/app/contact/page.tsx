@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
+import { useState, ChangeEvent, FormEvent } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Send, Phone, Mail, MapPin, ExternalLink, Loader2 } from 'lucide-react';
@@ -53,6 +53,7 @@ const ContactPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [contactInfo, _, isLoadingContactInfo] = useLocalStorage<ContactData>(
     STORAGE_KEYS.CONTACT, 
     defaultContactData
@@ -90,7 +91,7 @@ const ContactPage = () => {
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulating API call
       setSubmitStatus({ success: true, message: 'Your message has been sent successfully!' });
       setFormData({ name: '', email: '', subject: '', message: '' });
-    } catch (error) {
+    } catch {
       setSubmitStatus({ success: false, message: 'Failed to send message. Please try again.' });
     } finally {
       setIsSubmitting(false);
@@ -103,40 +104,40 @@ const ContactPage = () => {
       <main className="flex-grow bg-gray-50 dark:bg-gray-900 py-12 md:py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-center mb-4 text-blue-600 dark:text-blue-400">Contact Me</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-center mb-4 text-primary dark:text-primary">Contact Me</h1>
             <p className="text-gray-600 dark:text-gray-400 text-center mb-12">
               Have a question or want to work together? Feel free to reach out.
             </p>
 
             {isLoadingContactInfo ? (
-              <div className="text-center py-10"><Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-600 dark:text-blue-400" /></div>
+              <div className="text-center py-10"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary dark:text-primary" /></div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 flex flex-col items-center text-center">
-                  <div className="bg-blue-100 dark:bg-blue-900 p-4 rounded-full mb-4">
-                    <Mail size={28} className="text-blue-600 dark:text-blue-400" />
+                  <div className="bg-secondary dark:bg-secondary p-4 rounded-full mb-4">
+                    <Mail size={28} className="text-secondary-foreground dark:text-secondary-foreground" />
                   </div>
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Email</h2>
-                  <a href={`mailto:${contactInfo.email}`} className="text-blue-600 dark:text-blue-400 hover:underline flex items-center break-all">
+                  <a href={`mailto:${contactInfo.email}`} className="text-primary dark:text-primary hover:underline flex items-center break-all">
                     {contactInfo.email || 'Not Available'}
                     <ExternalLink size={16} className="ml-1 flex-shrink-0" />
                   </a>
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 flex flex-col items-center text-center">
-                  <div className="bg-blue-100 dark:bg-blue-900 p-4 rounded-full mb-4">
-                    <Phone size={28} className="text-blue-600 dark:text-blue-400" />
+                  <div className="bg-secondary dark:bg-secondary p-4 rounded-full mb-4">
+                    <Phone size={28} className="text-secondary-foreground dark:text-secondary-foreground" />
                   </div>
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Phone</h2>
-                  <a href={`tel:${contactInfo.phone}`} className="text-blue-600 dark:text-blue-400 hover:underline flex items-center">
+                  <a href={`tel:${contactInfo.phone}`} className="text-primary dark:text-primary hover:underline flex items-center">
                     {contactInfo.phone || 'Not Available'}
                     <ExternalLink size={16} className="ml-1 flex-shrink-0" />
                   </a>
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 flex flex-col items-center text-center">
-                  <div className="bg-blue-100 dark:bg-blue-900 p-4 rounded-full mb-4">
-                    <MapPin size={28} className="text-blue-600 dark:text-blue-400" />
+                  <div className="bg-secondary dark:bg-secondary p-4 rounded-full mb-4">
+                    <MapPin size={28} className="text-secondary-foreground dark:text-secondary-foreground" />
                   </div>
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Location</h2>
                   <p className="text-gray-700 dark:text-gray-300">{contactInfo.location || 'Not Available'}</p>
@@ -156,13 +157,13 @@ const ContactPage = () => {
 
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-1">
                       Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       id="name"
-                      className={`w-full px-4 py-3 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-blue-500 focus:border-blue-500`}
+                      className={`w-full px-4 py-3 border ${errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-md focus:ring-primary focus:border-ring dark:bg-gray-700 dark:text-white`}
                       placeholder="Your name"
                       value={formData.name}
                       onChange={handleChange}
@@ -172,13 +173,13 @@ const ContactPage = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-1">
                       Email <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="email"
                       id="email"
-                      className={`w-full px-4 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-blue-500 focus:border-blue-500`}
+                      className={`w-full px-4 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-md focus:ring-primary focus:border-ring dark:bg-gray-700 dark:text-white`}
                       placeholder="Your email"
                       value={formData.email}
                       onChange={handleChange}
@@ -188,13 +189,13 @@ const ContactPage = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-1">
                       Subject
                     </label>
                     <input
                       type="text"
                       id="subject"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary focus:border-ring dark:bg-gray-700 dark:text-white"
                       placeholder="Subject"
                       value={formData.subject}
                       onChange={handleChange}
@@ -202,27 +203,34 @@ const ContactPage = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-1">
                       Message <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       id="message"
-                      rows={6}
-                      className={`w-full px-4 py-3 border ${errors.message ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-blue-500 focus:border-blue-500`}
+                      rows={5}
+                      className={`w-full px-4 py-3 border ${errors.message ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-md focus:ring-primary focus:border-ring dark:bg-gray-700 dark:text-white`}
                       placeholder="Your message"
                       value={formData.message}
                       onChange={handleChange}
                       required
-                    ></textarea>
+                    />
                     {errors.message && <p className="mt-1 text-sm text-red-500">{errors.message}</p>}
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center disabled:bg-blue-400"
+                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-gray-800 disabled:opacity-50"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? 'Sending...' : 'Send Message'} <Send size={18} className="ml-2" />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <><Send size={18} className="mr-2" /> Send Message</>
+                    )}
                   </button>
                 </form>
               </div>

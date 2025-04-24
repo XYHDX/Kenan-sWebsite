@@ -8,9 +8,9 @@ export function saveToLocalStorage<T>(key: string, data: T): void {
   if (typeof window !== 'undefined') {
     try {
       localStorage.setItem(key, JSON.stringify(data));
-      // Dispatch storage event to notify other components in the same window
-      // window.dispatchEvent(new Event('storage')); // Standard event only works across tabs
-      window.dispatchEvent(new Event('storageupdate')); // Dispatch custom event listened for by hook
+      
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new Event('storageupdate'));
     } catch (error) {
       console.error(`Error saving data to localStorage (${key}):`, error);
     }
@@ -35,7 +35,7 @@ export function getFromLocalStorage<T>(key: string, defaultValue: T): T {
   }
 }
 
-// Custom hook to listen for localStorage changes
+// Setup a listener for localStorage changes
 export function setupStorageListener(key: string, callback: () => void): () => void {
   if (typeof window === 'undefined') {
     return () => {};

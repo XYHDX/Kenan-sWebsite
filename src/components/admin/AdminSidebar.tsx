@@ -38,7 +38,7 @@ const AdminSidebar = ({ activePage }: { activePage: string }) => {
                 href={item.path}
                 className={`flex items-center px-4 py-3 ${
                   activePage === item.name.toLowerCase() 
-                    ? 'bg-blue-700 text-white' 
+                    ? 'bg-theme-primary text-theme-primary-text' 
                     : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                 } transition-colors rounded-lg mx-2`}
               >

@@ -2,7 +2,7 @@
 
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { BarChart, CheckCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS } from '@/lib/localStorage';
 
@@ -27,6 +27,7 @@ const defaultSkills: SkillsData = {
 };
 
 const SkillsPage = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [skillsData, _, isLoading] = useLocalStorage<SkillsData>(
     STORAGE_KEYS.SKILLS, 
     defaultSkills
@@ -46,7 +47,7 @@ const SkillsPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {skills.map((skill) => (
                 <div key={skill.id} className="flex items-center">
-                  <CheckCircle size={20} className="text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0" />
+                  <CheckCircle size={20} className="text-primary dark:text-primary mr-3 flex-shrink-0" />
                   <span className="text-lg text-gray-900 dark:text-white">{skill.name}</span>
                 </div>
               ))}
@@ -61,7 +62,7 @@ const SkillsPage = () => {
                   </div>
                   <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3">
                     <div 
-                      className="bg-blue-600 h-3 rounded-full" 
+                      className="bg-primary h-3 rounded-full" 
                       style={{ width: `${skill.level}%` }}
                     ></div>
                   </div>
@@ -79,7 +80,7 @@ const SkillsPage = () => {
       <Header />
       <main className="flex-grow py-12 bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-12 text-blue-600 dark:text-blue-400">Technical Skills</h1>
+          <h1 className="text-4xl font-bold text-center mb-12 text-primary dark:text-primary">Technical Skills</h1>
           
           {isLoading ? (
             <div className="text-center text-gray-500 dark:text-gray-400 text-xl py-10">

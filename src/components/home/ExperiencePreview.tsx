@@ -17,6 +17,7 @@ interface Experience {
 const defaultExperiences: Experience[] = [];
 
 const ExperiencePreview = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [experiences, _, isLoading] = useLocalStorage<Experience[]>(
     STORAGE_KEYS.EXPERIENCE, 
     defaultExperiences
@@ -28,10 +29,10 @@ const ExperiencePreview = () => {
     <section className="py-12 bg-gray-50 dark:bg-gray-800">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-blue-600 dark:text-blue-400">Experience Highlights</h2>
+          <h2 className="text-3xl font-bold text-primary">Experience Highlights</h2>
           <Link 
             href="/experience" 
-            className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+            className="flex items-center text-primary hover:text-primary/90 transition-colors"
           >
             See All <ArrowRight size={16} className="ml-1" />
           </Link>
@@ -58,7 +59,7 @@ const ExperiencePreview = () => {
                 className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-100 dark:border-gray-600 p-6 hover:shadow-md transition-shadow"
               >
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{exp.organization}</h3>
-                <h4 className="text-blue-600 dark:text-blue-400 font-medium mb-1">{exp.position}</h4>
+                <h4 className="text-primary font-medium mb-1">{exp.position}</h4>
                 <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">{exp.period}</p>
                 <p className="text-gray-700 dark:text-gray-300">
                   {exp.description || exp.responsibilities?.[0] || 'Details available on the experience page.'}

@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root { /* Default = Blue Theme */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 221 83% 53%; /* Blue-600 */
+    --primary-foreground: 0 0% 100%; /* White */
+    --secondary: 210 40% 96.1%; /* Blue-50 */
+    --secondary-foreground: 221 83% 53%; /* Blue-700 */
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 221 83% 53%; /* Blue-600 */
+    --input: 240 5.9% 90%;
+    --ring: 221 83% 53%; /* Blue-600 */
+    --radius: 0.5rem;
+  }
+
+  .dark { /* Default Dark = Dark Blue Theme */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 217 91% 60%; /* Blue-400 */
+    --primary-foreground: 0 0% 100%; /* White */
+    --secondary: 222 84% 4.9%; /* Blue-900 */
+    --secondary-foreground: 217 91% 60%; /* Blue-400 */
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 217 91% 60%; /* Blue-400 */
+    --input: 240 3.7% 15.9%;
+    --ring: 217 91% 60%; /* Blue-400 */
+  }
+
+  /* Theme Definitions - Overriding ONLY base variables */
+  .theme-blue {
+    /* Values already set in :root */
+  }
+  .dark.theme-blue {
+    /* Values already set in .dark */
+  }
+
+  .theme-green {
+    --primary: 145 63% 32%; /* Adjusted Green */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 148 34% 90%;
+    --secondary-foreground: 145 63% 32%;
+    --border: 145 63% 32%;
+    --ring: 145 63% 32%;
+  }
+  .dark.theme-green {
+    --primary: 145 63% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 148 34% 15%;
+    --secondary-foreground: 145 63% 45%;
+    --border: 145 63% 45%;
+    --ring: 145 63% 45%;
+  }
+
+  .theme-purple {
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 265 89% 97%;
+    --secondary-foreground: 263 70% 50%;
+    --border: 262 83% 58%;
+    --ring: 262 83% 58%;
+  }
+  .dark.theme-purple {
+    --primary: 262 90% 70%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 263 84% 10%;
+    --secondary-foreground: 262 90% 70%;
+    --border: 262 90% 70%;
+    --ring: 262 90% 70%;
+  }
+
+  .theme-orange {
+    --primary: 25 95% 53%;
+    --primary-foreground: 0 0% 0%; /* Dark text on orange */
+    --secondary: 24 100% 96%;
+    --secondary-foreground: 24 96% 48%;
+    --border: 25 95% 53%;
+    --ring: 25 95% 53%;
+  }
+  .dark.theme-orange {
+    --primary: 25 95% 65%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 24 84% 10%;
+    --secondary-foreground: 25 95% 65%;
+    --border: 25 95% 65%;
+    --ring: 25 95% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border; /* Will now use themed --border */
+  }
+  body {
+    @apply bg-background text-foreground; /* Uses base bg/fg */
+  }
+} 

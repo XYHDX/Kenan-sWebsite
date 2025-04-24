@@ -15,24 +15,24 @@ interface ContactFormData {
   emailNotifications: boolean;
 }
 
-const ContactEditor = () => {
-  const defaultContactData: ContactFormData = {
-    email: 'yahyademeriah@gmail.com',
-    phone: '+971 58 127 7542',
-    location: 'Dubai, UAE',
-    linkedinUrl: 'https://linkedin.com/in/yahyademeriah',
-    githubUrl: 'https://github.com/yahyademeriah',
-    showContactForm: true,
-    emailNotifications: true
-  };
+// Moved outside the component
+const defaultContactData: ContactFormData = {
+  email: 'yahyademeriah@gmail.com',
+  phone: '+971 58 127 7542',
+  location: 'Dubai, UAE',
+  linkedinUrl: 'https://linkedin.com/in/yahyademeriah',
+  githubUrl: 'https://github.com/yahyademeriah',
+  showContactForm: true,
+  emailNotifications: true
+};
 
+const ContactEditor = () => {
   const [formData, setFormData] = useState<ContactFormData>(defaultContactData);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
 
   useEffect(() => {
     // We disable exhaustive-deps because defaultContactData is constant and doesn't need to be re-tracked.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const savedData = getFromLocalStorage<ContactFormData>(STORAGE_KEYS.CONTACT, defaultContactData);
     setFormData(savedData);
   }, []);

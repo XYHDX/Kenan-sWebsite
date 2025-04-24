@@ -13,20 +13,21 @@ interface Experience {
   responsibilities: string[];
 }
 
-const ExperienceEditor = () => {
-  const defaultExperiences: Experience[] = [
-    {
-      id: 1,
-      organization: 'Syrian Private University',
-      position: 'Full-Time Lecturer and Project Mentor',
-      period: 'September 2024 - Present',
-      responsibilities: [
-        'Develop and instruct lab courses including ROS, MATLAB, Proteus, Processing, 8086 Emulator, mikroC, and Arduino C',
-        'Mentor junior projects, guiding students in project design, implementation, and technical presentation'
-      ]
-    }
-  ];
+// Moved outside the component
+const defaultExperiences: Experience[] = [
+  {
+    id: 1,
+    organization: 'Syrian Private University',
+    position: 'Full-Time Lecturer and Project Mentor',
+    period: 'September 2024 - Present',
+    responsibilities: [
+      'Develop and instruct lab courses including ROS, MATLAB, Proteus, Processing, 8086 Emulator, mikroC, and Arduino C',
+      'Mentor junior projects, guiding students in project design, implementation, and technical presentation'
+    ]
+  }
+];
 
+const ExperienceEditor = () => {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [editingExperience, setEditingExperience] = useState<Experience>({
     id: Date.now(),
@@ -111,7 +112,7 @@ const ExperienceEditor = () => {
 
       setIsEditing(false);
       setSaveMessage('Experience saved successfully!');
-    } catch (err) {
+    } catch {
       setSaveMessage('An error occurred while saving. Please try again.');
     } finally {
       setIsSaving(false);

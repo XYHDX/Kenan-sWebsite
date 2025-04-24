@@ -18,6 +18,7 @@ interface Achievement {
 const defaultAchievements: Achievement[] = [];
 
 const AchievementsPage = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [achievements, _, isLoading] = useLocalStorage<Achievement[]>(
     STORAGE_KEYS.ACHIEVEMENTS,
     defaultAchievements
@@ -28,7 +29,7 @@ const AchievementsPage = () => {
       <Header />
       <main className="flex-grow py-12 bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-12 text-blue-600 dark:text-blue-400">Competitions & Achievements</h1>
+          <h1 className="text-4xl font-bold text-center mb-12 text-primary dark:text-primary">Competitions & Achievements</h1>
 
           {isLoading ? (
             <div className="text-center text-gray-500 dark:text-gray-400 text-xl py-10">
@@ -45,8 +46,8 @@ const AchievementsPage = () => {
                 >
                   <div className="flex flex-col md:flex-row gap-6">
                     <div className="md:w-1/4 flex flex-col items-center justify-center">
-                      <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-4">
-                        <Trophy size={36} className="text-blue-600 dark:text-blue-400" />
+                      <div className="w-20 h-20 rounded-full bg-secondary dark:bg-secondary flex items-center justify-center mb-4">
+                        <Trophy size={36} className="text-secondary-foreground dark:text-secondary-foreground" />
                       </div>
                       <h2 className="text-xl font-bold text-center text-gray-900 dark:text-white">{achievement.title}</h2>
                     </div>

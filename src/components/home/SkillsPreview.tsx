@@ -26,6 +26,7 @@ const defaultSkills: SkillsData = {
 };
 
 const SkillsPreview = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [skillsData, _, isLoading] = useLocalStorage<SkillsData>(
     STORAGE_KEYS.SKILLS, 
     defaultSkills
@@ -37,10 +38,10 @@ const SkillsPreview = () => {
     <section className="py-12 bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-blue-600 dark:text-blue-400">Skills Overview</h2>
+          <h2 className="text-3xl font-bold text-primary">Skills Overview</h2>
           <Link 
             href="/skills" 
-            className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+            className="flex items-center text-primary hover:text-primary/90 transition-colors"
           >
             See All <BarChart size={16} className="ml-1" />
           </Link>
@@ -87,7 +88,7 @@ const SkillsPreview = () => {
                         </div>
                         <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5">
                           <div 
-                            className="bg-blue-600 h-2.5 rounded-full" 
+                            className="bg-primary h-2.5 rounded-full" 
                             style={{ width: `${skill.level}%` }}
                           ></div>
                         </div>
@@ -109,7 +110,7 @@ const SkillsPreview = () => {
                         </div>
                         <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5">
                           <div 
-                            className="bg-blue-600 h-2.5 rounded-full" 
+                            className="bg-primary h-2.5 rounded-full" 
                             style={{ width: `${skill.level}%` }}
                           ></div>
                         </div>
@@ -131,7 +132,7 @@ const SkillsPreview = () => {
                         </div>
                         <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5">
                           <div 
-                            className="bg-blue-600 h-2.5 rounded-full" 
+                            className="bg-primary h-2.5 rounded-full" 
                             style={{ width: `${skill.level}%` }}
                           ></div>
                         </div>
@@ -148,7 +149,7 @@ const SkillsPreview = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {other.slice(0, 6).map((skill) => (
                     <div key={skill.id} className="flex items-center">
-                      <CheckCircle size={18} className="text-blue-600 dark:text-blue-400 mr-2 flex-shrink-0" />
+                      <CheckCircle size={18} className="text-primary mr-2 flex-shrink-0" />
                       <span className="text-gray-700 dark:text-gray-300">{skill.name}</span>
                     </div>
                   ))}

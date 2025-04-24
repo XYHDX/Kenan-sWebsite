@@ -4,7 +4,7 @@ import { useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { User, Mail, Phone, MapPin, Save } from 'lucide-react';
 import Image from 'next/image';
-import { saveToLocalStorage, getFromLocalStorage, STORAGE_KEYS } from '@/lib/localStorage';
+import { saveToLocalStorage, STORAGE_KEYS } from '@/lib/localStorage';
 
 const ProfileEditor = () => {
   // In a real implementation, this data would come from an API
@@ -41,7 +41,7 @@ const ProfileEditor = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       setSaveMessage('Profile updated successfully!');
-    } catch (err) {
+    } catch {
       setSaveMessage('An error occurred while saving. Please try again.');
     } finally {
       setIsSaving(false);

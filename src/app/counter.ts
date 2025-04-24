@@ -17,7 +17,7 @@ interface CounterResult {
 export async function incrementAndLog(): Promise<CounterResult> {
   try {
     const cf = await getCloudflareContext()
-    const headersList = headers()
+    const headersList = await headers()
 
     // Insert into counters table with increment or create new entry
     const { results: countResults, error: countError } = await cf.env.DB.prepare(

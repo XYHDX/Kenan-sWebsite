@@ -17,6 +17,7 @@ interface Achievement {
 const defaultAchievements: Achievement[] = [];
 
 const AchievementsPreview = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [achievements, _, isLoading] = useLocalStorage<Achievement[]>(
     STORAGE_KEYS.ACHIEVEMENTS, 
     defaultAchievements
@@ -28,10 +29,10 @@ const AchievementsPreview = () => {
     <section className="py-12 bg-gray-50 dark:bg-gray-800">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Achievements</h2>
+          <h2 className="text-3xl font-bold text-primary">Achievements</h2>
           <Link 
             href="/achievements" 
-            className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+            className="flex items-center text-primary hover:text-primary/90 transition-colors"
           >
             See All <ArrowRight size={16} className="ml-1" />
           </Link>
@@ -64,7 +65,7 @@ const AchievementsPreview = () => {
                   <Trophy size={24} className="text-yellow-500 mr-3 flex-shrink-0" />
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white truncate">{achievement.title}</h3>
                 </div>
-                <h4 className="text-blue-600 dark:text-blue-400 font-medium mb-1">{achievement.competition}</h4>
+                <h4 className="text-primary font-medium mb-1">{achievement.competition}</h4>
                 <p className="text-gray-700 dark:text-gray-300">{achievement.location}</p>
                 <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">{achievement.year}</p>
               </div>

@@ -6,13 +6,13 @@ import {
   Save, 
   Globe, 
   Moon, 
-  Sun, 
   Shield, 
   Eye, 
   ArrowUpDown,
   Image as ImageIcon 
 } from 'lucide-react';
 import { saveToLocalStorage, getFromLocalStorage, STORAGE_KEYS } from '@/lib/localStorage';
+import ThemeSwitcher from '@/components/ThemeSwitcher';
 
 interface SiteSettings {
   siteName: string;
@@ -26,20 +26,20 @@ interface SiteSettings {
   maxItemsPerPage: number;
 }
 
-const SettingsPage = () => {
-  // Default settings
-  const defaultSettings: SiteSettings = {
-    siteName: 'Yahya Demeriah - Portfolio',
-    siteDescription: 'Personal portfolio and CV for Yahya Demeriah, IT Engineer & Robotics Specialist',
-    siteLanguage: 'en',
-    enableDarkMode: true,
-    enablePublicProfile: true,
-    enableSEO: true,
-    maintenanceMode: false,
-    customTheme: 'blue',
-    maxItemsPerPage: 10
-  };
+// Moved outside the component
+const defaultSettings: SiteSettings = {
+  siteName: 'Yahya Demeriah - Portfolio',
+  siteDescription: 'Personal portfolio and CV for Yahya Demeriah, IT Engineer & Robotics Specialist',
+  siteLanguage: 'en',
+  enableDarkMode: true,
+  enablePublicProfile: true,
+  enableSEO: true,
+  maintenanceMode: false,
+  customTheme: 'blue',
+  maxItemsPerPage: 10
+};
 
+const SettingsPage = () => {
   const [formData, setFormData] = useState<SiteSettings>(defaultSettings);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
@@ -80,7 +80,7 @@ const SettingsPage = () => {
       saveToLocalStorage(STORAGE_KEYS.SETTINGS, formData);
       
       setSaveMessage('Settings updated successfully!');
-    } catch (err) {
+    } catch {
       setSaveMessage('An error occurred while saving. Please try again.');
     } finally {
       setIsSaving(false);
@@ -147,18 +147,7 @@ const SettingsPage = () => {
                   <label htmlFor="customTheme" className="block text-sm font-medium text-gray-700 mb-1">
                     Color Theme
                   </label>
-                  <select
-                    id="customTheme"
-                    name="customTheme"
-                    value={formData.customTheme}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
-                  >
-                    <option value="blue">Blue</option>
-                    <option value="green">Green</option>
-                    <option value="purple">Purple</option>
-                    <option value="orange">Orange</option>
-                  </select>
+                  <ThemeSwitcher className="w-full" />
                 </div>
               </div>
               

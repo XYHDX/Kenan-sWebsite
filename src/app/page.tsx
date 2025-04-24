@@ -1,5 +1,6 @@
 'use client';
 
+// import { useEffect } from 'react'; // Remove this if not used elsewhere in the file
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Hero from '@/components/home/Hero';
@@ -9,8 +10,19 @@ import SkillsPreview from '@/components/home/SkillsPreview';
 import AchievementsPreview from '@/components/home/AchievementsPreview';
 import EducationPreview from '@/components/home/EducationPreview';
 import Contact from '@/components/home/Contact';
+import ThemeVerifier from '@/components/home/ThemeVerifier';
+// import useTheme from '@/hooks/useTheme'; // Remove this import
+// import { applyTheme } from '@/lib/themeUtils'; // Remove this import
 
 export default function Home() {
+  // Use the theme hook to ensure the page re-renders when theme changes
+  // const currentTheme = useTheme(); // Remove this line
+  
+  // Force apply theme on initial render and theme changes
+  // useEffect(() => { // Remove this entire useEffect block
+  //   applyTheme(currentTheme);
+  // }, [currentTheme]);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -22,6 +34,7 @@ export default function Home() {
         <EducationPreview />
         <AchievementsPreview />
         <Contact />
+        <ThemeVerifier />
       </main>
       <Footer />
     </div>

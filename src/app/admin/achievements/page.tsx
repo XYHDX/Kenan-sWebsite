@@ -67,8 +67,9 @@ const AchievementsEditor = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setEditingAchievement((prev: any) => ({
-      ...prev,
+    setEditingAchievement((prev: Achievement | null) => ({
+      ...(prev as Achievement),
+      id: prev?.id || Date.now(),
       [name]: value
     }));
   };
@@ -110,12 +111,12 @@ const AchievementsEditor = () => {
     <AdminLayout activePage="achievements">
       <div className="mb-6 flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Manage Achievements</h1>
-          <p className="text-gray-600">Add, edit, or remove your competitions and achievements</p>
+          <h1 className="text-2xl font-bold text-primary">Manage Achievements</h1>
+          <p className="text-gray-600 dark:text-gray-400">Add, edit, or remove your competitions and achievements</p>
         </div>
         <button
           onClick={handleNew}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-md flex items-center transition-colors"
         >
           <Plus size={18} className="mr-2" /> Add Achievement
         </button>
@@ -128,8 +129,8 @@ const AchievementsEditor = () => {
       )}
 
       {isEditing ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold mb-4">
+        <div className="bg-white dark:bg-card rounded-lg shadow-sm border border-border p-6">
+          <h2 className="text-xl font-semibold mb-4 text-primary">
             {editingAchievement?.id && achievements.some(achievement => achievement.id === editingAchievement.id)
               ? 'Edit Achievement'
               : 'Add New Achievement'}
@@ -236,8 +237,8 @@ const AchievementsEditor = () => {
               <button
                 type="submit"
                 disabled={isSaving}
-                className={`flex items-center px-6 py-2 rounded-md text-white ${
-                  isSaving ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+                className={`flex items-center px-6 py-2 rounded-md text-primary-foreground ${
+                  isSaving ? 'bg-primary/70' : 'bg-primary hover:bg-primary/90'
                 } transition-colors`}
               >
                 {isSaving ? 'Saving...' : 'Save Achievement'}
@@ -255,39 +256,39 @@ const AchievementsEditor = () => {
             >
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="md:w-1/4 flex flex-col items-center justify-center">
-                  <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-4">
-                    <Trophy size={36} className="text-blue-600 dark:text-blue-400" />
+                  <div className="w-20 h-20 rounded-full bg-accent dark:bg-accent flex items-center justify-center mb-4">
+                    <Trophy size={36} className="text-primary dark:text-primary" />
                   </div>
-                  <h2 className="text-xl font-bold text-center text-gray-900 dark:text-white">{achievement.title}</h2>
+                  <h2 className="text-xl font-bold text-center text-primary dark:text-primary-foreground">{achievement.title}</h2>
                 </div>
 
                 <div className="md:w-3/4">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{achievement.competition}</h3>
+                  <h3 className="text-xl font-semibold text-primary mb-2">{achievement.competition}</h3>
 
                   <div className="flex flex-wrap gap-4 mb-4">
-                    <div className="flex items-center text-gray-600">
+                    <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <MapPin size={16} className="mr-1" />
                       <span>{achievement.location}</span>
                     </div>
 
-                    <div className="flex items-center text-gray-600">
+                    <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <Calendar size={16} className="mr-1" />
                       <span>{achievement.year}</span>
                     </div>
                   </div>
 
-                  <p className="text-gray-700 mb-4">{achievement.description}</p>
+                  <p className="text-gray-700 dark:text-gray-300 mb-4">{achievement.description}</p>
 
                   <div className="flex space-x-2">
                     <button
                       onClick={() => handleEdit(achievement)}
-                      className="bg-blue-50 text-blue-700 px-3 py-1 rounded flex items-center text-sm hover:bg-blue-100 transition-colors"
+                      className="bg-secondary text-secondary-foreground px-3 py-1 rounded flex items-center text-sm hover:bg-secondary/80 transition-colors"
                     >
                       <Edit size={14} className="mr-1" /> Edit
                     </button>
                     <button
                       onClick={() => handleDelete(achievement.id)}
-                      className="bg-red-50 text-red-700 px-3 py-1 rounded flex items-center text-sm hover:bg-red-100 transition-colors"
+                      className="bg-destructive/10 text-destructive px-3 py-1 rounded flex items-center text-sm hover:bg-destructive/20 transition-colors"
                     >
                       <Trash2 size={14} className="mr-1" /> Delete
                     </button>

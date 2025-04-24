@@ -21,46 +21,47 @@ interface Education {
   details: string[];
 }
 
+// Moved outside the component
+const defaultEducation: Education = {
+  degree: 'Bachelor of Engineering',
+  institution: 'Syrian Private University',
+  period: '2016 - 2024',
+  project: 'Waste Sorting System Using Object Detection',
+  details: [
+    'Developed an automated system for waste classification and sorting, utilizing object detection',
+    'Integrated a mechanical sorting mechanism, achieving a 40% efficiency improvement in waste segregation'
+  ]
+};
+
+// Moved outside the component
+const defaultCertifications: Certification[] = [
+  {
+    id: 1,
+    title: 'Take the Lead Program',
+    organization: 'Cornell University',
+    year: '2023'
+  },
+  {
+    id: 2,
+    title: 'Certified Lego EV3 Trainer',
+    organization: 'Syrian Robotic Academy',
+    year: '2023'
+  },
+  {
+    id: 3,
+    title: 'Advertising Design Program',
+    organization: 'Youth Empowerment Program',
+    year: '2021'
+  },
+  {
+    id: 4,
+    title: 'Cisco CCNA R&S',
+    organization: 'NGO Egypt',
+    year: '2018'
+  }
+];
+
 const EducationEditor = () => {
-  // Default data
-  const defaultEducation: Education = {
-    degree: 'Bachelor of Engineering',
-    institution: 'Syrian Private University',
-    period: '2016 - 2024',
-    project: 'Waste Sorting System Using Object Detection',
-    details: [
-      'Developed an automated system for waste classification and sorting, utilizing object detection',
-      'Integrated a mechanical sorting mechanism, achieving a 40% efficiency improvement in waste segregation'
-    ]
-  };
-
-  const defaultCertifications: Certification[] = [
-    {
-      id: 1,
-      title: 'Take the Lead Program',
-      organization: 'Cornell University',
-      year: '2023'
-    },
-    {
-      id: 2,
-      title: 'Certified Lego EV3 Trainer',
-      organization: 'Syrian Robotic Academy',
-      year: '2023'
-    },
-    {
-      id: 3,
-      title: 'Advertising Design Program',
-      organization: 'Youth Empowerment Program',
-      year: '2021'
-    },
-    {
-      id: 4,
-      title: 'Cisco CCNA R&S',
-      organization: 'NGO Egypt',
-      year: '2018'
-    }
-  ];
-
   // State
   const [education, setEducation] = useState<Education>(defaultEducation);
   const [certifications, setCertifications] = useState<Certification[]>(defaultCertifications);
@@ -127,7 +128,7 @@ const EducationEditor = () => {
       
       setIsEditingEducation(false);
       setSaveMessage('Education updated successfully!');
-    } catch (err) {
+    } catch {
       setSaveMessage('An error occurred while saving. Please try again.');
     } finally {
       setIsSaving(false);
@@ -162,8 +163,8 @@ const EducationEditor = () => {
 
   const handleCertificationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setEditingCertification((prev: any) => ({
-      ...prev,
+    setEditingCertification((prev) => ({
+      ...prev!,
       [name]: value
     }));
   };
@@ -195,7 +196,7 @@ const EducationEditor = () => {
       
       setIsEditingCertification(false);
       setSaveMessage('Certification saved successfully!');
-    } catch (err) {
+    } catch {
       setSaveMessage('An error occurred while saving. Please try again.');
     } finally {
       setIsSaving(false);
