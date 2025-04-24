@@ -10,7 +10,7 @@ import SkillsPreview from '@/components/home/SkillsPreview';
 import AchievementsPreview from '@/components/home/AchievementsPreview';
 import EducationPreview from '@/components/home/EducationPreview';
 import Contact from '@/components/home/Contact';
-import ThemeVerifier from '@/components/home/ThemeVerifier';
+// import ThemeVerifier from '@/components/home/ThemeVerifier'; // Removed import
 // import useTheme from '@/hooks/useTheme'; // Remove this import
 // import { applyTheme } from '@/lib/themeUtils'; // Remove this import
 
@@ -34,7 +34,7 @@ export default function Home() {
         <EducationPreview />
         <AchievementsPreview />
         <Contact />
-        <ThemeVerifier />
+        {/* <ThemeVerifier /> */}{/* Removed component */}
       </main>
       <Footer />
     </div>

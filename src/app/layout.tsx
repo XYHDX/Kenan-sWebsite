@@ -22,7 +22,7 @@ const defaultSettings: SiteSettings = {
   siteName: 'Yahya Demeriah - CV',
   siteDescription: 'The personal CV website for Yahya Demeriah.',
   siteLanguage: 'en',
-  enableDarkMode: true,
+  enableDarkMode: false,
   enableSEO: true,
   customTheme: 'blue',
   maintenanceMode: false,
@@ -142,14 +142,14 @@ export default function RootLayout({
                      }
                   } else {
                     // Default behavior if no settings found (matches defaultSettings)
-                    document.documentElement.classList.add('dark');
+                    // document.documentElement.classList.add('dark'); // Removed default dark
                   }
 
                 } catch (error) {
                   console.error('Error applying theme from localStorage:', error);
-                  // Apply default theme and dark mode as fallback
+                  // Apply default theme and remove dark mode as fallback
                   document.documentElement.classList.add('theme-blue');
-                  document.documentElement.classList.add('dark');
+                  // document.documentElement.classList.add('dark'); // Removed fallback dark
                 }
               })();
             `,
