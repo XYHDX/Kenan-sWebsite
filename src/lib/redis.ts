@@ -4,7 +4,7 @@ import { Redis } from '@upstash/redis';
 // This ensures the client is only created at runtime, not during build
 let redisClient: Redis | null = null;
 
-export function getRedisClient() {
+export function getRedisClient(): Redis {
   // Only create the client once
   if (redisClient) return redisClient;
   
@@ -61,7 +61,7 @@ export const redis = {
   get: async function<T>(key: string): Promise<T | null> {
     return getRedisClient().get(key);
   },
-  set: async function<T>(key: string, value: T): Promise<any> {
+  set: async function<T>(key: string, value: T): Promise<unknown> {
     return getRedisClient().set(key, value);
   }
   // Add other Redis methods you use in your application

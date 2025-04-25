@@ -1,7 +1,7 @@
-// Import the Redis library
-const { Redis } = require('@upstash/redis');
-const fs = require('fs');
-const path = require('path');
+// Convert to ESM syntax for Next.js compatibility
+import { Redis } from '@upstash/redis';
+import fs from 'fs';
+import path from 'path';
 
 // Read .env.local file manually
 const envFile = fs.readFileSync(path.join(__dirname, '../.env.local'), 'utf8');
