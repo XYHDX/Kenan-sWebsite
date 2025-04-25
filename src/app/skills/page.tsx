@@ -2,99 +2,104 @@
 
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { CheckCircle } from 'lucide-react';
-import useLocalStorage from '@/hooks/useLocalStorage';
-import { STORAGE_KEYS } from '@/lib/localStorage';
+import { Code, Server, Palette, Brain } from 'lucide-react';
+import { redis } from "@/lib/redis"; // Import shared Redis client
+import { STORAGE_KEYS } from '@/lib/localStorage'; // Keep for KV key name
 
+// Skill interface
 interface Skill {
-  id: string | number;
+  id: number | string;
   name: string;
-  level?: number;
+  level: number;
+  category: string;
+  description?: string;
 }
 
-interface SkillsData {
-  programming: Skill[];
-  robotics: Skill[];
-  networking: Skill[];
-  other: Skill[];
-}
+// Define the Redis key
+const REDIS_SKILLS_KEY = STORAGE_KEYS.SKILLS;
 
-const defaultSkills: SkillsData = {
-  programming: [],
-  robotics: [],
-  networking: [],
-  other: []
+// Function to get the appropriate icon for a skill category
+const getCategoryIcon = (category: string) => {
+  switch (category.toLowerCase()) {
+    case 'frontend':
+      return <Palette className="text-primary" size={24} />;
+    case 'backend':
+      return <Server className="text-primary" size={24} />;
+    case 'programming':
+      return <Code className="text-primary" size={24} />;
+    default:
+      return <Brain className="text-primary" size={24} />;
+  }
 };
 
-const SkillsPage = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [skillsData, _, isLoading] = useLocalStorage<SkillsData>(
-    STORAGE_KEYS.SKILLS, 
-    defaultSkills
-  );
+// Make the component async to fetch data
+const SkillsPage = async () => {
+  // Fetch skills directly from Upstash Redis on the server
+  let skills: Skill[] = [];
+  let error: string | null = null;
 
-  const { programming, robotics, networking, other } = skillsData || defaultSkills;
-  const hasSkills = programming?.length > 0 || robotics?.length > 0 || networking?.length > 0 || other?.length > 0;
+  try {
+    // Fetch skills from Upstash Redis using shared client
+    skills = await redis.get<Skill[]>(REDIS_SKILLS_KEY) || [];
+  } catch (err) {
+    console.error("Error fetching skills from Upstash Redis:", err);
+    error = "Failed to load skills. Please try again later.";
+  }
 
-  const renderSkillSection = (title: string, skills: Skill[], isOther: boolean = false) => {
-    if (!skills || skills.length === 0) return null;
-    
-    return (
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-6 text-gray-800 dark:text-gray-200">{title}</h2>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 md:p-8">
-          {isOther ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {skills.map((skill) => (
-                <div key={skill.id} className="flex items-center">
-                  <CheckCircle size={20} className="text-primary dark:text-primary mr-3 flex-shrink-0" />
-                  <span className="text-lg text-gray-900 dark:text-white">{skill.name}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {skills.map((skill) => (
-                <div key={skill.id}>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-lg font-medium text-gray-900 dark:text-white">{skill.name}</span>
-                    <span className="text-gray-600 dark:text-gray-400">{skill.level}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3">
-                    <div 
-                      className="bg-primary h-3 rounded-full" 
-                      style={{ width: `${skill.level}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-    );
-  };
+  // Group skills by category
+  const groupedSkills: Record<string, Skill[]> = {};
+  
+  skills.forEach(skill => {
+    if (!groupedSkills[skill.category]) {
+      groupedSkills[skill.category] = [];
+    }
+    groupedSkills[skill.category].push(skill);
+  });
 
   return (
-    <div className="min-h-screen flex flex-col dark:bg-gray-900 dark:text-white">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Header />
-      <main className="flex-grow py-12 bg-gray-50 dark:bg-gray-900">
+      <main className="flex-grow py-12 bg-background">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-12 text-primary dark:text-primary">Technical Skills</h1>
-          
-          {isLoading ? (
-            <div className="text-center text-gray-500 dark:text-gray-400 text-xl py-10">
-              Loading skills...
-            </div>
-          ) : !hasSkills ? (
-            <div className="text-center text-gray-500 dark:text-gray-400 text-xl py-10">No skills have been added yet.</div>
+          <h1 className="text-4xl font-bold text-center mb-12 text-primary dark:text-primary">Skills & Expertise</h1>
+
+          {error ? (
+            <div className="text-center text-destructive text-xl py-10">{error}</div>
+          ) : Object.keys(groupedSkills).length === 0 ? (
+            <div className="text-center text-muted-foreground text-xl py-10">No skills have been added yet.</div>
           ) : (
-            <>
-              {renderSkillSection('Programming Languages', programming)}
-              {renderSkillSection('Robotics Platforms', robotics)}
-              {renderSkillSection('Networking', networking)}
-              {renderSkillSection('Other Skills', other, true)}
-            </>
+            <div className="space-y-16">
+              {Object.entries(groupedSkills).map(([category, categorySkills]) => (
+                <div key={category} className="bg-card text-card-foreground rounded-lg shadow-md border border-border p-6">
+                  <div className="flex items-center mb-6">
+                    {getCategoryIcon(category)}
+                    <h2 className="text-2xl font-semibold ml-2">{category}</h2>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {categorySkills.map((skill) => (
+                      <div key={skill.id} className="flex flex-col">
+                        <div className="flex justify-between mb-2">
+                          <span className="font-semibold text-lg">{skill.name}</span>
+                          <span className="text-muted-foreground">{skill.level}%</span>
+                        </div>
+                        
+                        <div className="w-full bg-secondary rounded-full h-2.5 mb-2">
+                          <div 
+                            className="bg-primary h-2.5 rounded-full" 
+                            style={{ width: `${skill.level}%` }}
+                          ></div>
+                        </div>
+                        
+                        {skill.description && (
+                          <p className="text-muted-foreground text-sm mt-1">{skill.description}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </main>
