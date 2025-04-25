@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis'; // Import Upstash Redis
 import { NextRequest, NextResponse } from 'next/server';
 import { STORAGE_KEYS } from '@/lib/localStorage'; // Keep for KV key name
 
@@ -12,7 +12,10 @@ interface Achievement {
   description?: string;
 }
 
-const KV_ACHIEVEMENTS_KEY = STORAGE_KEYS.ACHIEVEMENTS;
+const REDIS_ACHIEVEMENTS_KEY = STORAGE_KEYS.ACHIEVEMENTS;
+
+// Initialize Redis client
+const redis = Redis.fromEnv();
 
 // Basic Authentication Check Function
 function authenticateRequest(req: NextRequest): boolean {
@@ -33,22 +36,22 @@ function authenticateRequest(req: NextRequest): boolean {
   }
 }
 
-// GET Handler: Fetch achievements from KV
+// GET Handler: Fetch achievements from Redis
 export async function GET(request: NextRequest) {
   if (!authenticateRequest(request)) {
     return new NextResponse('Unauthorized', { status: 401 });
   }
 
   try {
-    const achievements = await kv.get<Achievement[]>(KV_ACHIEVEMENTS_KEY) || [];
+    const achievements = await redis.get<Achievement[]>(REDIS_ACHIEVEMENTS_KEY) || [];
     return NextResponse.json(achievements);
   } catch (error) {
-    console.error("KV GET Error:", error);
+    console.error("Redis GET Error:", error);
     return new NextResponse('Internal Server Error retrieving data', { status: 500 });
   }
 }
 
-// POST Handler: Save achievements to KV (overwrites existing list)
+// POST Handler: Save achievements to Redis
 export async function POST(request: NextRequest) {
   if (!authenticateRequest(request)) {
     return new NextResponse('Unauthorized', { status: 401 });
@@ -61,11 +64,12 @@ export async function POST(request: NextRequest) {
       return new NextResponse('Invalid data format', { status: 400 });
     }
     
-    await kv.set(KV_ACHIEVEMENTS_KEY, achievements);
+    // Use redis.set to save the data
+    await redis.set(REDIS_ACHIEVEMENTS_KEY, achievements);
     return NextResponse.json({ message: 'Achievements saved successfully' }, { status: 200 });
 
   } catch (error) {
-    console.error("KV SET Error or JSON parsing error:", error);
+    console.error("Redis SET Error or JSON parsing error:", error);
     if (error instanceof SyntaxError) {
         return new NextResponse('Bad Request: Invalid JSON', { status: 400 });
     }

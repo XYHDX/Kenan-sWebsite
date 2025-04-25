@@ -1,7 +1,7 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Trophy, Calendar, MapPin } from 'lucide-react';
-import { kv } from "@vercel/kv"; // Import Vercel KV
+import { Redis } from "@upstash/redis"; // Import Upstash Redis
 import { STORAGE_KEYS } from '@/lib/localStorage'; // Keep for KV key name
 
 interface Achievement {
@@ -13,21 +13,27 @@ interface Achievement {
   description?: string;
 }
 
-// Define the KV key
-const KV_ACHIEVEMENTS_KEY = STORAGE_KEYS.ACHIEVEMENTS; // Re-use key name for consistency
+// Define the Redis key
+const REDIS_ACHIEVEMENTS_KEY = STORAGE_KEYS.ACHIEVEMENTS; // Re-use key name for consistency
+
+// Initialize Redis client using environment variables
+// This automatically reads UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN
+// which Vercel sets when linking the store.
+const redis = Redis.fromEnv();
 
 // Make the component async to fetch data
 const AchievementsPage = async () => {
-  // Fetch achievements directly from Vercel KV on the server
+  // Fetch achievements directly from Upstash Redis on the server
   let achievements: Achievement[] = [];
   let isLoading = false; // Assume loading is false initially for server component
   let error: string | null = null;
 
   try {
-    // Use kv.get - returns null if key doesn't exist
-    achievements = await kv.get<Achievement[]>(KV_ACHIEVEMENTS_KEY) || []; 
+    // Fetch achievements from Upstash Redis
+    // Use redis.get - returns null if key doesn't exist
+    achievements = await redis.get<Achievement[]>(REDIS_ACHIEVEMENTS_KEY) || []; 
   } catch (err) {
-    console.error("Error fetching achievements from Vercel KV:", err);
+    console.error("Error fetching achievements from Upstash Redis:", err);
     error = "Failed to load achievements. Please try again later.";
     isLoading = false; // Still false on error for server render
   }
@@ -42,6 +48,8 @@ const AchievementsPage = async () => {
           {error ? (
             <div className="text-center text-destructive text-xl py-10">{error}</div>
           ) : isLoading ? (
+            // Note: isLoading will likely always be false here in a server component context
+            // unless we introduce streaming or suspense later.
             <div className="text-center text-muted-foreground text-xl py-10">
               Loading achievements...
             </div>
