@@ -112,7 +112,7 @@ const SkillsEditor = () => {
   };
 
   const handleDeleteCategory = async (category: string) => {
-    if (window.confirm(`Are you sure you want to delete the "${category}" category and all its skills?`)) {
+    if (window.confirm(`Are you sure you want to delete the &quot;${category}&quot; category and all its skills?`)) {
       try {
         setIsSaving(true);
         // Remove all skills in this category
@@ -323,7 +323,7 @@ const SkillsEditor = () => {
         <div className="space-y-8">
           {categories.length === 0 ? (
             <div className="text-center py-10 text-gray-500">
-              No skills added yet. Click the "Add Skill" button to add your first skill.
+              No skills added yet. Click the &quot;Add Skill&quot; button to add your first skill.
             </div>
           ) : (
             categories.map(category => (

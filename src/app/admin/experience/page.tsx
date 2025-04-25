@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { Briefcase, Calendar, Plus, Save, Trash2, Edit } from 'lucide-react';
+import { Calendar, Plus, Save, Trash2, Edit } from 'lucide-react';
 
 interface Experience {
   id: number | string;

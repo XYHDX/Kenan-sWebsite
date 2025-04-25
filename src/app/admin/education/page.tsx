@@ -2,17 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { GraduationCap, Calendar, Award, Plus, Save, Trash2, Edit } from 'lucide-react';
-import { saveToLocalStorage, getFromLocalStorage, STORAGE_KEYS } from '@/lib/localStorage';
+import { Calendar, Plus, Save, Trash2, Edit } from 'lucide-react';
 
 // Define types
-interface Certification {
-  id: string | number;
-  title: string;
-  organization: string;
-  year: string | number;
-}
-
 interface Education {
   id: number | string;
   institution: string;
@@ -25,46 +17,6 @@ interface Education {
   startDate?: string;
   endDate?: string;
 }
-
-// Moved outside the component
-const defaultEducation: Education = {
-  id: Date.now(),
-  institution: 'Syrian Private University',
-  degree: 'Bachelor of Engineering',
-  field: 'Computer Science',
-  period: '2016 - 2024',
-  description: 'Developed an automated system for waste classification and sorting, utilizing object detection',
-  location: 'Damascus, Syria',
-  gpa: '3.8'
-};
-
-// Moved outside the component
-const defaultCertifications: Certification[] = [
-  {
-    id: 1,
-    title: 'Take the Lead Program',
-    organization: 'Cornell University',
-    year: '2023'
-  },
-  {
-    id: 2,
-    title: 'Certified Lego EV3 Trainer',
-    organization: 'Syrian Robotic Academy',
-    year: '2023'
-  },
-  {
-    id: 3,
-    title: 'Advertising Design Program',
-    organization: 'Youth Empowerment Program',
-    year: '2021'
-  },
-  {
-    id: 4,
-    title: 'Cisco CCNA R&S',
-    organization: 'NGO Egypt',
-    year: '2018'
-  }
-];
 
 const EducationEditor = () => {
   const [education, setEducation] = useState<Education[]>([]);
