@@ -15,7 +15,7 @@ interface Achievement {
 const REDIS_ACHIEVEMENTS_KEY = STORAGE_KEYS.ACHIEVEMENTS;
 
 // GET Handler: Fetch achievements from Redis using shared client
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const achievements = await redis.get<Achievement[]>(REDIS_ACHIEVEMENTS_KEY) || [];
     return NextResponse.json(achievements);
