@@ -1,7 +1,7 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Trophy, Calendar, MapPin } from 'lucide-react';
-import { Redis } from "@upstash/redis"; // Import Upstash Redis
+import { redis } from "@/lib/redis"; // Import shared Redis client
 import { STORAGE_KEYS } from '@/lib/localStorage'; // Keep for KV key name
 
 interface Achievement {
@@ -16,10 +16,7 @@ interface Achievement {
 // Define the Redis key
 const REDIS_ACHIEVEMENTS_KEY = STORAGE_KEYS.ACHIEVEMENTS; // Re-use key name for consistency
 
-// Initialize Redis client using environment variables
-// This automatically reads UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN
-// which Vercel sets when linking the store.
-const redis = Redis.fromEnv();
+// Removed Redis initialization here
 
 // Make the component async to fetch data
 const AchievementsPage = async () => {
@@ -29,8 +26,7 @@ const AchievementsPage = async () => {
   let error: string | null = null;
 
   try {
-    // Fetch achievements from Upstash Redis
-    // Use redis.get - returns null if key doesn't exist
+    // Fetch achievements from Upstash Redis using shared client
     achievements = await redis.get<Achievement[]>(REDIS_ACHIEVEMENTS_KEY) || []; 
   } catch (err) {
     console.error("Error fetching achievements from Upstash Redis:", err);
