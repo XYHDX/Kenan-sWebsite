@@ -1,5 +1,3 @@
-'use client';
-
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Code, Server, Palette, Brain } from 'lucide-react';
@@ -40,7 +38,9 @@ const SkillsPage = async () => {
 
   try {
     // Fetch skills from Upstash Redis using shared client
-    skills = await redis.get<Skill[]>(REDIS_SKILLS_KEY) || [];
+    const result = await redis.get<Skill[]>(REDIS_SKILLS_KEY);
+    skills = result || [];
+    console.log("Fetched skills:", skills);
   } catch (err) {
     console.error("Error fetching skills from Upstash Redis:", err);
     error = "Failed to load skills. Please try again later.";

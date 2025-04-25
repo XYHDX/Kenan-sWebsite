@@ -1,314 +1,315 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Code, Cpu, Edit, Plus, Save, Trash2 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { BarChart, CheckCircle, Plus, Save, Trash2, Edit } from 'lucide-react';
-import { saveToLocalStorage, getFromLocalStorage, STORAGE_KEYS } from '@/lib/localStorage';
 
-// Define types (optional but recommended)
 interface Skill {
   id: string | number;
   name: string;
-  level?: number; // Optional for 'other' skills
+  level: number;
+  category: string;
 }
-
-interface SkillsData {
-  programming: Skill[];
-  robotics: Skill[];
-  networking: Skill[];
-  other: Skill[];
-}
-
-// Moved outside the component
-const defaultSkills: SkillsData = {
-  programming: [
-    { id: 1, name: 'Python', level: 80 },
-    { id: 2, name: 'C/C++', level: 70 }
-  ],
-  robotics: [
-    { id: 1, name: 'ROS', level: 90 },
-    { id: 2, name: 'Arduino', level: 100 },
-    { id: 3, name: 'Raspberry Pi', level: 80 },
-    { id: 4, name: 'Robo Analyzer', level: 70 }
-  ],
-  networking: [
-    { id: 1, name: 'Cisco Networking (CCNA)', level: 80 },
-    { id: 2, name: 'Packet tracer', level: 80 }
-  ],
-  other: [
-    { id: 1, name: 'Troubleshooting & Diagnostics' },
-    { id: 2, name: 'Cross-functional Collaboration' },
-    { id: 3, name: 'Problem Solving & Critical Thinking' }
-  ]
-};
 
 const SkillsEditor = () => {
-  // State for each category
-  const [programmingSkills, setProgrammingSkills] = useState<Skill[]>([]);
-  const [roboticsSkills, setRoboticsSkills] = useState<Skill[]>([]);
-  const [networkingSkills, setNetworkingSkills] = useState<Skill[]>([]);
-  const [otherSkills, setOtherSkills] = useState<Skill[]>([]);
-
+  const [skills, setSkills] = useState<Skill[]>([]);
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
-  const [editingCategory, setEditingCategory] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  // Load data on mount
   useEffect(() => {
-    const savedSkills = getFromLocalStorage<SkillsData>(STORAGE_KEYS.SKILLS, defaultSkills);
-    setProgrammingSkills(savedSkills.programming || []);
-    setRoboticsSkills(savedSkills.robotics || []);
-    setNetworkingSkills(savedSkills.networking || []);
-    setOtherSkills(savedSkills.other || []);
+    fetchSkills();
   }, []);
 
-  // Helper to save all skills
-  const saveAllSkills = (updatedSkills: SkillsData) => {
-    saveToLocalStorage(STORAGE_KEYS.SKILLS, updatedSkills);
-    setProgrammingSkills(updatedSkills.programming);
-    setRoboticsSkills(updatedSkills.robotics);
-    setNetworkingSkills(updatedSkills.networking);
-    setOtherSkills(updatedSkills.other);
-  };
-
-  const handleEdit = (skill: Skill, category: string) => {
-    setEditingSkill({...skill});
-    setEditingCategory(category);
-    setIsEditing(true);
-  };
-
-  const handleNew = (category: string) => {
-    setEditingSkill({
-      id: Date.now(), // Temporary ID
-      name: '',
-      level: category !== 'other' ? 50 : undefined
-    });
-    setEditingCategory(category);
-    setIsEditing(true);
-  };
-
-  const handleDelete = async (id: number | string, category: string) => {
-    if (window.confirm('Are you sure you want to delete this skill?')) {
-      const updatedSkills = { programming: programmingSkills, robotics: roboticsSkills, networking: networkingSkills, other: otherSkills };
-
-      if (category === 'programming') {
-        updatedSkills.programming = programmingSkills.filter(skill => skill.id !== id);
-      } else if (category === 'robotics') {
-        updatedSkills.robotics = roboticsSkills.filter(skill => skill.id !== id);
-      } else if (category === 'networking') {
-        updatedSkills.networking = networkingSkills.filter(skill => skill.id !== id);
-      } else if (category === 'other') {
-        updatedSkills.other = otherSkills.filter(skill => skill.id !== id);
+  const fetchSkills = async () => {
+    setIsLoading(true);
+    setErrorMessage('');
+    try {
+      const response = await fetch('/api/admin/skills');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch skills: ${response.statusText}`);
       }
-      
-      saveAllSkills(updatedSkills);
+      const data = await response.json() as Skill[];
+      setSkills(data);
 
-      setSaveMessage('Skill deleted successfully!');
-      setTimeout(() => setSaveMessage(''), 3000);
+      // Extract unique categories
+      const uniqueCategories = Array.from(new Set(data.map(skill => skill.category)));
+      setCategories(uniqueCategories);
+    } catch (err) {
+      console.error(err);
+      setErrorMessage('Failed to load skills. Please refresh.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditingSkill((prev) => ({
-      ...prev!,
-      [name]: name === 'level' ? parseInt(value) : value
-    }));
+  const handleEdit = (skill: Skill) => {
+    setEditingSkill({ ...skill });
+    setSaveMessage('');
+    setErrorMessage('');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSaving(true);
+  const handleNew = () => {
+    setEditingSkill({
+      id: Date.now(),
+      name: '',
+      level: 85,
+      category: categories.length > 0 ? categories[0] : 'Frontend'
+    });
     setSaveMessage('');
+    setErrorMessage('');
+  };
 
-    try {
-      // Ensure editingSkill is not null before saving
-      if (!editingSkill) {
-        setSaveMessage('Error: No skill selected for saving.');
+  const handleDelete = async (id: string | number) => {
+    if (window.confirm('Are you sure you want to delete this skill?')) {
+      try {
+        setIsSaving(true);
+        const updatedSkills = skills.filter(skill => skill.id !== id);
+        await saveSkills(updatedSkills);
+        setSaveMessage('Skill deleted successfully');
+      } catch (error) {
+        setErrorMessage(`Error deleting skill: ${error instanceof Error ? error.message : String(error)}`);
+      } finally {
         setIsSaving(false);
-        return;
       }
-      // Assign to a new const for type narrowing
-      const skillToSave = editingSkill;
+    }
+  };
 
-      // Simulate save delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+  const handleCategoryChange = async (oldCategory: string, newCategory: string) => {
+    if (oldCategory === newCategory) return;
+    
+    try {
+      setIsSaving(true);
+      // Update all skills in the category
+      const updatedSkills = skills.map(skill => 
+        skill.category === oldCategory ? { ...skill, category: newCategory } : skill
+      );
       
-      const currentSkills = { programming: programmingSkills, robotics: roboticsSkills, networking: networkingSkills, other: otherSkills };
-      let updatedCategorySkills: Skill[];
-
-      if (editingCategory === 'programming') {
-        if (currentSkills.programming.some(skill => skill.id === skillToSave.id)) {
-          updatedCategorySkills = currentSkills.programming.map(skill => 
-            skill.id === skillToSave.id ? skillToSave : skill
-          );
-        } else {
-          updatedCategorySkills = [...currentSkills.programming, skillToSave];
-        }
-        currentSkills.programming = updatedCategorySkills;
-      } else if (editingCategory === 'robotics') {
-        if (currentSkills.robotics.some(skill => skill.id === skillToSave.id)) {
-          updatedCategorySkills = currentSkills.robotics.map(skill => 
-            skill.id === skillToSave.id ? skillToSave : skill
-          );
-        } else {
-          updatedCategorySkills = [...currentSkills.robotics, skillToSave];
-        }
-        currentSkills.robotics = updatedCategorySkills;
-      } else if (editingCategory === 'networking') {
-        if (currentSkills.networking.some(skill => skill.id === skillToSave.id)) {
-          updatedCategorySkills = currentSkills.networking.map(skill => 
-            skill.id === skillToSave.id ? skillToSave : skill
-          );
-        } else {
-          updatedCategorySkills = [...currentSkills.networking, skillToSave];
-        }
-        currentSkills.networking = updatedCategorySkills;
-      } else if (editingCategory === 'other') {
-        if (currentSkills.other.some(skill => skill.id === skillToSave.id)) {
-          updatedCategorySkills = currentSkills.other.map(skill => 
-            skill.id === skillToSave.id ? skillToSave : skill
-          );
-        } else {
-          updatedCategorySkills = [...currentSkills.other, skillToSave];
-        }
-        currentSkills.other = updatedCategorySkills;
-      }
+      await saveSkills(updatedSkills);
+      // Update categories
+      const updatedCategories = categories.map(cat => cat === oldCategory ? newCategory : cat);
+      setCategories(updatedCategories);
       
-      saveAllSkills(currentSkills);
-
-      setIsEditing(false);
-      setSaveMessage('Skill saved successfully!');
-    } catch {
-      setSaveMessage('An error occurred while saving. Please try again.');
+      setSaveMessage('Category updated successfully');
+    } catch (error) {
+      setErrorMessage(`Error updating category: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsSaving(false);
     }
   };
 
-  const renderSkillList = (skills: Skill[], category: string) => (
-    <div className="space-y-4">
-      {skills.map((skill) => (
-        <div key={skill.id} className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg font-medium text-gray-900">{skill.name}</h3>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => handleEdit(skill, category)}
-                className="bg-blue-50 text-blue-700 px-3 py-1 rounded flex items-center text-sm hover:bg-blue-100 transition-colors"
-              >
-                <Edit size={14} className="mr-1" /> Edit
-              </button>
-              <button
-                onClick={() => handleDelete(skill.id, category)}
-                className="bg-red-50 text-red-700 px-3 py-1 rounded flex items-center text-sm hover:bg-red-100 transition-colors"
-              >
-                <Trash2 size={14} className="mr-1" /> Delete
-              </button>
-            </div>
-          </div>
-          
-          {category !== 'other' && (
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-gray-600">Proficiency</span>
-                <span className="text-gray-600">{skill.level}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div 
-                  className="bg-blue-600 h-2.5 rounded-full" 
-                  style={{ width: `${skill.level}%` }}
-                ></div>
-              </div>
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
+  const handleAddCategory = () => {
+    const newCategory = prompt('Enter new category name:');
+    if (newCategory && !categories.includes(newCategory)) {
+      setCategories([...categories, newCategory]);
+      if (editingSkill) {
+        setEditingSkill({...editingSkill, category: newCategory});
+      }
+    }
+  };
+
+  const handleDeleteCategory = async (category: string) => {
+    if (window.confirm(`Are you sure you want to delete the "${category}" category and all its skills?`)) {
+      try {
+        setIsSaving(true);
+        // Remove all skills in this category
+        const updatedSkills = skills.filter(skill => skill.category !== category);
+        await saveSkills(updatedSkills);
+        
+        // Update categories
+        const updatedCategories = categories.filter(cat => cat !== category);
+        setCategories(updatedCategories);
+        
+        setSaveMessage('Category and its skills deleted successfully');
+      } catch (error) {
+        setErrorMessage(`Error deleting category: ${error instanceof Error ? error.message : String(error)}`);
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    if (!editingSkill) return;
+    
+    if (name === 'level') {
+      setEditingSkill({
+        ...editingSkill,
+        [name]: parseInt(value, 10)
+      });
+    } else {
+      setEditingSkill({
+        ...editingSkill,
+        [name]: value
+      });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSkill) return;
+    
+    try {
+      setIsSaving(true);
+      let updatedSkills;
+      
+      if (skills.some(skill => skill.id === editingSkill.id)) {
+        // Update existing skill
+        updatedSkills = skills.map(skill => 
+          skill.id === editingSkill.id ? editingSkill : skill
+        );
+      } else {
+        // Add new skill
+        updatedSkills = [...skills, editingSkill];
+      }
+      
+      await saveSkills(updatedSkills);
+      setEditingSkill(null);
+      setSaveMessage('Skill saved successfully');
+    } catch (error) {
+      setErrorMessage(`Error saving skill: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const saveSkills = async (updatedSkills: Skill[]) => {
+    const response = await fetch('/api/admin/skills', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedSkills),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to save: ${response.status} ${errorText}`);
+    }
+
+    setSkills(updatedSkills);
+    return response.json();
+  };
+
+  // Group skills by category
+  const skillsByCategory: Record<string, Skill[]> = {};
+  categories.forEach(category => {
+    skillsByCategory[category] = skills.filter(skill => skill.category === category);
+  });
 
   return (
     <AdminLayout activePage="skills">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Manage Skills</h1>
-        <p className="text-gray-600">Add, edit, or remove your technical and professional skills</p>
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Manage Skills</h1>
+          <p className="text-gray-600">Add, edit, or remove your technical skills</p>
+        </div>
+        <button
+          onClick={handleNew}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
+          disabled={isLoading}
+        >
+          <Plus size={18} className="mr-2" /> Add Skill
+        </button>
       </div>
 
       {saveMessage && (
-        <div className={`p-4 mb-6 rounded-md ${saveMessage.includes('error') ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
+        <div className="p-4 mb-6 rounded-md bg-green-50 text-green-700">
           {saveMessage}
         </div>
       )}
 
-      {isEditing && editingSkill ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">
-            { ( (editingCategory === 'programming' && programmingSkills.some(skill => skill.id === editingSkill.id)) ||
-                (editingCategory === 'robotics' && roboticsSkills.some(skill => skill.id === editingSkill.id)) ||
-                (editingCategory === 'networking' && networkingSkills.some(skill => skill.id === editingSkill.id)) ||
-                (editingCategory === 'other' && otherSkills.some(skill => skill.id === editingSkill.id))
-              ) ? 'Edit Skill' : 'Add New Skill'}
-          </h2>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-6">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                Skill Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={editingSkill.name}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
-                placeholder="Skill name"
-                required
-                style={{color: '#1f2937'}}
-              />
-            </div>
+      {errorMessage && (
+        <div className="p-4 mb-6 rounded-md bg-red-50 text-red-700">
+          {errorMessage}
+        </div>
+      )}
 
-            {editingCategory !== 'other' && (
-              <div className="mb-6">
-                <label htmlFor="level" className="block text-sm font-medium text-gray-700 mb-1">
-                  Proficiency Level (%)
-                </label>
+      {isLoading ? (
+        <div className="text-center py-10 text-gray-500">Loading skills...</div>
+      ) : editingSkill ? (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">
+            {skills.some(skill => skill.id === editingSkill.id) ? 'Edit' : 'Add'} Skill
+          </h2>
+          
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
                 <input
-                  type="range"
-                  id="level"
-                  name="level"
-                  min="0"
-                  max="100"
-                  step="5"
-                  value={editingSkill.level}
+                  type="text"
+                  name="name"
+                  value={editingSkill.name}
                   onChange={handleChange}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  required
                 />
-                <div className="flex justify-between mt-2">
-                  <span className="text-xs text-gray-500">Beginner</span>
-                  <span className="text-xs text-gray-500">Intermediate</span>
-                  <span className="text-xs text-gray-500">Expert</span>
-                </div>
-                <div className="text-center mt-2">
-                  <span className="text-sm font-medium text-gray-700">{editingSkill.level}%</span>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <div className="flex">
+                  <select
+                    name="category"
+                    value={editingSkill.category}
+                    onChange={handleChange}
+                    className="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    {categories.map(category => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={handleAddCategory}
+                    className="px-3 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md hover:bg-gray-200"
+                  >
+                    <Plus size={18} />
+                  </button>
                 </div>
               </div>
-            )}
-
-            <div className="flex justify-end space-x-4">
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Proficiency Level: {editingSkill.level}%
+              </label>
+              <input
+                type="range"
+                name="level"
+                value={editingSkill.level}
+                onChange={handleChange}
+                min="0"
+                max="100"
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>Beginner</span>
+                <span>Intermediate</span>
+                <span>Expert</span>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3 mt-6">
               <button
                 type="button"
-                onClick={() => setIsEditing(false)}
-                className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-gray-800"
-                style={{color: '#1f2937'}}
+                onClick={() => setEditingSkill(null)}
+                className="px-5 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               >
                 Cancel
               </button>
+              
               <button
                 type="submit"
                 disabled={isSaving}
-                className={`flex items-center px-6 py-2 rounded-md text-white ${
+                className={`flex items-center px-5 py-2 rounded-md text-white ${
                   isSaving ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
                 } transition-colors`}
               >
@@ -320,73 +321,82 @@ const SkillsEditor = () => {
         </div>
       ) : (
         <div className="space-y-8">
-          {/* Programming Skills */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold flex items-center text-gray-800">
-                <BarChart size={20} className="mr-2 text-blue-600" />
-                Programming Languages
-              </h2>
-              <button
-                onClick={() => handleNew('programming')}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
-              >
-                <Plus size={18} className="mr-2" /> Add Skill
-              </button>
+          {categories.length === 0 ? (
+            <div className="text-center py-10 text-gray-500">
+              No skills added yet. Click the "Add Skill" button to add your first skill.
             </div>
-            {renderSkillList(programmingSkills, 'programming')}
-          </div>
-
-          {/* Robotics Skills */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold flex items-center text-gray-800">
-                <BarChart size={20} className="mr-2 text-blue-600" />
-                Robotics Platforms
-              </h2>
-              <button
-                onClick={() => handleNew('robotics')}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
-              >
-                <Plus size={18} className="mr-2" /> Add Skill
-              </button>
-            </div>
-            {renderSkillList(roboticsSkills, 'robotics')}
-          </div>
-
-          {/* Networking Skills */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold flex items-center text-gray-800">
-                <BarChart size={20} className="mr-2 text-blue-600" />
-                Networking
-              </h2>
-              <button
-                onClick={() => handleNew('networking')}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
-              >
-                <Plus size={18} className="mr-2" /> Add Skill
-              </button>
-            </div>
-            {renderSkillList(networkingSkills, 'networking')}
-          </div>
-
-          {/* Other Skills */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold flex items-center text-gray-800 ">
-                <CheckCircle size={20} className="mr-2 text-blue-600" />
-                Other Skills
-              </h2>
-              <button
-                onClick={() => handleNew('other')}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
-              >
-                <Plus size={18} className="mr-2" /> Add Skill
-              </button>
-            </div>
-            {renderSkillList(otherSkills, 'other')}
-          </div>
+          ) : (
+            categories.map(category => (
+              <div key={category} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="flex items-center">
+                    {category === 'Frontend' && <Code size={20} className="mr-2 text-blue-600" />}
+                    {category === 'Backend' && <Cpu size={20} className="mr-2 text-indigo-600" />}
+                    {(!['Frontend', 'Backend'].includes(category)) && 
+                      <Code size={20} className="mr-2 text-gray-600" />}
+                    
+                    <h2 className="text-xl font-semibold text-gray-800">{category}</h2>
+                  </div>
+                  
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => {
+                        const newName = prompt('Edit category name:', category);
+                        if (newName && newName !== category) {
+                          handleCategoryChange(category, newName);
+                        }
+                      }}
+                      className="bg-blue-50 text-blue-700 px-3 py-1 rounded flex items-center text-sm hover:bg-blue-100"
+                    >
+                      <Edit size={14} className="mr-1" /> Rename
+                    </button>
+                    
+                    <button
+                      onClick={() => handleDeleteCategory(category)}
+                      className="bg-red-50 text-red-700 px-3 py-1 rounded flex items-center text-sm hover:bg-red-100"
+                    >
+                      <Trash2 size={14} className="mr-1" /> Delete
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {skillsByCategory[category]?.map(skill => (
+                    <div key={skill.id} className="border border-gray-100 rounded-lg p-4 hover:shadow-sm transition-shadow">
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="font-medium text-gray-900">{skill.name}</h3>
+                        <div className="flex space-x-1">
+                          <button
+                            onClick={() => handleEdit(skill)}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          
+                          <button
+                            onClick={() => handleDelete(skill.id)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div 
+                          className="bg-blue-600 h-2.5 rounded-full" 
+                          style={{ width: `${skill.level}%` }}
+                        ></div>
+                      </div>
+                      <div className="text-right text-xs text-gray-500 mt-1">
+                        {skill.level}%
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
     </AdminLayout>

@@ -3,29 +3,19 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Briefcase, Calendar, Plus, Save, Trash2, Edit } from 'lucide-react';
-import { saveToLocalStorage, getFromLocalStorage, STORAGE_KEYS } from '@/lib/localStorage';
 
 interface Experience {
-  id: number;
+  id: number | string;
   organization: string;
   position: string;
   period: string;
   responsibilities: string[];
+  location?: string;
+  startDate?: string;
+  endDate?: string;
+  current?: boolean;
+  description?: string;
 }
-
-// Moved outside the component
-const defaultExperiences: Experience[] = [
-  {
-    id: 1,
-    organization: 'Syrian Private University',
-    position: 'Full-Time Lecturer and Project Mentor',
-    period: 'September 2024 - Present',
-    responsibilities: [
-      'Develop and instruct lab courses including ROS, MATLAB, Proteus, Processing, 8086 Emulator, mikroC, and Arduino C',
-      'Mentor junior projects, guiding students in project design, implementation, and technical presentation'
-    ]
-  }
-];
 
 const ExperienceEditor = () => {
   const [experiences, setExperiences] = useState<Experience[]>([]);
@@ -38,16 +28,38 @@ const ExperienceEditor = () => {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
   const [saveMessage, setSaveMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Fetch experiences from our Redis API
+  const fetchExperiences = async () => {
+    setIsLoadingData(true);
+    setErrorMessage('');
+    try {
+      const response = await fetch('/api/admin/experience');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch experiences: ${response.statusText}`);
+      }
+      const data: Experience[] = await response.json();
+      setExperiences(data);
+    } catch (err) {
+      console.error(err);
+      setErrorMessage('Failed to load experiences. Please refresh.');
+    } finally {
+      setIsLoadingData(false);
+    }
+  };
 
   useEffect(() => {
-    const savedExperiences = getFromLocalStorage<Experience[]>(STORAGE_KEYS.EXPERIENCE, defaultExperiences);
-    setExperiences(savedExperiences);
+    fetchExperiences();
   }, []);
 
   const handleEdit = (experience: Experience) => {
     setEditingExperience({ ...experience });
     setIsEditing(true);
+    setSaveMessage('');
+    setErrorMessage('');
   };
 
   const handleNew = () => {
@@ -59,15 +71,14 @@ const ExperienceEditor = () => {
       responsibilities: ['']
     });
     setIsEditing(true);
+    setSaveMessage('');
+    setErrorMessage('');
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number | string) => {
     if (window.confirm('Are you sure you want to delete this experience?')) {
       const updatedExperiences = experiences.filter(exp => exp.id !== id);
-      setExperiences(updatedExperiences);
-      saveToLocalStorage(STORAGE_KEYS.EXPERIENCE, updatedExperiences);
-      setSaveMessage('Experience deleted successfully!');
-      setTimeout(() => setSaveMessage(''), 3000);
+      await saveExperiences(updatedExperiences, 'Experience deleted successfully!');
     }
   };
 
@@ -92,31 +103,49 @@ const ExperienceEditor = () => {
     setEditingExperience(prev => ({ ...prev, responsibilities: updatedResponsibilities }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Save experiences to our Redis API
+  const saveExperiences = async (dataToSave: Experience[], successMessage: string) => {
     setIsSaving(true);
     setSaveMessage('');
-
+    setErrorMessage('');
     try {
-      let updatedExperiences;
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch('/api/admin/experience', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSave),
+      });
 
-      if (experiences.some(exp => exp.id === editingExperience.id)) {
-        updatedExperiences = experiences.map(exp => exp.id === editingExperience.id ? editingExperience : exp);
-      } else {
-        updatedExperiences = [...experiences, editingExperience];
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to save: ${response.status} ${errorText}`);
       }
 
-      setExperiences(updatedExperiences);
-      saveToLocalStorage(STORAGE_KEYS.EXPERIENCE, updatedExperiences);
-
+      setExperiences(dataToSave);
       setIsEditing(false);
-      setSaveMessage('Experience saved successfully!');
-    } catch {
-      setSaveMessage('An error occurred while saving. Please try again.');
+      setSaveMessage(successMessage);
+      setTimeout(() => setSaveMessage(''), 3000);
+
+    } catch (err) {
+      console.error(err);
+      setErrorMessage(`Error saving experiences: ${err instanceof Error ? err.message : String(err)}. Please try again.`);
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingExperience) return;
+
+    let updatedExperiences;
+    if (experiences.some(exp => exp.id === editingExperience.id)) {
+      updatedExperiences = experiences.map(exp => exp.id === editingExperience.id ? editingExperience : exp);
+    } else {
+      updatedExperiences = [...experiences, editingExperience];
+    }
+    await saveExperiences(updatedExperiences, 'Experience saved successfully!');
   };
 
   return (
@@ -140,7 +169,15 @@ const ExperienceEditor = () => {
         </div>
       )}
 
-      {isEditing ? (
+      {errorMessage && (
+        <div className="p-4 mb-6 rounded-md bg-red-50 text-red-700">
+          {errorMessage}
+        </div>
+      )}
+
+      {isLoadingData ? (
+        <div className="text-center py-10 text-gray-500">Loading experiences...</div>
+      ) : isEditing ? (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -173,6 +210,16 @@ const ExperienceEditor = () => {
                 value={editingExperience.period}
                 onChange={handleChange}
                 required
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Location (Optional)</label>
+              <input
+                type="text"
+                name="location"
+                value={editingExperience.location || ''}
+                onChange={handleChange}
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500 px-4 py-2"
               />
             </div>
@@ -224,47 +271,54 @@ const ExperienceEditor = () => {
         </form>
       ) : (
         <div className="space-y-6">
-          {experiences.map((experience) => (
-            <div
-              key={experience.id}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
-            >
-              <div className="flex flex-col md:flex-row gap-6">
-                <div className="md:w-1/3">
-                  <h2 className="text-xl font-semibold text-gray-900">{experience.organization}</h2>
-                  <h3 className="text-blue-600 font-medium mb-2">{experience.position}</h3>
-                  <div className="flex items-center text-gray-500 mb-4">
-                    <Calendar size={16} className="mr-2" />
-                    <span>{experience.period}</span>
+          {experiences.length === 0 ? (
+            <div className="text-center py-10 text-gray-500">No experiences added yet.</div>
+          ) : (
+            experiences.map((experience) => (
+              <div
+                key={experience.id}
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+              >
+                <div className="flex flex-col md:flex-row gap-6">
+                  <div className="md:w-1/3">
+                    <h2 className="text-xl font-semibold text-gray-900">{experience.organization}</h2>
+                    <h3 className="text-blue-600 font-medium mb-2">{experience.position}</h3>
+                    <div className="flex items-center text-gray-500 mb-4">
+                      <Calendar size={16} className="mr-2" />
+                      <span>{experience.period}</span>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEdit(experience)}
+                        className="bg-blue-50 text-blue-700 px-3 py-1 rounded flex items-center text-sm hover:bg-blue-100 transition-colors"
+                      >
+                        <Edit size={14} className="mr-1" /> Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(experience.id)}
+                        className="bg-red-50 text-red-700 px-3 py-1 rounded flex items-center text-sm hover:bg-red-100 transition-colors"
+                      >
+                        <Trash2 size={14} className="mr-1" /> Delete
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleEdit(experience)}
-                      className="bg-blue-50 text-blue-700 px-3 py-1 rounded flex items-center text-sm hover:bg-blue-100 transition-colors"
-                    >
-                      <Edit size={14} className="mr-1" /> Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(experience.id)}
-                      className="bg-red-50 text-red-700 px-3 py-1 rounded flex items-center text-sm hover:bg-red-100 transition-colors"
-                    >
-                      <Trash2 size={14} className="mr-1" /> Delete
-                    </button>
+                  <div className="md:w-2/3">
+                    <h4 className="font-medium text-gray-900 mb-2">Responsibilities:</h4>
+                    <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                      {experience.responsibilities.map((resp, index) => (
+                        <li key={index}>{resp}</li>
+                      ))}
+                    </ul>
+                    {experience.location && (
+                      <p className="mt-4 text-gray-600">
+                        <span className="font-medium">Location:</span> {experience.location}
+                      </p>
+                    )}
                   </div>
-                </div>
-                <div className="md:w-2/3">
-                  <h4 className="font-medium text-gray-900 mb-3 flex items-center">
-                    <Briefcase size={18} className="mr-2 text-blue-600" /> Responsibilities
-                  </h4>
-                  <ul className="list-disc list-inside text-gray-700 space-y-2">
-                    {experience.responsibilities.map((resp, idx) => (
-                      <li key={idx}>{resp}</li>
-                    ))}
-                  </ul>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       )}
     </AdminLayout>
