@@ -4,6 +4,46 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 
+// Make directories recursively with proper error handling
+async function ensureDir(dir: string): Promise<boolean> {
+  console.log(`🔍 Ensuring directory exists: ${dir}`);
+  try {
+    if (!fs.existsSync(dir)) {
+      console.log(`📂 Creating directory: ${dir}`);
+      await mkdir(dir, { recursive: true, mode: 0o777 });
+      
+      // Double-check it was created
+      if (!fs.existsSync(dir)) {
+        console.error(`❌ Failed to create directory: ${dir}`);
+        return false;
+      }
+      
+      // Set permissions explicitly
+      fs.chmodSync(dir, 0o777);
+      console.log(`✅ Directory created and permissions set: ${dir}`);
+    } else {
+      console.log(`✅ Directory already exists: ${dir}`);
+      // Update permissions on existing directory
+      fs.chmodSync(dir, 0o777);
+    }
+    
+    // Test write permissions
+    const testFile = path.join(dir, '.test-write');
+    try {
+      await writeFile(testFile, 'test');
+      fs.unlinkSync(testFile); // Clean up test file
+      console.log(`✅ Write permissions confirmed for: ${dir}`);
+      return true;
+    } catch (error: any) {
+      console.error(`❌ Write permission test failed: ${error.message}`);
+      return false;
+    }
+  } catch (error: any) {
+    console.error(`❌ Error ensuring directory: ${error.message}`);
+    return false;
+  }
+}
+
 export async function POST(request: NextRequest) {
   console.log("🔍 Upload API called");
   try {
@@ -40,40 +80,24 @@ export async function POST(request: NextRequest) {
     const cwd = process.cwd();
     console.log(`📂 Current working directory: ${cwd}`);
     
-    const uploadsDir = path.join(cwd, 'public', 'uploads');
-    console.log(`📂 Uploads directory path: ${uploadsDir}`);
-    
-    // Ensure the uploads directory exists
-    try {
-      if (!fs.existsSync(uploadsDir)) {
-        console.log(`📂 Creating directory: ${uploadsDir}`);
-        await mkdir(uploadsDir, { recursive: true });
-        console.log(`✅ Directory created`);
-      } else {
-        console.log(`✅ Uploads directory already exists`);
-        
-        // Test write permissions by creating a test file
-        const testPath = path.join(uploadsDir, '.test-write-permissions');
-        try {
-          await writeFile(testPath, 'test');
-          fs.unlinkSync(testPath); // Clean up test file
-          console.log(`✅ Write permissions confirmed`);
-        } catch (permErr: any) {
-          console.error(`❌ Permission error: ${permErr}`);
-          return NextResponse.json(
-            { error: 'Server lacks permission to write to uploads directory' },
-            { status: 500 }
-          );
-        }
-      }
-    } catch (dirError: any) {
-      console.error(`❌ Error creating directory: ${dirError}`);
+    // Create path to public directory
+    const publicDir = path.join(cwd, 'public');
+    if (!(await ensureDir(publicDir))) {
       return NextResponse.json(
-        { error: `Error creating upload directory: ${dirError.message}` },
+        { error: 'Server lacks permission to write to public directory' },
         { status: 500 }
       );
     }
     
+    // Create path to uploads directory
+    const uploadsDir = path.join(publicDir, 'uploads');
+    if (!(await ensureDir(uploadsDir))) {
+      return NextResponse.json(
+        { error: 'Server lacks permission to write to uploads directory' },
+        { status: 500 }
+      );
+    }
+
     // Convert file to buffer
     console.log(`📄 Converting file to buffer`);
     const buffer = Buffer.from(await file.arrayBuffer());

@@ -69,40 +69,72 @@ const ProfileEditor = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      // Upload the image to the server
-      console.log('Sending request to /api/admin/upload');
-      const response = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData,
-      });
+      // Try file upload first
+      let imageUrl = '';
+      let useDataUrl = false;
+      
+      try {
+        // Upload the image to the server
+        console.log('Sending request to /api/admin/upload');
+        const response = await fetch('/api/admin/upload', {
+          method: 'POST',
+          body: formData,
+        });
 
-      console.log('Upload response status:', response.status);
-      
-      // Get the response data
-      const responseData = await response.json() as { 
-        imageUrl?: string;
-        error?: string;
-        success?: boolean;
-      };
-      console.log('Upload response data:', responseData);
-      
-      if (!response.ok) {
-        throw new Error(responseData.error || 'Failed to upload image');
+        console.log('Upload response status:', response.status);
+        
+        // Get the response data
+        const responseData = await response.json() as { 
+          imageUrl?: string;
+          error?: string;
+          success?: boolean;
+        };
+        console.log('Upload response data:', responseData);
+        
+        if (!response.ok) {
+          throw new Error(responseData.error || 'Failed to upload image');
+        }
+
+        if (!responseData.imageUrl) {
+          throw new Error('No image URL returned from server');
+        }
+        
+        imageUrl = responseData.imageUrl;
+      } catch (uploadError) {
+        console.warn('Server file upload failed, falling back to data URL:', uploadError);
+        
+        // Fallback to data URL if file upload fails
+        return new Promise<void>((resolve) => {
+          const fallbackReader = new FileReader();
+          fallbackReader.onloadend = () => {
+            imageUrl = fallbackReader.result as string;
+            useDataUrl = true;
+            
+            // Update formData with the data URL
+            setFormData(prev => ({
+              ...prev,
+              profileImage: imageUrl
+            }));
+            
+            setSaveMessage('Image stored as data URL (client-side only).');
+            setIsUploading(false);
+            resolve();
+          };
+          fallbackReader.readAsDataURL(file);
+        });
       }
-
-      if (!responseData.imageUrl) {
-        throw new Error('No image URL returned from server');
-      }
       
-      // Update formData with the new image URL
-      setFormData(prev => ({
-        ...prev,
-        profileImage: responseData.imageUrl
-      }));
-
-      setSaveMessage('Image uploaded successfully!');
+      if (!useDataUrl) {
+        // Update formData with the new image URL
+        setFormData(prev => ({
+          ...prev,
+          profileImage: imageUrl
+        }));
+  
+        setSaveMessage('Image uploaded successfully!');
+      }
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error('Error handling image:', error);
       setSaveMessage('Failed to upload image. Please try again. ' + (error instanceof Error ? error.message : ''));
       
       // Reset the preview if there was an error
