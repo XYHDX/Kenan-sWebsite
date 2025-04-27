@@ -1,5 +1,3 @@
-'use client';
-
 // import { useEffect } from 'react'; // Remove this if not used elsewhere in the file
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';

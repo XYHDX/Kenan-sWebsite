@@ -1,9 +1,7 @@
-'use client';
-
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import useLocalStorage from '@/hooks/useLocalStorage';
-import { STORAGE_KEYS } from '@/lib/localStorage';
+import { redis } from "@/lib/redis"; // Import shared Redis client
+import { STORAGE_KEYS } from '@/lib/localStorage'; // Keep for KV key name
 
 interface Experience {
   id: number | string;
@@ -14,19 +12,26 @@ interface Experience {
   responsibilities?: string[];
 }
 
-const defaultExperiences: Experience[] = [];
+// Define the Redis key
+const REDIS_EXPERIENCE_KEY = STORAGE_KEYS.EXPERIENCE;
 
-const ExperiencePreview = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [experiences, _, isLoading] = useLocalStorage<Experience[]>(
-    STORAGE_KEYS.EXPERIENCE, 
-    defaultExperiences
-  );
+// Make the component async to fetch data
+const ExperiencePreview = async () => {
+  // Fetch experiences directly from Upstash Redis on the server
+  let experiences: Experience[] = [];
+
+  try {
+    // Fetch experiences from Upstash Redis using shared client
+    const result = await redis.get<Experience[]>(REDIS_EXPERIENCE_KEY);
+    experiences = result || [];
+  } catch (err) {
+    console.error("Error fetching experiences from Upstash Redis:", err);
+  }
 
   const previewExperiences = experiences.slice(0, 3);
 
   return (
-    <section className="py-12 bg-gray-50 dark:bg-gray-800">
+    <section className="py-12 bg-background/5">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-primary">Experience Highlights</h2>
@@ -38,30 +43,19 @@ const ExperiencePreview = () => {
           </Link>
         </div>
 
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(3)].map((_, index) => (
-              <div key={index} className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-100 dark:border-gray-600 p-6 animate-pulse">
-                <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded mb-3 w-3/4"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded mb-2 w-1/2"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded mb-4 w-1/3"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full"></div>
-              </div>
-            ))}
-          </div>
-        ) : previewExperiences.length === 0 ? (
-           <div className="text-center text-gray-500 dark:text-gray-400">No experience highlights available yet.</div>
+        {previewExperiences.length === 0 ? (
+           <div className="text-center text-muted-foreground">No experience highlights available yet.</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {previewExperiences.map((exp) => (
               <div 
                 key={exp.id} 
-                className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-100 dark:border-gray-600 p-6 hover:shadow-md transition-shadow"
+                className="bg-card text-card-foreground rounded-lg shadow-sm border border-border p-6 hover:shadow-md transition-shadow"
               >
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{exp.organization}</h3>
+                <h3 className="text-xl font-semibold mb-2">{exp.organization}</h3>
                 <h4 className="text-primary font-medium mb-1">{exp.position}</h4>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">{exp.period}</p>
-                <p className="text-gray-700 dark:text-gray-300">
+                <p className="text-muted-foreground text-sm mb-3">{exp.period}</p>
+                <p className="text-foreground">
                   {exp.description || exp.responsibilities?.[0] || 'Details available on the experience page.'}
                 </p>
               </div>

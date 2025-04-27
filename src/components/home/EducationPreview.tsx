@@ -1,63 +1,122 @@
-'use client';
+import { GraduationCap, Calendar, Award } from 'lucide-react';
+import Link from 'next/link';
+import { redis } from "@/lib/redis"; // Import shared Redis client
+import { STORAGE_KEYS } from '@/lib/localStorage'; // Keep for KV key name
 
-import { GraduationCap, Calendar } from 'lucide-react';
+interface Education {
+  id: number | string;
+  institution: string;
+  degree: string;
+  field: string;
+  period: string;
+  description?: string;
+  location?: string;
+  gpa?: string;
+  project?: string;
+  details?: string[];
+}
 
-const EducationPreview = () => {
+interface Certification {
+  id: string | number;
+  title: string;
+  organization: string;
+  year: string | number;
+}
+
+// Define the Redis keys
+const REDIS_EDUCATION_KEY = STORAGE_KEYS.EDUCATION;
+const REDIS_CERTIFICATIONS_KEY = STORAGE_KEYS.CERTIFICATIONS;
+
+// Make the component async to fetch data
+const EducationPreview = async () => {
+  // Fetch data directly from Upstash Redis on the server
+  let education: Education[] = [];
+  let certifications: Certification[] = [];
+
+  try {
+    // Fetch education from Upstash Redis using shared client
+    const educationResult = await redis.get<Education[]>(REDIS_EDUCATION_KEY);
+    education = educationResult || [];
+    
+    // Fetch certifications from Upstash Redis
+    const certificationsResult = await redis.get<Certification[]>(REDIS_CERTIFICATIONS_KEY);
+    certifications = certificationsResult || [];
+  } catch (err) {
+    console.error("Error fetching education data from Upstash Redis:", err);
+  }
+
+  // Get primary education and preview certifications
+  const primaryEducation = education.length > 0 ? education[0] : null;
+  const previewCertifications = certifications.slice(0, 4);
+
   return (
-    <section className="py-12 bg-white dark:bg-gray-900">
+    <section className="py-12 bg-background">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-8 text-primary">Education & Certifications</h2>
-        
-        <div className="max-w-4xl mx-auto bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-8 mb-8">
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="md:w-1/4 flex justify-center">
-              <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center">
-                <GraduationCap size={36} className="text-primary" />
-              </div>
-            </div>
-            <div className="md:w-3/4">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Bachelor of Engineering</h3>
-              <h4 className="text-primary font-medium mb-2">Syrian Private University</h4>
-              <div className="flex items-center text-gray-500 dark:text-gray-400 mb-4">
-                <Calendar size={16} className="mr-2" />
-                <span>2016 - 2024</span>
-              </div>
-              <div className="bg-white dark:bg-gray-700 p-4 rounded-md border border-gray-100 dark:border-gray-600">
-                <h5 className="font-medium text-gray-900 dark:text-white mb-2">Project: Waste Sorting System Using Object Detection</h5>
-                <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">
-                  <li>Developed an automated system for waste classification and sorting, utilizing object detection</li>
-                  <li>Integrated a mechanical sorting mechanism, achieving a 40% efficiency improvement in waste segregation</li>
-                </ul>
-              </div>
-            </div>
-          </div>
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold text-primary">Education & Certifications</h2>
+          <Link 
+            href="/education" 
+            className="flex items-center text-primary hover:text-primary/90 transition-colors"
+          >
+            See More <Award size={16} className="ml-1" />
+          </Link>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Take the Lead Program</h3>
-            <p className="text-primary mb-1">Cornell University</p>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">2023</p>
+        {primaryEducation ? (
+          <div className="max-w-4xl mx-auto bg-card text-card-foreground rounded-lg shadow-sm border border-border p-6 md:p-8 mb-8">
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="md:w-1/4 flex justify-center">
+                <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center">
+                  <GraduationCap size={36} className="text-primary" />
+                </div>
+              </div>
+              <div className="md:w-3/4">
+                <h3 className="text-xl font-semibold">{primaryEducation.degree}</h3>
+                <h4 className="text-primary font-medium mb-2">{primaryEducation.institution}</h4>
+                <div className="flex items-center text-muted-foreground mb-4">
+                  <Calendar size={16} className="mr-2" />
+                  <span>{primaryEducation.period}</span>
+                </div>
+                {(primaryEducation.project || primaryEducation.description || (primaryEducation.details && primaryEducation.details.length > 0)) && (
+                  <div className="bg-secondary/10 p-4 rounded-md border border-border">
+                    {primaryEducation.project && (
+                      <h5 className="font-medium mb-2">Project: {primaryEducation.project}</h5>
+                    )}
+                    {primaryEducation.description && (
+                      <p className="mb-2">{primaryEducation.description}</p>
+                    )}
+                    {primaryEducation.details && primaryEducation.details.length > 0 && (
+                      <ul className="list-disc list-inside text-foreground space-y-1">
+                        {primaryEducation.details.map((detail, index) => (
+                          <li key={index}>{detail}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-          
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Certified Lego EV3 Trainer</h3>
-            <p className="text-primary mb-1">Syrian Robotic Academy</p>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">2023</p>
+        ) : (
+          <div className="text-center text-muted-foreground mb-8">No education information available yet.</div>
+        )}
+        
+        {previewCertifications.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {previewCertifications.map((cert) => (
+              <div
+                key={cert.id}
+                className="bg-card text-card-foreground rounded-lg shadow-sm border border-border p-6 hover:shadow-md transition-shadow"
+              >
+                <h3 className="text-lg font-semibold mb-3">{cert.title}</h3>
+                <p className="text-primary mb-1">{cert.organization}</p>
+                <p className="text-muted-foreground text-sm">{cert.year}</p>
+              </div>
+            ))}
           </div>
-          
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Advertising Design Program</h3>
-            <p className="text-primary mb-1">Youth Empowerment Program</p>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">2021</p>
-          </div>
-          
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Cisco CCNA R&S</h3>
-            <p className="text-primary mb-1">NGO Egypt</p>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">2018</p>
-          </div>
-        </div>
+        ) : (
+          <div className="text-center text-muted-foreground">No certifications available yet.</div>
+        )}
       </div>
     </section>
   );
