@@ -22,22 +22,23 @@ const REDIS_ACHIEVEMENTS_KEY = STORAGE_KEYS.ACHIEVEMENTS; // Re-use key name for
 const AchievementsPage = async () => {
   // Fetch achievements directly from Upstash Redis on the server
   let achievements: Achievement[] = [];
-  let isLoading = false; // Assume loading is false initially for server component
   let error: string | null = null;
+  let isLoading: boolean = false;
 
   try {
     // Fetch achievements from Upstash Redis using shared client
-    achievements = await redis.get<Achievement[]>(REDIS_ACHIEVEMENTS_KEY) || []; 
+    const result = await redis.get<Achievement[]>(REDIS_ACHIEVEMENTS_KEY);
+    achievements = result || [];
+    console.log("Fetched achievements:", achievements);
   } catch (err) {
     console.error("Error fetching achievements from Upstash Redis:", err);
     error = "Failed to load achievements. Please try again later.";
-    isLoading = false; // Still false on error for server render
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 text-foreground">
       <Header />
-      <main className="flex-grow py-12 bg-background">
+      <main className="flex-grow py-12 bg-gray-100 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-bold text-center mb-12 text-primary dark:text-primary">Competitions & Achievements</h1>
 
@@ -54,10 +55,10 @@ const AchievementsPage = async () => {
               {achievements.map((achievement) => (
                 <div 
                   key={achievement.id} 
-                  className="bg-card dark:bg-card rounded-lg shadow-sm border border-border p-4 flex flex-col md:flex-row justify-between items-center"
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-border p-4 flex flex-col md:flex-row justify-between items-center"
                 >
                   <div className="md:w-1/4 flex flex-col items-center justify-center">
-                    <div className="w-20 h-20 rounded-full bg-accent dark:bg-accent flex items-center justify-center mb-4">
+                    <div className="w-20 h-20 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center mb-4">
                       <Trophy size={36} className="text-primary dark:text-primary" />
                     </div>
                     <h2 className="text-xl font-bold text-center text-primary dark:text-primary-foreground">{achievement.title}</h2>

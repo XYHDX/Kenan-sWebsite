@@ -53,9 +53,9 @@ const AboutPage = () => {
   }, [localContactData]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background dark:bg-gray-900">
+    <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
       <Header />
-      <main className="flex-grow py-12 bg-gray-50 dark:bg-gray-900">
+      <main className="flex-grow py-12 bg-gray-100 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold text-center mb-12 text-primary dark:text-primary">About Me</h1>
@@ -65,7 +65,7 @@ const AboutPage = () => {
                 <div className="md:w-1/3 flex justify-center">
                   <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-primary">
                     <Image 
-                      src="/profile.jpg" 
+                      src="/images/profile-pic.png" 
                       alt="Yahya Demeriah"
                       fill
                       style={{ objectFit: 'cover' }}

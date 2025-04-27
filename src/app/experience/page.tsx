@@ -37,9 +37,9 @@ const ExperiencePage = async () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 text-foreground">
       <Header />
-      <main className="flex-grow py-12 bg-background">
+      <main className="flex-grow py-12 bg-gray-100 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-bold text-center mb-12 text-primary dark:text-primary">Professional Experience</h1>
           
@@ -52,7 +52,7 @@ const ExperiencePage = async () => {
               {experiences.map((exp) => (
                 <div 
                   key={exp.id} 
-                  className="bg-card text-card-foreground rounded-lg shadow-md border border-border p-6 md:p-8 hover:shadow-lg transition-shadow"
+                  className="bg-white dark:bg-gray-800 text-card-foreground rounded-lg shadow-md border border-border p-6 md:p-8 hover:shadow-lg transition-shadow"
                 >
                   <div className="flex flex-col md:flex-row gap-6">
                     <div className="md:w-1/3">

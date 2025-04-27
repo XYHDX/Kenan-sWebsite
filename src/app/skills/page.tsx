@@ -57,9 +57,9 @@ const SkillsPage = async () => {
   });
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 text-foreground">
       <Header />
-      <main className="flex-grow py-12 bg-background">
+      <main className="flex-grow py-12 bg-gray-100 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-bold text-center mb-12 text-primary dark:text-primary">Skills & Expertise</h1>
 
@@ -70,7 +70,7 @@ const SkillsPage = async () => {
           ) : (
             <div className="space-y-16">
               {Object.entries(groupedSkills).map(([category, categorySkills]) => (
-                <div key={category} className="bg-card text-card-foreground rounded-lg shadow-md border border-border p-6">
+                <div key={category} className="bg-white dark:bg-gray-800 text-card-foreground rounded-lg shadow-md border border-border p-6">
                   <div className="flex items-center mb-6">
                     {getCategoryIcon(category)}
                     <h2 className="text-2xl font-semibold ml-2">{category}</h2>

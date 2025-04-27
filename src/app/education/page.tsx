@@ -56,9 +56,9 @@ const EducationPage = async () => {
   const primaryEducation = education.length > 0 ? education[0] : null;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 text-foreground">
       <Header />
-      <main className="flex-grow py-12 bg-background">
+      <main className="flex-grow py-12 bg-gray-100 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-bold text-center mb-12 text-primary dark:text-primary">Education & Certifications</h1>
           
@@ -74,7 +74,7 @@ const EducationPage = async () => {
                 </h2>
                 
                 {primaryEducation ? (
-                  <div className="bg-card text-card-foreground rounded-lg shadow-md border border-border p-8">
+                  <div className="bg-white dark:bg-gray-800 text-card-foreground rounded-lg shadow-md border border-border p-8">
                     <div className="flex flex-col md:flex-row gap-8">
                       <div className="md:w-1/3">
                         <h3 className="text-xl font-semibold">{primaryEducation.degree}</h3>
@@ -93,7 +93,7 @@ const EducationPage = async () => {
                       
                       {(primaryEducation.description || (primaryEducation.details && primaryEducation.details.length > 0)) && (
                         <div className="md:w-2/3">
-                          <div className="bg-secondary/10 p-6 rounded-md border border-border">
+                          <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-md border border-border">
                             {primaryEducation.project && (
                               <h5 className="font-medium mb-4">Project: {primaryEducation.project}</h5>
                             )}
@@ -137,7 +137,7 @@ const EducationPage = async () => {
                     {certifications.map((cert) => (
                       <div 
                         key={cert.id} 
-                        className="bg-card text-card-foreground rounded-lg shadow-md border border-border p-6 hover:shadow-lg transition-shadow"
+                        className="bg-white dark:bg-gray-800 text-card-foreground rounded-lg shadow-md border border-border p-6 hover:shadow-lg transition-shadow"
                       >
                         <h3 className="text-lg font-semibold mb-3">{cert.title}</h3>
                         <p className="text-primary mb-1">{cert.organization}</p>

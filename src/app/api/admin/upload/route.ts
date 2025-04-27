@@ -32,15 +32,32 @@ export async function POST(request: NextRequest) {
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
     
     // Ensure the uploads directory exists
-    if (!fs.existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true });
+    try {
+      if (!fs.existsSync(uploadsDir)) {
+        await mkdir(uploadsDir, { recursive: true });
+        console.log(`Created directory: ${uploadsDir}`);
+      }
+    } catch (dirError) {
+      console.error('Error creating directory:', dirError);
+      return NextResponse.json(
+        { error: 'Error creating upload directory' },
+        { status: 500 }
+      );
     }
     
     // Convert file to buffer
     const buffer = Buffer.from(await file.arrayBuffer());
     
-    // Save file to uploads directory
-    await writeFile(path.join(uploadsDir, fileName), buffer);
+    try {
+      // Save file to uploads directory
+      await writeFile(path.join(uploadsDir, fileName), buffer);
+    } catch (writeError) {
+      console.error('Error writing file:', writeError);
+      return NextResponse.json(
+        { error: 'Error saving file' },
+        { status: 500 }
+      );
+    }
     
     // Return the URL to the uploaded file
     return NextResponse.json({ 
