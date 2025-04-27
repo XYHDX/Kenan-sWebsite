@@ -76,6 +76,9 @@ const ContactEditor = () => {
     setSaveMessage('');
 
     try {
+      // Log the data we're about to save
+      console.log('Form data being saved:', formData);
+      
       // Save to localStorage for immediate UI update
       saveToLocalStorage(STORAGE_KEYS.CONTACT, formData);
       
@@ -88,10 +91,33 @@ const ContactEditor = () => {
         body: JSON.stringify(formData),
       });
       
+      const responseText = await response.text();
+      console.log(`API response (${response.status}):`, responseText);
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Failed to parse response JSON:', e);
+        data = { error: 'Invalid response from server' };
+      }
+      
       if (response.ok) {
         setSaveMessage('Contact information updated successfully!');
+        
+        // Refresh the data to ensure it's in sync
+        setTimeout(async () => {
+          try {
+            const refreshResponse = await fetch('/api/admin/contact');
+            if (refreshResponse.ok) {
+              const refreshData = await refreshResponse.json();
+              console.log('Refreshed contact data:', refreshData);
+            }
+          } catch (err) {
+            console.error('Error refreshing data:', err);
+          }
+        }, 500);
       } else {
-        const data = await response.json() as { error?: string };
         setSaveMessage(`Error: ${data.error || 'Failed to save to server. Data saved locally only.'}`);
       }
     } catch (err) {

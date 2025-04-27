@@ -16,18 +16,41 @@ interface Contact {
 
 const REDIS_CONTACT_KEY = STORAGE_KEYS.CONTACT;
 
+// Default contact data to use when missing
+const defaultContactData = {
+  email: 'yahyademeriah@gmail.com',
+  phone: '+971 58 127 7542',
+  location: 'Dubai, UAE',
+  linkedinUrl: 'https://linkedin.com/in/yahyademeriah',
+  githubUrl: 'https://github.com/yahyademeriah',
+  showContactForm: true,
+  emailNotifications: true
+};
+
 // GET Handler: Fetch contact data from Redis
 export async function GET() {
   try {
-    const contact = await redis.get<Contact>(REDIS_CONTACT_KEY) || {
-      email: '',
-      showContactForm: true,
-      emailNotifications: false
+    const contact = await redis.get<Contact>(REDIS_CONTACT_KEY);
+    
+    if (!contact || !contact.email) {
+      return NextResponse.json(defaultContactData);
+    }
+    
+    // Fill in any missing fields with defaults
+    const completeContact = {
+      email: contact.email || defaultContactData.email,
+      phone: contact.phone || defaultContactData.phone,
+      location: contact.location || defaultContactData.location,
+      linkedinUrl: contact.linkedinUrl || defaultContactData.linkedinUrl,
+      githubUrl: contact.githubUrl || defaultContactData.githubUrl,
+      showContactForm: typeof contact.showContactForm === 'boolean' ? contact.showContactForm : true,
+      emailNotifications: typeof contact.emailNotifications === 'boolean' ? contact.emailNotifications : true
     };
-    return NextResponse.json(contact);
+    
+    return NextResponse.json(completeContact);
   } catch (error) {
     console.error('🔥 GET /api/admin/contact failed:', error);
-    return NextResponse.json({ error: 'Internal Server Error fetching data' }, { status: 500 });
+    return NextResponse.json(defaultContactData);
   }
 }
 
@@ -41,7 +64,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
     
-    await redis.set(REDIS_CONTACT_KEY, contact);
+    // Ensure all boolean fields are properly set
+    const sanitizedContact = {
+      ...contact,
+      showContactForm: typeof contact.showContactForm === 'boolean' ? contact.showContactForm : true,
+      emailNotifications: typeof contact.emailNotifications === 'boolean' ? contact.emailNotifications : true
+    };
+    
+    // Save to Redis
+    await redis.set(REDIS_CONTACT_KEY, sanitizedContact);
+    
+    // Also log for debugging
+    console.log('Saving contact data to Redis:', sanitizedContact);
+    
     return NextResponse.json({ message: 'Contact information saved successfully' }, { status: 200 });
   } catch (error) {
     console.error("🔥 POST /api/admin/contact failed:", error);
