@@ -93,6 +93,20 @@ const AdminDashboard = () => {
               <ArrowUp size={16} className="transform rotate-45" />
             </Link>
             <Link 
+              href="/admin/education" 
+              className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 p-4 rounded-lg flex items-center justify-between transition-colors"
+            >
+              <span>Manage Education</span>
+              <ArrowUp size={16} className="transform rotate-45" />
+            </Link>
+            <Link 
+              href="/admin/certifications" 
+              className="bg-pink-50 hover:bg-pink-100 text-pink-700 p-4 rounded-lg flex items-center justify-between transition-colors"
+            >
+              <span>Manage Certifications</span>
+              <ArrowUp size={16} className="transform rotate-45" />
+            </Link>
+            <Link 
               href="/admin/skills" 
               className="bg-purple-50 hover:bg-purple-100 text-purple-700 p-4 rounded-lg flex items-center justify-between transition-colors"
             >

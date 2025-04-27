@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { User, LogOut, Home, Briefcase, GraduationCap, BarChart, Trophy, Mail, Settings } from 'lucide-react';
+import { User, LogOut, Home, Briefcase, GraduationCap, BarChart, Trophy, Mail, Settings, Award } from 'lucide-react';
 
 const AdminSidebar = ({ activePage }: { activePage: string }) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -12,6 +12,7 @@ const AdminSidebar = ({ activePage }: { activePage: string }) => {
     { name: 'Profile', icon: <User size={20} />, path: '/admin/profile' },
     { name: 'Experience', icon: <Briefcase size={20} />, path: '/admin/experience' },
     { name: 'Education', icon: <GraduationCap size={20} />, path: '/admin/education' },
+    { name: 'Certifications', icon: <Award size={20} />, path: '/admin/certifications' },
     { name: 'Skills', icon: <BarChart size={20} />, path: '/admin/skills' },
     { name: 'Achievements', icon: <Trophy size={20} />, path: '/admin/achievements' },
     { name: 'Contact', icon: <Mail size={20} />, path: '/admin/contact' },
