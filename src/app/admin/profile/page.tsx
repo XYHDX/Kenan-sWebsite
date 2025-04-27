@@ -66,8 +66,8 @@ const ProfileEditor = () => {
       console.log('Starting image upload for file:', file.name);
       
       // Create FormData for file upload
-      const formData = new FormData();
-      formData.append('file', file);
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
 
       // Try file upload first
       let imageUrl = '';
@@ -78,7 +78,7 @@ const ProfileEditor = () => {
         console.log('Sending request to /api/admin/upload');
         const response = await fetch('/api/admin/upload', {
           method: 'POST',
-          body: formData,
+          body: uploadFormData,
         });
 
         console.log('Upload response status:', response.status);
@@ -106,17 +106,26 @@ const ProfileEditor = () => {
         // Fallback to data URL if file upload fails
         return new Promise<void>((resolve) => {
           const fallbackReader = new FileReader();
-          fallbackReader.onloadend = () => {
+          fallbackReader.onloadend = async () => {
             imageUrl = fallbackReader.result as string;
             useDataUrl = true;
             
             // Update formData with the data URL
-            setFormData(prev => ({
-              ...prev,
+            const updatedFormData = {
+              ...formData,
               profileImage: imageUrl
-            }));
+            };
+            setFormData(updatedFormData);
             
-            setSaveMessage('Image stored as data URL (client-side only).');
+            // Automatically save to backend when using data URL
+            try {
+              await saveProfileData(updatedFormData);
+              setSaveMessage('Image stored as data URL and saved to profile.');
+            } catch (saveError) {
+              console.error('Error saving profile with data URL:', saveError);
+              setSaveMessage('Image stored as data URL (client-side only). Click Save Changes to persist.');
+            }
+            
             setIsUploading(false);
             resolve();
           };
@@ -126,12 +135,20 @@ const ProfileEditor = () => {
       
       if (!useDataUrl) {
         // Update formData with the new image URL
-        setFormData(prev => ({
-          ...prev,
+        const updatedFormData = {
+          ...formData,
           profileImage: imageUrl
-        }));
-  
-        setSaveMessage('Image uploaded successfully!');
+        };
+        setFormData(updatedFormData);
+        
+        // Automatically save to backend when upload succeeds
+        try {
+          await saveProfileData(updatedFormData);
+          setSaveMessage('Image uploaded and saved successfully!');
+        } catch (saveError) {
+          console.error('Error saving profile after upload:', saveError);
+          setSaveMessage('Image uploaded but not saved. Click Save Changes to persist.');
+        }
       }
     } catch (error) {
       console.error('Error handling image:', error);
@@ -144,28 +161,34 @@ const ProfileEditor = () => {
     }
   };
 
+  // Helper function to save profile data to the backend
+  const saveProfileData = async (profileData: ProfileData): Promise<void> => {
+    // Save to localStorage for fallback
+    saveToLocalStorage(STORAGE_KEYS.PROFILE, profileData);
+
+    // Save to Redis via API endpoint
+    const response = await fetch('/api/admin/profile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(profileData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to save profile');
+    }
+    
+    return;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     setSaveMessage('');
 
     try {
-      // Save to localStorage for fallback
-      saveToLocalStorage(STORAGE_KEYS.PROFILE, formData);
-
-      // Save to Redis via API endpoint
-      const response = await fetch('/api/admin/profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save profile');
-      }
-      
+      await saveProfileData(formData);
       setSaveMessage('Profile updated successfully!');
     } catch (error) {
       console.error('Error saving profile:', error);
