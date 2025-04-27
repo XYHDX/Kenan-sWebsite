@@ -3,57 +3,54 @@ import { NextRequest, NextResponse } from 'next/server';
 import { STORAGE_KEYS } from '@/lib/localStorage'; // Keep for KV key name
 
 // Profile interface
-interface Profile {
+interface ProfileData {
   name: string;
   title: string;
+  email: string;
+  phone: string;
+  location: string;
   summary: string;
-  photoUrl?: string;
-  headerImage?: string;
-  bio?: string;
-  location?: string;
-  availability?: string;
-  social?: {
-    linkedin?: string;
-    github?: string;
-    twitter?: string;
-    website?: string;
-  };
+  profileImage?: string;
 }
-
-const REDIS_PROFILE_KEY = STORAGE_KEYS.PROFILE;
 
 // GET Handler: Fetch profile data from Redis
 export async function GET() {
   try {
-    const profile = await redis.get<Profile>(REDIS_PROFILE_KEY) || {
-      name: '',
-      title: '',
-      summary: '',
-    };
-    return NextResponse.json(profile);
+    const profileData = await redis.get<ProfileData>(STORAGE_KEYS.PROFILE);
+    return NextResponse.json(profileData || {});
   } catch (error) {
-    console.error('🔥 GET /api/admin/profile failed:', error);
-    return NextResponse.json({ error: 'Internal Server Error fetching data' }, { status: 500 });
+    console.error('Error fetching profile data:', error);
+    return NextResponse.json(
+      { error: 'Error fetching profile data' },
+      { status: 500 }
+    );
   }
 }
 
 // POST Handler: Save profile data to Redis
 export async function POST(request: NextRequest) {
   try {
-    const profile: Profile = await request.json();
+    const profileData = await request.json() as ProfileData;
     
     // Validate required fields
-    if (!profile.name || !profile.title) {
-      return NextResponse.json({ error: 'Name and title are required' }, { status: 400 });
+    if (!profileData.name || !profileData.title || !profileData.email) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
     }
     
-    await redis.set(REDIS_PROFILE_KEY, profile);
-    return NextResponse.json({ message: 'Profile saved successfully' }, { status: 200 });
+    // Save profile data to Redis
+    await redis.set(STORAGE_KEYS.PROFILE, profileData);
+    
+    return NextResponse.json({ 
+      message: 'Profile updated successfully' 
+    });
   } catch (error) {
-    console.error("🔥 POST /api/admin/profile failed:", error);
-    if (error instanceof SyntaxError) {
-      return NextResponse.json({ error: 'Bad Request: Invalid JSON' }, { status: 400 });
-    }
-    return NextResponse.json({ error: 'Internal Server Error saving data' }, { status: 500 });
+    console.error('Error updating profile data:', error);
+    return NextResponse.json(
+      { error: 'Error updating profile data' },
+      { status: 500 }
+    );
   }
 } 

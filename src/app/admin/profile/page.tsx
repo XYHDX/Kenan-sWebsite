@@ -1,20 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { User, Mail, Phone, MapPin, Save } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Save, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { saveToLocalStorage, STORAGE_KEYS } from '@/lib/localStorage';
 
+interface ProfileData {
+  name: string;
+  title: string;
+  email: string;
+  phone: string;
+  location: string;
+  summary: string;
+  profileImage?: string;
+}
+
 const ProfileEditor = () => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  
   // In a real implementation, this data would come from an API
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProfileData>({
     name: 'Yahya Demeriah',
     title: 'IT Engineer & Robotics Specialist',
     email: 'yahyademeriah@gmail.com',
     phone: '+963 956 633 888',
     location: 'Masaken Barzeh, Damascus, Syria',
-    summary: 'Results-driven IT Engineer and Robotics Specialist with over 3 years of experience leading teams, designing robotic systems, and optimizing IT infrastructures. Demonstrated success in mentoring junior engineers and students, and recognized for implementing robust IT solutions. Skilled in emerging technologies and cross-functional collaboration to drive innovation.'
+    summary: 'Results-driven IT Engineer and Robotics Specialist with over 3 years of experience leading teams, designing robotic systems, and optimizing IT infrastructures. Demonstrated success in mentoring junior engineers and students, and recognized for implementing robust IT solutions. Skilled in emerging technologies and cross-functional collaboration to drive innovation.',
+    profileImage: '/images/profile-pic.png'
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -28,20 +43,81 @@ const ProfileEditor = () => {
     }));
   };
 
+  const handleImageClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Preview the image locally first
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    setIsUploading(true);
+    try {
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // Upload the image to the server
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const data = await response.json() as { imageUrl: string };
+      
+      // Update formData with the new image URL
+      setFormData(prev => ({
+        ...prev,
+        profileImage: data.imageUrl
+      }));
+
+      setSaveMessage('Image uploaded successfully!');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setSaveMessage('Failed to upload image. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     setSaveMessage('');
 
     try {
-      // Save to localStorage
+      // Save to localStorage for fallback
       saveToLocalStorage(STORAGE_KEYS.PROFILE, formData);
 
-      // Simulate API delay if needed, or remove if saving is fast enough
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Save to Redis via API endpoint
+      const response = await fetch('/api/admin/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save profile');
+      }
       
       setSaveMessage('Profile updated successfully!');
-    } catch {
+    } catch (error) {
+      console.error('Error saving profile:', error);
       setSaveMessage('An error occurred while saving. Please try again.');
     } finally {
       setIsSaving(false);
@@ -56,7 +132,7 @@ const ProfileEditor = () => {
       </div>
 
       {saveMessage && (
-        <div className={`p-4 mb-6 rounded-md ${saveMessage.includes('error') ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
+        <div className={`p-4 mb-6 rounded-md ${saveMessage.includes('error') || saveMessage.includes('Failed') ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
           {saveMessage}
         </div>
       )}
@@ -167,19 +243,38 @@ const ProfileEditor = () => {
                   Profile Image
                 </label>
                 <div className="flex flex-col items-center">
-                  <div className="relative w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-md mb-4">
-                    <Image
-                      src="/images/profile-pic.png"
-                      alt="Profile"
-                      fill
-                      className="object-cover"
-                    />
+                  <div 
+                    className="relative w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-md mb-4 cursor-pointer"
+                    onClick={handleImageClick}
+                  >
+                    {isUploading ? (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-50">
+                        <Loader2 size={40} className="animate-spin text-blue-600" />
+                      </div>
+                    ) : (
+                      <Image
+                        src={imagePreview || formData.profileImage || "/images/profile-pic.png"}
+                        alt="Profile"
+                        fill
+                        className="object-cover"
+                      />
+                    )}
                   </div>
+                  <input
+                    ref={fileInputRef}
+                    id="profile-image"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
                   <button
                     type="button"
+                    onClick={handleImageClick}
                     className="bg-blue-50 text-blue-700 px-4 py-2 rounded-md hover:bg-blue-100 transition-colors"
+                    disabled={isUploading}
                   >
-                    Change Image
+                    {isUploading ? 'Uploading...' : 'Change Image'}
                   </button>
                 </div>
               </div>
@@ -204,9 +299,9 @@ const ProfileEditor = () => {
           <div className="flex justify-end">
             <button
               type="submit"
-              disabled={isSaving}
+              disabled={isSaving || isUploading}
               className={`flex items-center px-6 py-2 rounded-md text-white ${
-                isSaving ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+                isSaving || isUploading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
               } transition-colors`}
             >
               {isSaving ? 'Saving...' : 'Save Changes'}
