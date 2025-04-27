@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { STORAGE_KEYS } from '@/lib/localStorage';
@@ -12,6 +13,7 @@ interface ProfileData {
   email?: string;
   phone?: string;
   location?: string;
+  profileImage?: string;
 }
 
 const Hero = () => {
@@ -19,15 +21,56 @@ const Hero = () => {
   const defaultProfile: ProfileData = {
     name: 'Yahya Demeriah',
     title: 'IT Engineer & Robotics Specialist',
-    summary: 'Results-driven professional with over 3 years of experience leading teams, designing robotic systems, and optimizing IT infrastructures. Passionate about innovation and technology education.'
+    summary: 'Results-driven professional with over 3 years of experience leading teams, designing robotic systems, and optimizing IT infrastructures. Passionate about innovation and technology education.',
+    profileImage: '/images/profile-pic.png'
   };
 
-  // Use our custom hook to get profile data
+  const [isLoading, setIsLoading] = useState(true);
+  const [profileData, setProfileData] = useState<ProfileData>(defaultProfile);
+  
+  // Use our custom hook to get profile data from localStorage as fallback
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [profileData, _, isLoading] = useLocalStorage<ProfileData>(
+  const [localProfileData] = useLocalStorage<ProfileData>(
     STORAGE_KEYS.PROFILE,
     defaultProfile
   );
+
+  // Fetch profile data from API
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await fetch('/api/admin/profile', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json() as Partial<ProfileData>;
+          console.log('Hero: Fetched profile data from API', data ? Object.keys(data) : 'empty data');
+          
+          if (data && typeof data === 'object' && 'name' in data && data.name) {
+            setProfileData(data as ProfileData);
+          } else {
+            console.log('Hero: API returned empty data, using localStorage fallback');
+            setProfileData(localProfileData);
+          }
+        } else {
+          console.log('Hero: API request failed, using localStorage fallback');
+          setProfileData(localProfileData);
+        }
+      } catch (error) {
+        console.error('Hero: Error fetching profile data:', error);
+        setProfileData(localProfileData);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, [localProfileData]);
 
   if (isLoading) {
     return (
@@ -37,6 +80,10 @@ const Hero = () => {
     );
   }
 
+  // Use profileImage from API if available, otherwise use default
+  const profileImageSrc = profileData.profileImage || '/images/profile-pic.png';
+  console.log('Hero: Using profile image:', profileImageSrc);
+
   return (
     <section className="py-12 md:py-20 bg-secondary dark:bg-gray-900">
       <div className="container mx-auto px-4">
@@ -45,7 +92,7 @@ const Hero = () => {
           <div className="w-full md:w-2/5 flex justify-center">
             <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-xl">
               <Image
-                src="/images/profile-pic.png"
+                src={profileImageSrc}
                 alt={profileData.name}
                 fill
                 className="object-cover"

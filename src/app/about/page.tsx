@@ -29,28 +29,58 @@ const AboutPage = () => {
   
   // State for API data
   const [contactData, setContactData] = useState<ContactData>(defaultContactData);
+  const [profileData, setProfileData] = useState<{ profileImage?: string }>({});
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Fetch contact data from API
+  // Fetch contact and profile data from API
   useEffect(() => {
-    const fetchContactData = async () => {
+    const fetchData = async () => {
+      setIsLoading(true);
       try {
-        const response = await fetch('/api/contact/data');
-        if (response.ok) {
-          const data = await response.json() as ContactData;
+        // Fetch contact data
+        const contactResponse = await fetch('/api/contact/data');
+        if (contactResponse.ok) {
+          const data = await contactResponse.json() as ContactData;
           setContactData(data);
         } else {
           // Fallback to localStorage if API fails
           setContactData(localContactData);
         }
+        
+        // Fetch profile data for the image
+        const profileResponse = await fetch('/api/admin/profile', { 
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
+        
+        if (profileResponse.ok) {
+          const data = await profileResponse.json() as any;
+          if (data && typeof data === 'object' && 'profileImage' in data && data.profileImage) {
+            console.log('About: Got profile image from API');
+            setProfileData({
+              profileImage: data.profileImage
+            });
+          } else {
+            console.log('About: No profile image in API response');
+          }
+        }
       } catch (error) {
-        console.error('Error fetching contact data for about page:', error);
+        console.error('Error fetching data for about page:', error);
         // Fallback to localStorage if API fails
         setContactData(localContactData);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchContactData();
+    fetchData();
   }, [localContactData]);
+
+  // Default image path to use if no custom image is set
+  const profileImageSrc = profileData.profileImage || '/images/profile-pic.png';
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
@@ -60,47 +90,53 @@ const AboutPage = () => {
           <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold text-center mb-12 text-primary dark:text-primary">About Me</h1>
             
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden mb-12">
-              <div className="p-6 md:p-8 lg:p-10 flex flex-col md:flex-row gap-8 items-center">
-                <div className="md:w-1/3 flex justify-center">
-                  <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-primary">
-                    <Image 
-                      src="/images/profile-pic.png" 
-                      alt="Yahya Demeriah"
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      priority
-                    />
+            {isLoading ? (
+              <div className="flex justify-center items-center h-40">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+              </div>
+            ) : (
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden mb-12">
+                <div className="p-6 md:p-8 lg:p-10 flex flex-col md:flex-row gap-8 items-center">
+                  <div className="md:w-1/3 flex justify-center">
+                    <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-primary">
+                      <Image 
+                        src={profileImageSrc}
+                        alt="Yahya Demeriah"
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        priority
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className="md:w-2/3">
-                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Yahya Demeriah</h2>
-                  <h3 className="text-xl text-primary dark:text-primary font-medium mb-6">IT Engineer & Robotics Specialist</h3>
+                  <div className="md:w-2/3">
+                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Yahya Demeriah</h2>
+                    <h3 className="text-xl text-primary dark:text-primary font-medium mb-6">IT Engineer & Robotics Specialist</h3>
 
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center">
-                      <Mail size={18} className="text-primary dark:text-primary mr-3" />
-                      <a href={`mailto:${contactData.email}`} className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
-                        {contactData.email}
-                      </a>
-                    </div>
+                    <div className="space-y-3 mb-6">
+                      <div className="flex items-center">
+                        <Mail size={18} className="text-primary dark:text-primary mr-3" />
+                        <a href={`mailto:${contactData.email}`} className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+                          {contactData.email}
+                        </a>
+                      </div>
 
-                    <div className="flex items-center">
-                      <Phone size={18} className="text-primary dark:text-primary mr-3" />
-                      <a href={`tel:${contactData.phone}`} className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
-                        {contactData.phone}
-                      </a>
-                    </div>
+                      <div className="flex items-center">
+                        <Phone size={18} className="text-primary dark:text-primary mr-3" />
+                        <a href={`tel:${contactData.phone}`} className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+                          {contactData.phone}
+                        </a>
+                      </div>
 
-                    <div className="flex items-center">
-                      <MapPin size={18} className="text-primary dark:text-primary mr-3" />
-                      <span className="text-gray-700 dark:text-gray-300">{contactData.location}</span>
+                      <div className="flex items-center">
+                        <MapPin size={18} className="text-primary dark:text-primary mr-3" />
+                        <span className="text-gray-700 dark:text-gray-300">{contactData.location}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="space-y-8">
               <section className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 md:p-8">
