@@ -87,11 +87,31 @@ const ContactPage = () => {
     setSubmitStatus(null);
     
     try {
-      // In a production app, you would send data to your backend here
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulating API call
-      setSubmitStatus({ success: true, message: 'Your message has been sent successfully!' });
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    } catch {
+      // Send data to the API endpoint
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      const data = await response.json() as { 
+        success?: boolean; 
+        message?: string; 
+        error?: string 
+      };
+      
+      if (response.ok && data.success) {
+        setSubmitStatus({ success: true, message: data.message || 'Your message has been sent successfully!' });
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        setSubmitStatus({ 
+          success: false, 
+          message: data.error || 'Failed to send message. Please try again.' 
+        });
+      }
+    } catch (_error) {
       setSubmitStatus({ success: false, message: 'Failed to send message. Please try again.' });
     } finally {
       setIsSubmitting(false);

@@ -72,5 +72,6 @@ export const STORAGE_KEYS = {
   SKILLS: 'skills_data',
   ACHIEVEMENTS: 'achievements_data',
   CONTACT: 'contact_data',
+  MESSAGES: 'contact_messages',
   SETTINGS: 'site_settings'
 }; 
