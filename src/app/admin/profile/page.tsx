@@ -61,33 +61,52 @@ const ProfileEditor = () => {
     reader.readAsDataURL(file);
 
     setIsUploading(true);
+    setSaveMessage('');
     try {
+      console.log('Starting image upload for file:', file.name);
+      
       // Create FormData for file upload
       const formData = new FormData();
       formData.append('file', file);
 
       // Upload the image to the server
+      console.log('Sending request to /api/admin/upload');
       const response = await fetch('/api/admin/upload', {
         method: 'POST',
         body: formData,
       });
 
+      console.log('Upload response status:', response.status);
+      
+      // Get the response data
+      const responseData = await response.json() as { 
+        imageUrl?: string;
+        error?: string;
+        success?: boolean;
+      };
+      console.log('Upload response data:', responseData);
+      
       if (!response.ok) {
-        throw new Error('Failed to upload image');
+        throw new Error(responseData.error || 'Failed to upload image');
       }
 
-      const data = await response.json() as { imageUrl: string };
+      if (!responseData.imageUrl) {
+        throw new Error('No image URL returned from server');
+      }
       
       // Update formData with the new image URL
       setFormData(prev => ({
         ...prev,
-        profileImage: data.imageUrl
+        profileImage: responseData.imageUrl
       }));
 
       setSaveMessage('Image uploaded successfully!');
     } catch (error) {
       console.error('Error uploading image:', error);
-      setSaveMessage('Failed to upload image. Please try again.');
+      setSaveMessage('Failed to upload image. Please try again. ' + (error instanceof Error ? error.message : ''));
+      
+      // Reset the preview if there was an error
+      setImagePreview(null);
     } finally {
       setIsUploading(false);
     }
