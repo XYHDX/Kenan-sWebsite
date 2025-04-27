@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, ChangeEvent, FormEvent } from 'react';
+import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { Mail, Phone, MapPin, Send, Loader2 } from 'lucide-react';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS } from '@/lib/localStorage';
@@ -28,6 +28,8 @@ interface ContactData {
   email: string;
   phone: string;
   location: string;
+  linkedinUrl?: string;
+  githubUrl?: string;
   showContactForm: boolean;
 }
 
@@ -48,12 +50,40 @@ const Contact = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus | null>(null);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [contactInfo, _, isLoadingContactInfo] = useLocalStorage<ContactData>(
+  // Keep the localStorage hook for fallback
+  const [localContactInfo, , isLoadingLocalStorage] = useLocalStorage<ContactData>(
     STORAGE_KEYS.CONTACT, 
     defaultContactData
   );
+  
+  // Add state for API-fetched contact data
+  const [contactInfo, setContactInfo] = useState<ContactData>(defaultContactData);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch contact data from API
+  useEffect(() => {
+    const fetchContactData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch('/api/contact/data');
+        if (response.ok) {
+          const data = await response.json() as ContactData;
+          setContactInfo(data);
+        } else {
+          // Fallback to localStorage if API fails
+          setContactInfo(localContactInfo);
+        }
+      } catch (error) {
+        console.error('Error fetching contact data:', error);
+        // Fallback to localStorage if API fails
+        setContactInfo(localContactInfo);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchContactData();
+  }, [localContactInfo]);
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -119,7 +149,7 @@ const Contact = () => {
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-8 text-primary">Get In Touch</h2>
         
-        {isLoadingContactInfo ? (
+        {isLoading ? (
           <div className="text-center py-10"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" /></div>
         ) : (
           <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">

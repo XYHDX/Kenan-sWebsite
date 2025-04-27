@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, ChangeEvent, FormEvent } from 'react';
+import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Send, Phone, Mail, MapPin, ExternalLink, Loader2 } from 'lucide-react';
@@ -53,11 +53,40 @@ const ContactPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus | null>(null);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [contactInfo, _, isLoadingContactInfo] = useLocalStorage<ContactData>(
+  // Keep the localStorage hook for fallback
+  const [localContactInfo, , isLoadingLocalStorage] = useLocalStorage<ContactData>(
     STORAGE_KEYS.CONTACT, 
     defaultContactData
   );
+  
+  // Add state for API-fetched contact data
+  const [contactInfo, setContactInfo] = useState<ContactData>(defaultContactData);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch contact data from API
+  useEffect(() => {
+    const fetchContactData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch('/api/contact/data');
+        if (response.ok) {
+          const data = await response.json() as ContactData;
+          setContactInfo(data);
+        } else {
+          // Fallback to localStorage if API fails
+          setContactInfo(localContactInfo);
+        }
+      } catch (error) {
+        console.error('Error fetching contact data:', error);
+        // Fallback to localStorage if API fails
+        setContactInfo(localContactInfo);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchContactData();
+  }, [localContactInfo]);
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -129,7 +158,7 @@ const ContactPage = () => {
               Have a question or want to work together? Feel free to reach out.
             </p>
 
-            {isLoadingContactInfo ? (
+            {isLoading ? (
               <div className="text-center py-10"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary dark:text-primary" /></div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
@@ -165,7 +194,7 @@ const ContactPage = () => {
               </div>
             )}
 
-            {!isLoadingContactInfo && contactInfo.showContactForm && (
+            {!isLoading && contactInfo.showContactForm && (
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 md:p-8">
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-8">Send a Message</h2>
 
@@ -256,7 +285,7 @@ const ContactPage = () => {
               </div>
             )}
             
-            {!isLoadingContactInfo && !contactInfo.showContactForm && (
+            {!isLoading && !contactInfo.showContactForm && (
               <div className="text-center text-gray-500 dark:text-gray-400 italic">Contact form is currently disabled.</div>
             )}
           </div>

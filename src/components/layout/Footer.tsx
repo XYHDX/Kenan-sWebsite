@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Mail, Phone, MapPin, Linkedin, Github } from 'lucide-react';
 import { STORAGE_KEYS } from '@/lib/localStorage';
@@ -24,12 +25,45 @@ const Footer = () => {
     githubUrl: 'https://github.com/yahyademeriah'
   };
 
-  // Use our custom hook to get contact data
+  // Use our custom hook to get contact data from localStorage as fallback
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [contactData, _, isLoading] = useLocalStorage<ContactData>(
+  const [localContactData, , isLocalLoading] = useLocalStorage<ContactData>(
     STORAGE_KEYS.CONTACT, 
     defaultContactData
   );
+  
+  // State for API data
+  const [contactData, setContactData] = useState<ContactData>(defaultContactData);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch contact data from API
+  useEffect(() => {
+    const fetchContactData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch('/api/contact/data');
+        if (response.ok) {
+          const data = await response.json() as ContactData;
+          setContactData({
+            ...data,
+            linkedinUrl: data.linkedinUrl || defaultContactData.linkedinUrl,
+            githubUrl: data.githubUrl || defaultContactData.githubUrl
+          });
+        } else {
+          // Fallback to localStorage if API fails
+          setContactData(localContactData);
+        }
+      } catch (error) {
+        console.error('Error fetching contact data for footer:', error);
+        // Fallback to localStorage if API fails
+        setContactData(localContactData);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchContactData();
+  }, [localContactData]);
 
   if (isLoading) {
     return null; // Don't render anything while loading

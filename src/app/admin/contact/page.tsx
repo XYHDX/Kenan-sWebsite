@@ -30,11 +30,36 @@ const ContactEditor = () => {
   const [formData, setFormData] = useState<ContactFormData>(defaultContactData);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // We disable exhaustive-deps because defaultContactData is constant and doesn't need to be re-tracked.
-    const savedData = getFromLocalStorage<ContactFormData>(STORAGE_KEYS.CONTACT, defaultContactData);
-    setFormData(savedData);
+    // First try to get data from Redis, then fallback to localStorage
+    const fetchContactData = async () => {
+      setIsLoading(true);
+      try {
+        // Try to fetch from API first
+        const response = await fetch('/api/admin/contact');
+        if (response.ok) {
+          const apiData = await response.json() as ContactFormData;
+          setFormData(apiData);
+          // Also update localStorage to keep them in sync
+          saveToLocalStorage(STORAGE_KEYS.CONTACT, apiData);
+        } else {
+          // If API fails, fall back to localStorage
+          const savedData = getFromLocalStorage<ContactFormData>(STORAGE_KEYS.CONTACT, defaultContactData);
+          setFormData(savedData);
+        }
+      } catch (error) {
+        console.error('Error fetching contact data:', error);
+        // Fall back to localStorage if API call fails
+        const savedData = getFromLocalStorage<ContactFormData>(STORAGE_KEYS.CONTACT, defaultContactData);
+        setFormData(savedData);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchContactData();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,17 +76,42 @@ const ContactEditor = () => {
     setSaveMessage('');
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Save to localStorage for immediate UI update
       saveToLocalStorage(STORAGE_KEYS.CONTACT, formData);
-      setSaveMessage('Contact information updated successfully!');
+      
+      // Also save to Redis through API
+      const response = await fetch('/api/admin/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      if (response.ok) {
+        setSaveMessage('Contact information updated successfully!');
+      } else {
+        const data = await response.json() as { error?: string };
+        setSaveMessage(`Error: ${data.error || 'Failed to save to server. Data saved locally only.'}`);
+      }
     } catch (err) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const error = err;
-      setSaveMessage('An error occurred while saving. Please try again.');
+      console.error('Error saving contact data:', err);
+      setSaveMessage('An error occurred while saving to server. Data saved locally only.');
     } finally {
       setIsSaving(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <AdminLayout activePage="contact">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Contact Information</h1>
+          <p className="text-gray-600">Loading contact details...</p>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout activePage="contact">
@@ -71,7 +121,7 @@ const ContactEditor = () => {
       </div>
 
       {saveMessage && (
-        <div className={`p-4 mb-6 rounded-md ${saveMessage.includes('error') ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
+        <div className={`p-4 mb-6 rounded-md ${saveMessage.includes('Error') ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
           {saveMessage}
         </div>
       )}
