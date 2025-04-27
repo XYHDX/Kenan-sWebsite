@@ -31,7 +31,7 @@ const ExperiencePreview = async () => {
   const previewExperiences = experiences.slice(0, 3);
 
   return (
-    <section className="py-12 bg-background/5">
+    <section className="py-12 bg-gray-100 dark:bg-gray-900">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-primary">Experience Highlights</h2>

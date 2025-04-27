@@ -90,7 +90,7 @@ export default function RootLayout({
   const darkModeClass = settings.enableDarkMode ? "dark" : "";
   const combinedClasses = `${themeClass} ${darkModeClass}`.trim();
 
-  if (!isLoadingSettings && settings.maintenanceMode && !pathname.startsWith('/admin')) {
+  if (!isLoadingSettings && settings.maintenanceMode && pathname && !pathname.startsWith('/admin')) {
     return (
       <html 
         lang={settings.siteLanguage || defaultSettings.siteLanguage} 

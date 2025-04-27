@@ -6,7 +6,7 @@ const ProfessionalSummary = () => {
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-8 text-primary">Professional Summary</h2>
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gray-50 dark:bg-gray-800 p-6 md:p-8 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+          <div className="bg-gray-100 dark:bg-gray-800 p-6 md:p-8 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
               Results-driven IT Engineer and Robotics Specialist with over 3 years of experience leading
               teams, designing robotic systems, and optimizing IT infrastructures. Demonstrated success

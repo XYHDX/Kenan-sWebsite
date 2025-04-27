@@ -281,46 +281,51 @@ const AchievementsEditor = () => {
         ) : (
           <div className="space-y-4">
             {achievements.map((achievement) => (
-              <div key={achievement.id} className="bg-card dark:bg-card rounded-lg shadow-sm border border-border p-4 flex justify-between items-center">
-                <div className="md:w-1/4 flex flex-col items-center justify-center">
-                  <div className="w-20 h-20 rounded-full bg-accent dark:bg-accent flex items-center justify-center mb-4">
-                    <Trophy size={36} className="text-primary dark:text-primary" />
-                  </div>
-                  <h2 className="text-xl font-bold text-center text-primary dark:text-primary-foreground">{achievement.title}</h2>
-                </div>
-
-                <div className="md:w-3/4">
-                  <h3 className="text-xl font-semibold text-card-foreground mb-2">{achievement.competition}</h3>
-
-                  <div className="flex flex-wrap gap-4 mb-4">
-                    <div className="flex items-center text-gray-600 dark:text-gray-400">
-                      <MapPin size={16} className="mr-1" />
-                      <span>{achievement.location}</span>
+              <div 
+                key={achievement.id} 
+                className="bg-card text-card-foreground rounded-lg shadow-md border border-border p-6 md:p-8 hover:shadow-lg transition-shadow"
+              >
+                <div className="flex flex-col md:flex-row gap-6">
+                  <div className="md:w-1/4 flex flex-col items-center justify-center">
+                    <div className="w-20 h-20 rounded-full bg-secondary dark:bg-secondary flex items-center justify-center mb-4">
+                      <Trophy size={36} className="text-secondary-foreground dark:text-secondary-foreground" />
                     </div>
-
-                    <div className="flex items-center text-gray-600 dark:text-gray-400">
-                      <Calendar size={16} className="mr-1" />
-                      <span>{achievement.year}</span>
-                    </div>
+                    <h2 className="text-xl font-bold text-center text-foreground">{achievement.title}</h2>
                   </div>
 
-                  <p className="text-card-foreground mb-4">{achievement.description}</p>
+                  <div className="md:w-3/4">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">{achievement.competition}</h3>
 
-                  <div className="flex space-x-3">
-                    <button
-                      onClick={() => handleEdit(achievement)}
-                      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                      title="Edit"
-                    >
-                      <Edit size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(achievement.id)}
-                      className="text-destructive hover:text-destructive/80"
-                      title="Delete"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    <div className="flex flex-wrap gap-4 mb-4">
+                      <div className="flex items-center text-muted-foreground">
+                        <MapPin size={16} className="mr-1" />
+                        <span>{achievement.location}</span>
+                      </div>
+
+                      <div className="flex items-center text-muted-foreground">
+                        <Calendar size={16} className="mr-1" />
+                        <span>{achievement.year}</span>
+                      </div>
+                    </div>
+
+                    <p className="text-foreground mb-4">{achievement.description}</p>
+
+                    <div className="flex space-x-3">
+                      <button
+                        onClick={() => handleEdit(achievement)}
+                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                        title="Edit"
+                      >
+                        <Edit size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(achievement.id)}
+                        className="text-destructive hover:text-destructive/80"
+                        title="Delete"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
