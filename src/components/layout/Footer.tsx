@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Mail, Phone, MapPin, Linkedin, Github } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Instagram } from 'lucide-react';
 import { STORAGE_KEYS } from '@/lib/localStorage';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { navLinks } from '@/config/navigation';
@@ -12,17 +12,17 @@ interface ContactData {
   phone: string;
   location: string;
   linkedinUrl: string;
-  githubUrl: string;
+  instagramUrl: string;
 }
 
 const Footer = () => {
   // Default contact data
   const defaultContactData: ContactData = {
-    email: 'yahyademeriah@gmail.com',
-    phone: '+971 58 127 7542',
-    location: 'Dubai, UAE',
-    linkedinUrl: 'https://linkedin.com/in/yahyademeriah',
-    githubUrl: 'https://github.com/yahyademeriah'
+    email: 'kenan.saoud@outlook.com',
+    phone: '09639666005656',
+    location: 'Damascus, Syria',
+    linkedinUrl: 'https://linkedin.com/in/Kenan.saoud',
+    instagramUrl: 'https://instagram.com/Kenan.saoud'
   };
 
   // Use our custom hook to get contact data from localStorage as fallback
@@ -47,7 +47,7 @@ const Footer = () => {
           setContactData({
             ...data,
             linkedinUrl: data.linkedinUrl || defaultContactData.linkedinUrl,
-            githubUrl: data.githubUrl || defaultContactData.githubUrl
+            instagramUrl: data.instagramUrl || defaultContactData.instagramUrl
           });
         } else {
           // Fallback to localStorage if API fails
@@ -124,20 +124,20 @@ const Footer = () => {
                 <Linkedin size={20} />
               </a>
               <a 
-                href={contactData.githubUrl} 
+                href={contactData.instagramUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="bg-gray-800 hover:bg-blue-600 p-3 rounded-full transition-colors"
-                aria-label="GitHub"
+                aria-label="Instagram"
               >
-                <Github size={20} />
+                <Instagram size={20} />
               </a>
             </div>
           </div>
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} Yahya Demeriah. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Kenan Younes Saoud. All rights reserved.</p>
         </div>
       </div>
     </footer>

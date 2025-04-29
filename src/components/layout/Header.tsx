@@ -30,7 +30,7 @@ const Header = () => {
     <header className="bg-white dark:bg-gray-900 shadow-sm dark:shadow-gray-700 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold text-theme-primary" onClick={closeMenu}>
-          Yahya Demeriah
+          Kenan Younes Saoud
         </Link>
 
         <div className="hidden md:flex items-center space-x-4">

@@ -19,8 +19,8 @@ interface SiteSettings {
 }
 
 const defaultSettings: SiteSettings = {
-  siteName: 'Yahya Demeriah - CV',
-  siteDescription: 'The personal CV website for Yahya Demeriah.',
+  siteName: 'Kenan Younes Saoud - CV',
+  siteDescription: 'The personal CV website for Kenan Younes Saoud.',
   siteLanguage: 'en',
   enableDarkMode: false,
   enableSEO: true,

@@ -2,11 +2,15 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Hero from '@/components/home/Hero';
+import PersonalDetails from '@/components/home/PersonalDetails';
 import ProfessionalSummary from '@/components/home/ProfessionalSummary';
 import ExperiencePreview from '@/components/home/ExperiencePreview';
 import SkillsPreview from '@/components/home/SkillsPreview';
 import AchievementsPreview from '@/components/home/AchievementsPreview';
 import EducationPreview from '@/components/home/EducationPreview';
+import Publications from '@/components/home/Publications';
+import AdditionalInformation from '@/components/home/AdditionalInformation';
+import Languages from '@/components/home/Languages';
 import Contact from '@/components/home/Contact';
 // import ThemeVerifier from '@/components/home/ThemeVerifier'; // Removed import
 // import useTheme from '@/hooks/useTheme'; // Remove this import
@@ -26,11 +30,15 @@ export default function Home() {
       <Header />
       <main className="flex-grow">
         <Hero />
+        <PersonalDetails />
         <ProfessionalSummary />
+        <EducationPreview />
         <ExperiencePreview />
         <SkillsPreview />
-        <EducationPreview />
         <AchievementsPreview />
+        <Publications />
+        <AdditionalInformation />
+        <Languages />
         <Contact />
         {/* <ThemeVerifier /> */}{/* Removed component */}
       </main>

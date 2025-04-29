@@ -19,9 +19,12 @@ interface ProfileData {
 const Hero = () => {
   // Default profile data
   const defaultProfile: ProfileData = {
-    name: 'Yahya Demeriah',
-    title: 'IT Engineer & Robotics Specialist',
-    summary: 'Results-driven professional with over 3 years of experience leading teams, designing robotic systems, and optimizing IT infrastructures. Passionate about innovation and technology education.',
+    name: 'Kenan Younes Saoud',
+    title: 'Doctor of Dental Surgery',
+    summary: 'Specialized dental surgeon with PhD degree and extensive experience in oral and maxillofacial surgery (OMFS) and dental implantology.',
+    email: 'kenan.saoud@outlook.com',
+    phone: '09639666005656',
+    location: 'Damascus - Syria',
     profileImage: '/images/profile-pic.png'
   };
 
