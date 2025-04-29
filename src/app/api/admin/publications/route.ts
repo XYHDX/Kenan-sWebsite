@@ -1,3 +1,6 @@
+// Add dynamic export for static site generation
+export const dynamic = 'force-static';
+
 import { redis } from '@/lib/redis';
 import { NextRequest, NextResponse } from 'next/server';
 import { STORAGE_KEYS } from '@/lib/localStorage';

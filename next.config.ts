@@ -24,10 +24,15 @@ const nextConfig: NextConfig = {
   },
   // Ensure trailing slashes are handled properly
   trailingSlash: false,
-  // Use export instead of standalone for static site generation
-  output: 'export',
-  // Disable image optimization during export
-  distDir: 'out'
+  // Use standalone output for Vercel deployment
+  output: 'standalone',
+  // Directory for output files
+  distDir: '.next',
+  // Disable dynamic API routes and middleware for static export
+  experimental: {
+    // This helps with static exports
+    appDocumentPreloading: false,
+  }
 }
 
 export default nextConfig
