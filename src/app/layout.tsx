@@ -97,6 +97,52 @@ export default function RootLayout({
         className={combinedClasses}
         suppressHydrationWarning
       >
+        <head>
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="icon" href="/favicon.ico" />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  try {
+                    const storedSettings = localStorage.getItem('site_settings');
+                    let theme = 'blue'; // Default theme
+                    if (storedSettings) {
+                      const settings = JSON.parse(storedSettings);
+                      if (settings && settings.customTheme) {
+                        theme = settings.customTheme;
+                      }
+                    }
+                    const themeClassName = 'theme-' + theme;
+                    // Add the theme class to the html element
+                    document.documentElement.classList.add(themeClassName);
+
+                    // Also handle dark mode based on localStorage setting
+                    if (storedSettings) {
+                       const settings = JSON.parse(storedSettings);
+                       if (settings && settings.enableDarkMode) {
+                         document.documentElement.classList.add('dark');
+                       } else {
+                         // Optional: explicitly remove dark if it's disabled
+                         document.documentElement.classList.remove('dark');
+                       }
+                    } else {
+                      // Default behavior if no settings found (matches defaultSettings)
+                      // document.documentElement.classList.add('dark'); // Removed default dark
+                    }
+
+                  } catch (error) {
+                    console.error('Error applying theme from localStorage:', error);
+                    // Apply default theme and remove dark mode as fallback
+                    document.documentElement.classList.add('theme-blue');
+                    // document.documentElement.classList.add('dark'); // Removed fallback dark
+                  }
+                })();
+              `,
+            }}
+          />
+        </head>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <MaintenancePage />
         </body>
@@ -113,6 +159,7 @@ export default function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
         {/* Inline script to set theme from localStorage */}
         <script
           dangerouslySetInnerHTML={{

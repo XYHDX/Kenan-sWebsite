@@ -65,13 +65,14 @@ export function setupStorageListener(key: string, callback: () => void): () => v
 
 // Storage keys used throughout the application
 export const STORAGE_KEYS = {
-  PROFILE: 'profile_data',
-  EDUCATION: 'education_data',
-  CERTIFICATIONS: 'certifications_data',
-  EXPERIENCE: 'experience_data',
-  SKILLS: 'skills_data',
-  ACHIEVEMENTS: 'achievements_data',
-  CONTACT: 'contact_data',
-  MESSAGES: 'contact_messages',
-  SETTINGS: 'site_settings'
+  PROFILE: 'kenan_profile_data',
+  EDUCATION: 'kenan_education_data',
+  CERTIFICATIONS: 'kenan_certifications_data',
+  EXPERIENCE: 'kenan_experience_data',
+  SKILLS: 'kenan_skills_data',
+  ACHIEVEMENTS: 'kenan_achievements_data',
+  PUBLICATIONS: 'kenan_publications_data',
+  CONTACT: 'kenan_contact_data',
+  MESSAGES: 'kenan_contact_messages',
+  SETTINGS: 'kenan_site_settings'
 }; 

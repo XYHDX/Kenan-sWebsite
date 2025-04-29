@@ -40,6 +40,11 @@ const Hero = () => {
 
   // Fetch profile data from API
   useEffect(() => {
+    // Reset the local storage profile data to ensure sync with our changes
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(STORAGE_KEYS.PROFILE);
+    }
+    
     const fetchProfileData = async () => {
       try {
         const response = await fetch('/api/admin/profile', {

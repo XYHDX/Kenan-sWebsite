@@ -15,12 +15,12 @@ interface ProfileData {
 
 // Default profile data for fallback
 const defaultProfile: ProfileData = {
-  name: 'Yahya Demeriah',
-  title: 'IT Engineer & Robotics Specialist',
-  email: 'yahyademeriah@gmail.com',
-  phone: '+963 956 633 888',
-  location: 'Masaken Barzeh, Damascus, Syria',
-  summary: 'Results-driven IT Engineer and Robotics Specialist with over 3 years of experience leading teams, designing robotic systems, and optimizing IT infrastructures. Demonstrated success in mentoring junior engineers and students, and recognized for implementing robust IT solutions. Skilled in emerging technologies and cross-functional collaboration to drive innovation.',
+  name: 'Kenan Younes Saoud',
+  title: 'Doctor of Dental Surgery',
+  email: 'kenan.saoud@outlook.com',
+  phone: '09639666005656',
+  location: 'Damascus, Syria',
+  summary: 'Specialized dental surgeon with PhD degree and extensive experience in oral and maxillofacial surgery (OMFS) and dental implantology.',
   profileImage: '/images/profile-pic.png'
 };
 
