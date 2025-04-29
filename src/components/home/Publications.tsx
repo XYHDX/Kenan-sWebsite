@@ -59,30 +59,26 @@ const Publications = async () => {
             See All <ArrowRight size={16} className="ml-1" />
           </Link>
         </div>
-        <div className="max-w-4xl mx-auto">
-          <div className="space-y-6">
-            {publications.map((publication) => (
-              <div 
-                key={publication.id} 
-                className="bg-gray-100 dark:bg-gray-800 p-6 md:p-8 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <Book className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">{publication.title}</h3>
-                    {publication.year && (
-                      <p className="text-muted-foreground">Published: {publication.year}</p>
-                    )}
-                    {publication.description && (
-                      <p className="mt-2">{publication.description}</p>
-                    )}
-                  </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {publications.slice(0, 3).map((publication) => (
+            <div 
+              key={publication.id} 
+              className="p-6 border border-border rounded-lg shadow-sm bg-card hover:shadow-md hover:border-primary/20 transition-all"
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 mt-1">
+                  <Book className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-medium">{publication.title}</h3>
+                  {publication.year && (
+                    <p className="text-sm text-muted-foreground mt-2">Published: {publication.year}</p>
+                  )}
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
