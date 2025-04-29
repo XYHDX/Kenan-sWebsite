@@ -32,14 +32,16 @@ export default function Home() {
         <Hero />
         <PersonalDetails />
         <ProfessionalSummary />
-        <EducationPreview />
-        <ExperiencePreview />
-        <SkillsPreview />
-        <AchievementsPreview />
-        <Publications />
-        <AdditionalInformation />
-        <Languages />
-        <Contact />
+        <div id="sections" className="space-y-0">
+          <EducationPreview />
+          <ExperiencePreview />
+          <SkillsPreview />
+          <AchievementsPreview />
+          <Publications />
+          <AdditionalInformation />
+          <Languages />
+          <Contact />
+        </div>
         {/* <ThemeVerifier /> */}{/* Removed component */}
       </main>
       <Footer />

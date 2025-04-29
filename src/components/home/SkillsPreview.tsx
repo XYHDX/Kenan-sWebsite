@@ -1,4 +1,4 @@
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 const SkillsPreview = () => {
@@ -9,15 +9,15 @@ const SkillsPreview = () => {
   ];
 
   return (
-    <section className="py-12 bg-gray-100 dark:bg-gray-900">
+    <section className="py-12 bg-gray-100 dark:bg-gray-900" id="skills-section">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-primary">Skills</h2>
           <Link 
             href="/skills" 
-            className="flex items-center text-primary hover:text-primary/90 transition-colors"
+            className="flex items-center text-primary font-medium hover:underline transition-all hover:text-primary/90"
           >
-            See All <CheckCircle size={16} className="ml-1" />
+            See All <ArrowRight size={16} className="ml-1" />
           </Link>
         </div>
 
@@ -30,6 +30,15 @@ const SkillsPreview = () => {
               </li>
             ))}
           </ul>
+        </div>
+        
+        <div className="mt-8 text-center">
+          <Link 
+            href="/skills"
+            className="inline-flex items-center justify-center rounded-md bg-primary text-white font-medium px-6 py-3 hover:bg-primary/90 transition-colors"
+          >
+            View All Skills <ArrowRight size={16} className="ml-2" />
+          </Link>
         </div>
       </div>
     </section>

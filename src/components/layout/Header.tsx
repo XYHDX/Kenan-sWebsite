@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { navLinks } from '@/config/navigation';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
@@ -17,6 +18,7 @@ const Header = () => {
   //   }
   // );
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const toggleMenu = () => {
     setMobileMenuOpen(!isMobileMenuOpen);
@@ -29,7 +31,7 @@ const Header = () => {
   return (
     <header className="bg-white dark:bg-gray-900 shadow-sm dark:shadow-gray-700 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold text-theme-primary" onClick={closeMenu}>
+        <Link href="/" className="text-2xl font-bold text-primary" onClick={closeMenu}>
           Kenan Younes Saoud
         </Link>
 
@@ -40,7 +42,11 @@ const Header = () => {
               <Link 
                 key={link.href} 
                 href={link.href} 
-                className="text-gray-700 dark:text-gray-300 hover:text-theme-primary transition-colors"
+                className={`transition-colors ${
+                  pathname === link.href
+                    ? "text-primary font-semibold"
+                    : "text-gray-700 dark:text-gray-300 hover:text-primary"
+                }`}
               >
                 {link.label}
               </Link>
@@ -53,7 +59,7 @@ const Header = () => {
 
         {/* Mobile Menu Button */}
         <button 
-          className="md:hidden text-gray-700 dark:text-gray-300 hover:text-theme-primary focus:outline-none"
+          className="md:hidden text-gray-700 dark:text-gray-300 hover:text-primary focus:outline-none"
           onClick={toggleMenu}
           aria-label="Toggle menu"
           aria-expanded={isMobileMenuOpen}
@@ -74,8 +80,12 @@ const Header = () => {
               <Link 
                 key={link.href} 
                 href={link.href} 
-                className="text-gray-700 dark:text-gray-300 hover:text-theme-primary transition-colors py-2"
-                onClick={toggleMenu} // Close menu on link click
+                className={`py-2 transition-colors ${
+                  pathname === link.href
+                    ? "text-primary font-semibold"
+                    : "text-gray-700 dark:text-gray-300 hover:text-primary"
+                }`}
+                onClick={closeMenu}
               >
                 {link.label}
               </Link>

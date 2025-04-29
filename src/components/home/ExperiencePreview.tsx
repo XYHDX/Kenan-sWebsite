@@ -48,13 +48,13 @@ const ExperiencePreview = () => {
   ];
 
   return (
-    <section className="py-12 bg-gray-100 dark:bg-gray-900">
+    <section className="py-12 bg-gray-100 dark:bg-gray-900" id="experience-section">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-primary">Experience</h2>
           <Link 
             href="/experience" 
-            className="flex items-center text-primary hover:text-primary/90 transition-colors"
+            className="flex items-center text-primary font-medium hover:underline transition-all hover:text-primary/90"
           >
             See All <ArrowRight size={16} className="ml-1" />
           </Link>
@@ -79,6 +79,15 @@ const ExperiencePreview = () => {
               </div>
             </div>
           ))}
+        </div>
+        
+        <div className="mt-8 text-center">
+          <Link 
+            href="/experience"
+            className="inline-flex items-center justify-center rounded-md bg-primary text-white font-medium px-6 py-3 hover:bg-primary/90 transition-colors"
+          >
+            View Full Experience <ArrowRight size={16} className="ml-2" />
+          </Link>
         </div>
       </div>
     </section>
