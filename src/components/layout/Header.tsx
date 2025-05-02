@@ -24,11 +24,11 @@ const Header = () => {
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center" onClick={closeMenu}>
           <Image 
-            src="/images/profile-pic.png" 
+            src="/images/logo.png" 
             alt="Kenan Younes Saoud" 
-            width={50} 
+            width={220} 
             height={50} 
-            className="rounded-full"
+            className="h-auto"
           />
         </Link>
 

@@ -7,7 +7,8 @@ interface GalleryItem {
   id: string | number;
   title: string;
   description?: string;
-  imagePath: string;
+  beforeImagePath: string;
+  afterImagePath: string;
   date?: string;
 }
 
@@ -46,9 +47,9 @@ export async function PUT(
     const updatedItem: GalleryItem = await request.json();
     
     // Validate required fields
-    if (!updatedItem.title || !updatedItem.imagePath) {
+    if (!updatedItem.title || !updatedItem.beforeImagePath || !updatedItem.afterImagePath) {
       return NextResponse.json(
-        { error: "Title and image path are required" },
+        { error: "Title, before image, and after image are required" },
         { status: 400 }
       );
     }

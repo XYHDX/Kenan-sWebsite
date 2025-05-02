@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Raleway } from 'next/font/google';
 import './globals.css';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS } from '@/lib/localStorage';
@@ -28,14 +28,11 @@ const defaultSettings: SiteSettings = {
   maintenanceMode: false,
 };
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin']
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin']
+const raleway = Raleway({
+  variable: '--font-raleway',
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['300', '600', '700'],
 });
 
 // Simple Maintenance Component
@@ -143,7 +140,7 @@ export default function RootLayout({
             }}
           />
         </head>
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <body className={`${raleway.variable} antialiased`}>
           <MaintenancePage />
         </body>
       </html>
@@ -203,7 +200,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${raleway.variable} antialiased`}>
         {!isLoadingSettings ? children : null}
       </body>
     </html>

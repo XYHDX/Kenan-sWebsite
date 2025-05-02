@@ -102,11 +102,11 @@ const EducationPage = async () => {
   }
 
   // If no data is retrieved, use the default data
-  if (education.length === 0) {
+  if (!education || education.length === 0) {
     education = defaultEducation;
   }
   
-  if (certifications.length === 0) {
+  if (!certifications || certifications.length === 0) {
     certifications = defaultCertifications;
   }
 

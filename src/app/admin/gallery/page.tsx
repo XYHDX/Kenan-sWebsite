@@ -9,7 +9,8 @@ interface GalleryItem {
   id: string | number;
   title: string;
   description?: string;
-  imagePath: string;
+  beforeImagePath: string;
+  afterImagePath: string;
   date?: string;
 }
 
@@ -20,7 +21,8 @@ const AdminGalleryPage = () => {
   const [newItem, setNewItem] = useState<Omit<GalleryItem, 'id'>>({
     title: '',
     description: '',
-    imagePath: '/images/profile-pic.png', // Default image
+    beforeImagePath: '/images/profile-pic.png', // Default image
+    afterImagePath: '/images/profile-pic.png', // Default image
     date: new Date().toISOString().split('T')[0]
   });
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -58,7 +60,8 @@ const AdminGalleryPage = () => {
     setNewItem({
       title: '',
       description: '',
-      imagePath: '/images/profile-pic.png',
+      beforeImagePath: '/images/profile-pic.png',
+      afterImagePath: '/images/profile-pic.png',
       date: new Date().toISOString().split('T')[0]
     });
   };
@@ -96,6 +99,11 @@ const AdminGalleryPage = () => {
       return;
     }
 
+    if (!newItem.beforeImagePath || !newItem.afterImagePath) {
+      alert('Both before and after images are required');
+      return;
+    }
+
     setIsSaving(true);
     try {
       const response = await fetch('/api/gallery', {
@@ -113,7 +121,8 @@ const AdminGalleryPage = () => {
         setNewItem({
           title: '',
           description: '',
-          imagePath: '/images/profile-pic.png',
+          beforeImagePath: '/images/profile-pic.png',
+          afterImagePath: '/images/profile-pic.png',
           date: new Date().toISOString().split('T')[0]
         });
       } else {
@@ -130,6 +139,11 @@ const AdminGalleryPage = () => {
     if (!editingItem) return;
     if (!editingItem.title.trim()) {
       alert('Title is required');
+      return;
+    }
+
+    if (!editingItem.beforeImagePath || !editingItem.afterImagePath) {
+      alert('Both before and after images are required');
       return;
     }
 
@@ -175,17 +189,22 @@ const AdminGalleryPage = () => {
     }
   };
 
+  const handleUploadImage = async (type: 'before' | 'after') => {
+    alert(`Image upload functionality should be implemented here for ${type} image`);
+    // Add your image upload functionality here
+  };
+
   return (
     <AdminLayout activePage="gallery">      
       <div className="p-6">
         <div className="flex justify-between mb-8">
-          <h1 className="text-2xl font-bold">Gallery Items</h1>
+          <h1 className="text-2xl font-bold">Case Gallery Items</h1>
           <button
             onClick={handleAddNew}
             disabled={isAddingNew}
             className="bg-primary text-primary-foreground px-4 py-2 rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Plus size={16} className="mr-2" /> Add New Item
+            <Plus size={16} className="mr-2" /> Add New Case
           </button>
         </div>
 
@@ -197,7 +216,7 @@ const AdminGalleryPage = () => {
             {isAddingNew && (
               <div className="bg-white dark:bg-gray-800 border border-border rounded-lg p-6 mb-8">
                 <h2 className="text-xl font-semibold mb-4 flex items-center">
-                  <Camera size={20} className="mr-2" /> Add New Gallery Item
+                  <Camera size={20} className="mr-2" /> Add New Case
                 </h2>
                 
                 <div className="space-y-4">
@@ -226,23 +245,50 @@ const AdminGalleryPage = () => {
                     />
                   </div>
                   
+                  {/* Before Image */}
                   <div>
-                    <label htmlFor="imagePath" className="block text-sm font-medium mb-1">Image Path *</label>
+                    <label htmlFor="beforeImagePath" className="block text-sm font-medium mb-1">Before Image Path *</label>
                     <div className="flex">
                       <input
                         type="text"
-                        id="imagePath"
-                        name="imagePath"
-                        value={newItem.imagePath}
+                        id="beforeImagePath"
+                        name="beforeImagePath"
+                        value={newItem.beforeImagePath}
                         onChange={handleInputChange}
                         className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-l-md dark:bg-gray-700"
                         required
                       />
-                      <button className="bg-secondary px-4 py-2 rounded-r-md flex items-center">
+                      <button 
+                        className="bg-secondary px-4 py-2 rounded-r-md flex items-center"
+                        onClick={() => handleUploadImage('before')}
+                      >
                         <Upload size={16} className="mr-1" /> Upload
                       </button>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">Enter the path to the image or upload a new one.</p>
+                    <p className="text-xs text-muted-foreground mt-1">Enter the path to the "before" image or upload a new one.</p>
+                  </div>
+                  
+                  {/* After Image */}
+                  <div>
+                    <label htmlFor="afterImagePath" className="block text-sm font-medium mb-1">After Image Path *</label>
+                    <div className="flex">
+                      <input
+                        type="text"
+                        id="afterImagePath"
+                        name="afterImagePath"
+                        value={newItem.afterImagePath}
+                        onChange={handleInputChange}
+                        className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-l-md dark:bg-gray-700"
+                        required
+                      />
+                      <button 
+                        className="bg-secondary px-4 py-2 rounded-r-md flex items-center"
+                        onClick={() => handleUploadImage('after')}
+                      >
+                        <Upload size={16} className="mr-1" /> Upload
+                      </button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Enter the path to the "after" image or upload a new one.</p>
                   </div>
                   
                   <div>
@@ -257,19 +303,19 @@ const AdminGalleryPage = () => {
                     />
                   </div>
                   
-                  <div className="flex justify-end space-x-3 mt-6">
-                    <button
-                      onClick={handleCancelAdd}
-                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      Cancel
-                    </button>
+                  <div className="flex space-x-3 pt-2">
                     <button
                       onClick={handleSaveNew}
                       disabled={isSaving}
-                      className="bg-primary text-primary-foreground px-4 py-2 rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-50"
+                      className="bg-primary text-primary-foreground px-4 py-2 rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isSaving ? 'Saving...' : 'Save'} <Save size={16} className="ml-2" />
+                      <Save size={16} className="mr-2" /> {isSaving ? 'Saving...' : 'Save'}
+                    </button>
+                    <button
+                      onClick={handleCancelAdd}
+                      className="bg-muted text-muted-foreground px-4 py-2 rounded-md flex items-center hover:bg-muted/90 transition-colors"
+                    >
+                      <X size={16} className="mr-2" /> Cancel
                     </button>
                   </div>
                 </div>
@@ -309,19 +355,45 @@ const AdminGalleryPage = () => {
                     />
                   </div>
                   
+                  {/* Before Image */}
                   <div>
-                    <label htmlFor="edit-imagePath" className="block text-sm font-medium mb-1">Image Path *</label>
+                    <label htmlFor="edit-beforeImagePath" className="block text-sm font-medium mb-1">Before Image Path *</label>
                     <div className="flex">
                       <input
                         type="text"
-                        id="edit-imagePath"
-                        name="imagePath"
-                        value={editingItem.imagePath}
+                        id="edit-beforeImagePath"
+                        name="beforeImagePath"
+                        value={editingItem.beforeImagePath}
                         onChange={handleInputChange}
                         className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-l-md dark:bg-gray-700"
                         required
                       />
-                      <button className="bg-secondary px-4 py-2 rounded-r-md flex items-center">
+                      <button 
+                        className="bg-secondary px-4 py-2 rounded-r-md flex items-center"
+                        onClick={() => handleUploadImage('before')}
+                      >
+                        <Upload size={16} className="mr-1" /> Upload
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* After Image */}
+                  <div>
+                    <label htmlFor="edit-afterImagePath" className="block text-sm font-medium mb-1">After Image Path *</label>
+                    <div className="flex">
+                      <input
+                        type="text"
+                        id="edit-afterImagePath"
+                        name="afterImagePath"
+                        value={editingItem.afterImagePath}
+                        onChange={handleInputChange}
+                        className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-l-md dark:bg-gray-700"
+                        required
+                      />
+                      <button 
+                        className="bg-secondary px-4 py-2 rounded-r-md flex items-center"
+                        onClick={() => handleUploadImage('after')}
+                      >
                         <Upload size={16} className="mr-1" /> Upload
                       </button>
                     </div>
@@ -339,81 +411,103 @@ const AdminGalleryPage = () => {
                     />
                   </div>
                   
-                  <div className="flex justify-end space-x-3 mt-6">
-                    <button
-                      onClick={handleCancelEdit}
-                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      Cancel
-                    </button>
+                  <div className="flex space-x-3 pt-2">
                     <button
                       onClick={handleSaveEdit}
                       disabled={isSaving}
-                      className="bg-primary text-primary-foreground px-4 py-2 rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-50"
+                      className="bg-primary text-primary-foreground px-4 py-2 rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isSaving ? 'Saving...' : 'Save Changes'} <Save size={16} className="ml-2" />
+                      <Save size={16} className="mr-2" /> {isSaving ? 'Saving...' : 'Save'}
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      className="bg-muted text-muted-foreground px-4 py-2 rounded-md flex items-center hover:bg-muted/90 transition-colors"
+                    >
+                      <X size={16} className="mr-2" /> Cancel
                     </button>
                   </div>
                 </div>
               </div>
             )}
-
+            
             {/* Gallery Items List */}
-            {galleryItems.length === 0 ? (
-              <div className="text-center py-10 bg-white dark:bg-gray-800 border border-border rounded-lg">
-                <Camera size={40} className="mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No gallery items found. Add your first one!</p>
+            <div className="bg-white dark:bg-gray-800 border border-border rounded-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-semibold">Title</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold">Description</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold">Before Image</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold">After Image</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {galleryItems.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-4 text-center text-muted-foreground">
+                          No gallery items found. Add some to get started.
+                        </td>
+                      </tr>
+                    ) : (
+                      galleryItems.map((item) => (
+                        <tr key={item.id} className="hover:bg-muted/50">
+                          <td className="px-6 py-4 whitespace-nowrap">{item.title}</td>
+                          <td className="px-6 py-4">
+                            {item.description ? 
+                              (item.description.length > 30 ? 
+                                `${item.description.substring(0, 30)}...` : 
+                                item.description) : 
+                              '-'}
+                          </td>
+                          <td className="px-6 py-4">
+                            {item.beforeImagePath ? (
+                              <img
+                                src={item.beforeImagePath}
+                                alt={`Before: ${item.title}`}
+                                className="h-12 w-12 object-cover rounded-md"
+                              />
+                            ) : '-'}
+                          </td>
+                          <td className="px-6 py-4">
+                            {item.afterImagePath ? (
+                              <img
+                                src={item.afterImagePath}
+                                alt={`After: ${item.title}`}
+                                className="h-12 w-12 object-cover rounded-md"
+                              />
+                            ) : '-'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {item.date ? new Date(item.date).toLocaleDateString() : '-'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleEdit(item)}
+                                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                                title="Edit"
+                              >
+                                <Edit size={16} />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(item.id)}
+                                className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+                                title="Delete"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {galleryItems.map(item => (
-                  <div key={item.id} className="bg-white dark:bg-gray-800 border border-border rounded-lg overflow-hidden shadow-sm">
-                    <div className="relative h-48 bg-gray-200 dark:bg-gray-700">
-                      {item.imagePath ? (
-                        <img 
-                          src={item.imagePath} 
-                          alt={item.title} 
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full">
-                          <Camera size={40} className="text-muted-foreground" />
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="p-4">
-                      <h3 className="font-semibold text-lg mb-1">{item.title}</h3>
-                      {item.description && (
-                        <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{item.description}</p>
-                      )}
-                      {item.date && (
-                        <p className="text-xs text-muted-foreground mb-4">
-                          Date: {new Date(item.date).toLocaleDateString()}
-                        </p>
-                      )}
-                      
-                      <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={() => handleEdit(item)}
-                          className="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors"
-                          aria-label="Edit"
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item.id)}
-                          className="p-2 text-destructive hover:bg-destructive/10 rounded-full transition-colors"
-                          aria-label="Delete"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            </div>
           </>
         )}
       </div>

@@ -8,7 +8,8 @@ interface GalleryItem {
   id: string | number;
   title: string;
   description?: string;
-  imagePath: string;
+  beforeImagePath: string;
+  afterImagePath: string;
   date?: string;
 }
 
@@ -41,14 +42,15 @@ export async function POST(request: NextRequest) {
     const newItemData = await request.json() as {
       title: string;
       description?: string;
-      imagePath: string;
+      beforeImagePath: string;
+      afterImagePath: string;
       date?: string;
     };
     
     // Validate required fields
-    if (!newItemData.title || !newItemData.imagePath) {
+    if (!newItemData.title || !newItemData.beforeImagePath || !newItemData.afterImagePath) {
       return NextResponse.json(
-        { error: "Title and image path are required" },
+        { error: "Title, before image, and after image are required" },
         { status: 400 }
       );
     }

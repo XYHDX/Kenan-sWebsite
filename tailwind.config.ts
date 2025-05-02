@@ -87,8 +87,8 @@ export default {
   			'accordion-up': 'accordion-up 0.2s ease-out'
   		},
   		fontFamily: {
-  			sans: ['var(--font-geist-sans)'],
-  			mono: ['var(--font-geist-mono)']
+  			sans: ['var(--font-raleway)', 'sans-serif'],
+  			heading: ['var(--font-raleway)', 'sans-serif']
   		}
   	}
   },
