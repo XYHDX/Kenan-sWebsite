@@ -34,4 +34,24 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Vercel Blob Storage Configuration
+
+To enable file uploads in the admin panel, you need to configure Vercel Blob Storage:
+
+1. Add the Vercel Blob Storage integration to your project
+   - Go to your Vercel project dashboard
+   - Navigate to Settings → Integrations
+   - Find and add "Vercel Blob" integration
+
+2. Once the integration is added, Vercel will automatically create a `BLOB_READ_WRITE_TOKEN` environment variable
+
+3. Add this environment variable to your local development environment by adding it to your `.env.local` file:
+   ```
+   BLOB_READ_WRITE_TOKEN=your-blob-token-from-vercel
+   ```
+
+4. Rebuild and deploy your project
+
+File uploads in the admin gallery will now properly store files in Vercel Blob Storage instead of trying to write to the filesystem, which isn't supported in serverless environments.
 # Kenan-sWebsite
