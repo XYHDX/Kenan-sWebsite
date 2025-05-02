@@ -31,7 +31,7 @@ const defaultSettings: SiteSettings = {
   siteName: 'Yahya Demeriah - Portfolio',
   siteDescription: 'Personal portfolio and CV for Yahya Demeriah, IT Engineer & Robotics Specialist',
   siteLanguage: 'en',
-  enableDarkMode: true,
+  enableDarkMode: false,
   enablePublicProfile: true,
   enableSEO: true,
   maintenanceMode: false,

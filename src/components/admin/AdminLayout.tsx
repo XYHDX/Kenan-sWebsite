@@ -94,6 +94,11 @@ const AdminLayout = ({ children, activePage }: AdminLayoutProps) => {
         <main className="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-900">
           {children}
         </main>
+        
+        {/* Footer */}
+        <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 text-center text-sm text-gray-600 dark:text-gray-400">
+          <p>&copy; {new Date().getFullYear()} Dr. Kenan Younes Saoud. All rights reserved.</p>
+        </footer>
       </div>
     </div>
   );
