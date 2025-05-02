@@ -21,7 +21,7 @@ const AdminSidebar = ({ activePage }: { activePage: string }) => {
   ];
 
   return (
-    <div className={`bg-gray-900 text-white h-screen ${collapsed ? 'w-20' : 'w-64'} transition-all duration-300 flex flex-col`}>
+    <div className={`bg-gray-900 text-white h-full min-h-screen ${collapsed ? 'w-20' : 'w-64'} transition-all duration-300 flex flex-col`}>
       <div className="p-4 border-b border-gray-800 flex items-center justify-between">
         <h2 className={`font-bold text-xl ${collapsed ? 'hidden' : 'block'}`}>Admin Panel</h2>
         <button 

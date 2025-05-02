@@ -239,11 +239,21 @@ const AdminGalleryPage = () => {
       });
       
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to upload image');
+        const errorData = await response.json() as { error?: string };
+        console.error(`Error response from upload API:`, errorData);
+        throw new Error(errorData.error || 'Failed to upload image');
       }
       
-      const data = await response.json();
+      const data = await response.json() as { 
+        imageUrl?: string;
+        success?: boolean;
+      };
+      
+      if (!data.imageUrl) {
+        throw new Error('No image URL returned from server');
+      }
+      
+      console.log(`Upload successful, received URL: ${data.imageUrl}`);
       
       // Update the state with the new image URL
       if (isEdit && editingItem) {
@@ -260,6 +270,11 @@ const AdminGalleryPage = () => {
     } catch (error: any) {
       console.error(`Error uploading ${type} image:`, error);
       setUploadError(error.message || `Failed to upload ${type} image`);
+      
+      // Show more detailed error to help debugging
+      if (error instanceof Error) {
+        console.error('Error details:', error.stack);
+      }
     } finally {
       setIsUploading(prev => ({...prev, [type]: false}));
     }
@@ -272,6 +287,13 @@ const AdminGalleryPage = () => {
       // Check if the file is an image
       if (!file.type.startsWith('image/')) {
         setUploadError('Please select an image file (JPEG, PNG, etc.)');
+        return;
+      }
+      
+      // Check file size (max 2MB)
+      const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+      if (file.size > MAX_FILE_SIZE) {
+        setUploadError(`Image size exceeds maximum allowed (2MB). Selected file is ${(file.size / (1024 * 1024)).toFixed(2)}MB`);
         return;
       }
       

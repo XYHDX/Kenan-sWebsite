@@ -28,7 +28,7 @@ const AdminLayout = ({ children, activePage }: AdminLayoutProps) => {
   }, [settings.customTheme]);
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
       <AdminSidebar activePage={activePage} />
       
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -96,7 +96,7 @@ const AdminLayout = ({ children, activePage }: AdminLayoutProps) => {
         </main>
         
         {/* Footer */}
-        <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 text-center text-sm text-gray-600 dark:text-gray-400">
+        <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-2 px-4 text-center text-xs text-gray-600 dark:text-gray-400">
           <p>&copy; {new Date().getFullYear()} Dr. Kenan Younes Saoud. All rights reserved.</p>
         </footer>
       </div>
