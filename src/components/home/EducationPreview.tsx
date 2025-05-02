@@ -40,21 +40,21 @@ const EducationPreview = () => {
           </Link>
         </div>
         
-        <div className="space-y-6">
+        <div className="space-y-4">
           {education.map(edu => (
-            <div key={edu.id} className="bg-card text-card-foreground rounded-lg shadow-sm border border-border p-6">
-              <div className="flex flex-col md:flex-row gap-6">
-                <div className="md:w-1/4 flex justify-center md:justify-start">
-                  <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center">
-                    <GraduationCap size={28} className="text-primary" />
+            <div key={edu.id} className="bg-card text-card-foreground rounded-lg shadow-sm border border-border p-4">
+              <div className="flex flex-col md:flex-row md:items-center gap-4">
+                <div className="md:w-1/6 flex justify-center md:justify-start">
+                  <div className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center">
+                    <GraduationCap size={24} className="text-primary" />
                   </div>
                 </div>
-                <div className="md:w-3/4">
-                  <h3 className="text-xl font-semibold">{edu.institution}</h3>
-                  <h4 className="text-primary font-medium mb-2">{edu.degree}</h4>
-                  {edu.honors && <p className="text-foreground mb-2">{edu.honors}</p>}
-                  <div className="flex items-center text-muted-foreground">
-                    <Calendar size={16} className="mr-2" />
+                <div className="md:w-5/6">
+                  <h3 className="text-lg font-semibold">{edu.institution}</h3>
+                  <h4 className="text-primary font-medium">{edu.degree}</h4>
+                  {edu.honors && <p className="text-foreground">{edu.honors}</p>}
+                  <div className="flex items-center text-muted-foreground mt-1">
+                    <Calendar size={14} className="mr-2" />
                     <span>{edu.period}</span>
                   </div>
                 </div>

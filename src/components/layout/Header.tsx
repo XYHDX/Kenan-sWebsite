@@ -6,18 +6,8 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { navLinks } from '@/config/navigation';
-import ThemeSwitcher from '@/components/ThemeSwitcher';
-// import useTheme from '@/hooks/useTheme'; // Commented out as currentTheme is unused
-// import useLocalStorage from '@/hooks/useLocalStorage'; // Remove this if settings are unused
 
 const Header = () => {
-  // Remove the useLocalStorage hook call if settings are not used in this component
-  // const [settings, _, isLoadingSettings] = useLocalStorage<SiteSettings>(
-  //   'siteSettings', // Or STORAGE_KEYS.SETTINGS if defined
-  //   {
-  //     // Default settings if needed, otherwise remove the hook call entirely
-  //   }
-  // );
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
@@ -42,7 +32,7 @@ const Header = () => {
           />
         </Link>
 
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="hidden md:flex items-center">
           {/* Desktop Navigation */}
           <nav className="flex space-x-8">
             {navLinks.map((link) => (
@@ -59,9 +49,6 @@ const Header = () => {
               </Link>
             ))}
           </nav>
-          
-          {/* Theme Switcher */}
-          <ThemeSwitcher />
         </div>
 
         {/* Mobile Menu Button */}
@@ -97,11 +84,6 @@ const Header = () => {
                 {link.label}
               </Link>
             ))}
-            
-            {/* Mobile Theme Switcher */}
-            <div className="py-2">
-              <ThemeSwitcher />
-            </div>
           </div>
         </div>
       )}
