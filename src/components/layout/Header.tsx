@@ -26,11 +26,11 @@ const Header = () => {
           <Image 
             src="/images/logo.png" 
             alt="Kenan Younes Saoud" 
-            width={100} 
+            width={75} 
             height={50} 
             className="h-auto"
           />
-          <span className="ml-4 text-xl font-bold text-gray-800 dark:text-white">KENAN SAOUD</span>
+          <span className="ml-4 text-xl font-light text-primary dark:text-primary">KENAN SAOUD</span>
         </Link>
 
         <div className="hidden md:flex items-center">
