@@ -2,9 +2,13 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { put } from '@vercel/blob';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
+import { redis } from '@/lib/redis';
+import { STORAGE_KEYS } from '@/lib/localStorage';
+
+// Max file size for Base64 encoding (2MB)
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
 export async function POST(request: NextRequest) {
   console.log("🔍 Upload API called");
@@ -33,30 +37,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      console.error(`❌ File too large: ${file.size} bytes (max: ${MAX_FILE_SIZE} bytes)`);
+      return NextResponse.json(
+        { error: `File size exceeds the maximum allowed size of 2MB` },
+        { status: 400 }
+      );
+    }
+
     // Create unique filename with appropriate extension
     const fileExtension = path.extname(file.name);
     const fileName = `${uuidv4()}${fileExtension}`;
     console.log(`🏷️ Generated filename: ${fileName}`);
     
     try {
-      // Upload to Vercel Blob Storage
-      console.log(`☁️ Uploading to Vercel Blob Storage...`);
-      const blob = await put(fileName, file, {
-        access: 'public',
-        addRandomSuffix: false, // Use our generated UUID
-      });
+      // Convert file to Base64
+      console.log(`📄 Converting file to Base64...`);
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const base64Data = buffer.toString('base64');
       
-      console.log(`✅ File uploaded successfully to Blob Storage: ${blob.url}`);
+      // Create data URL with MIME type
+      const dataUrl = `data:${file.type};base64,${base64Data}`;
+      console.log(`✅ Converted to data URL, length: ${dataUrl.length} chars`);
       
-      // Return the URL to the uploaded file
+      // Generate a key for this image in Redis
+      const imageKey = `image:${fileName}`;
+      
+      // Store the image data in Redis
+      await redis.set(imageKey, dataUrl);
+      console.log(`✅ Image stored in Redis with key: ${imageKey}`);
+      
+      // Return the "virtual" URL that will reference this Redis key
+      const imageUrl = `/api/images/${fileName}`;
+      
       return NextResponse.json({ 
-        imageUrl: blob.url,
+        imageUrl,
         success: true
       });
     } catch (uploadError: any) {
-      console.error(`❌ Error uploading to Blob Storage:`, uploadError);
+      console.error(`❌ Error storing image in Redis:`, uploadError);
       return NextResponse.json(
-        { error: `Error uploading to Blob Storage: ${uploadError.message}` },
+        { error: `Error storing image: ${uploadError.message}` },
         { status: 500 }
       );
     }

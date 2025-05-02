@@ -35,23 +35,27 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-## Vercel Blob Storage Configuration
+## Image Storage Configuration
 
-To enable file uploads in the admin panel, you need to configure Vercel Blob Storage:
+This project uses Upstash Redis for storing images as Base64-encoded data URLs. This approach:
 
-1. Add the Vercel Blob Storage integration to your project
-   - Go to your Vercel project dashboard
-   - Navigate to Settings → Integrations
-   - Find and add "Vercel Blob" integration
+1. Stores images directly in Redis
+2. Serves images through a dynamic API route
+3. Allows file uploads to work in serverless environments without filesystem access
 
-2. Once the integration is added, Vercel will automatically create a `BLOB_READ_WRITE_TOKEN` environment variable
+### Limitations:
 
-3. Add this environment variable to your local development environment by adding it to your `.env.local` file:
-   ```
-   BLOB_READ_WRITE_TOKEN=your-blob-token-from-vercel
-   ```
+- Image size limit: 2MB per image
+- Best for smaller images and cases (dental before/after photos)
+- Using the Redis database for image storage is suitable for small to medium sites
 
-4. Rebuild and deploy your project
+### Alternative Storage Solutions:
 
-File uploads in the admin gallery will now properly store files in Vercel Blob Storage instead of trying to write to the filesystem, which isn't supported in serverless environments.
+For larger production sites or high-volume image storage, consider:
+- Amazon S3
+- Cloudinary
+- Vercel Blob Storage
+- Other dedicated object storage services
+
+No additional configuration is required as the project already uses Upstash Redis for other data storage.
 # Kenan-sWebsite
