@@ -44,7 +44,7 @@ const EducationPreview = () => {
           {education.map(edu => (
             <div key={edu.id} className="bg-card text-card-foreground rounded-lg shadow-sm border border-border p-4">
               <div className="flex flex-col md:flex-row md:items-center gap-4">
-                <div className="md:w-1/6 flex justify-center md:justify-start">
+                <div className="md:w-1/6 flex justify-center">
                   <div className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center">
                     <GraduationCap size={24} className="text-primary" />
                   </div>

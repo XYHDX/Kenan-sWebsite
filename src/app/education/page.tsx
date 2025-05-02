@@ -23,11 +23,60 @@ interface Education {
   gpa?: string;
   project?: string;
   details?: string[];
+  honors?: string;
 }
 
 // Define the Redis keys
 const REDIS_EDUCATION_KEY = STORAGE_KEYS.EDUCATION;
 const REDIS_CERTIFICATIONS_KEY = STORAGE_KEYS.CERTIFICATIONS;
+
+// Default education data (same as in home component)
+const defaultEducation: Education[] = [
+  {
+    id: 1,
+    institution: 'Faculty of Dentistry - Damascus university',
+    degree: 'PhD Degree',
+    field: 'Dentistry',
+    period: 'May 2022 - November 2024',
+    honors: 'Honor'
+  },
+  {
+    id: 2,
+    institution: 'Damascus university',
+    degree: 'Master degree in OMFS',
+    field: 'Dentistry',
+    period: '2017 - 2021'
+  },
+  {
+    id: 3,
+    institution: 'Faculty of Dentistry - Damascus university',
+    degree: 'Bachelor Degree',
+    field: 'Dentistry',
+    period: '2011 - 2016'
+  }
+];
+
+// Default certifications
+const defaultCertifications: Certification[] = [
+  { 
+    id: 1, 
+    title: 'Course in ethitic veneers and smile designe', 
+    organization: 'Dental Academy',
+    year: '2023'
+  },
+  { 
+    id: 2, 
+    title: 'Courses in dental implantology (Implant Direct system, Bio-tem system, Megagen system)',
+    organization: 'Implantology Institute',
+    year: '2022'
+  },
+  { 
+    id: 3, 
+    title: 'Certified from NHCPS in ACLS (Advanced Cardiac life support)',
+    organization: 'NHCPS',
+    year: '2021'
+  }
+];
 
 // Make the component async to fetch data
 const EducationPage = async () => {
@@ -52,8 +101,14 @@ const EducationPage = async () => {
     error = "Failed to load education data. Please try again later.";
   }
 
-  // Get the first education item if available
-  const primaryEducation = education.length > 0 ? education[0] : null;
+  // If no data is retrieved, use the default data
+  if (education.length === 0) {
+    education = defaultEducation;
+  }
+  
+  if (certifications.length === 0) {
+    certifications = defaultCertifications;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 text-foreground">
@@ -73,52 +128,42 @@ const EducationPage = async () => {
                   Education
                 </h2>
                 
-                {primaryEducation ? (
-                  <div className="bg-white dark:bg-gray-800 text-card-foreground rounded-lg shadow-md border border-border p-8">
-                    <div className="flex flex-col md:flex-row gap-8">
-                      <div className="md:w-1/3">
-                        <h3 className="text-xl font-semibold">{primaryEducation.degree}</h3>
-                        <h4 className="text-primary font-medium mb-2">{primaryEducation.institution}</h4>
-                        <div className="flex items-center text-muted-foreground mb-4">
-                          <Calendar size={16} className="mr-2" />
-                          <span>{primaryEducation.period}</span>
-                        </div>
-                        {primaryEducation.location && (
-                          <p className="text-muted-foreground">Location: {primaryEducation.location}</p>
-                        )}
-                        {primaryEducation.gpa && (
-                          <p className="text-muted-foreground">GPA: {primaryEducation.gpa}</p>
-                        )}
-                      </div>
-                      
-                      {(primaryEducation.description || (primaryEducation.details && primaryEducation.details.length > 0)) && (
-                        <div className="md:w-2/3">
-                          <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-md border border-border">
-                            {primaryEducation.project && (
-                              <h5 className="font-medium mb-4">Project: {primaryEducation.project}</h5>
-                            )}
-                            
-                            {primaryEducation.description && (
-                              <p className="mb-4">{primaryEducation.description}</p>
-                            )}
-                            
-                            {primaryEducation.details && primaryEducation.details.length > 0 && (
-                              <ul className="list-disc list-inside text-foreground space-y-2">
-                                {primaryEducation.details.map((detail, index) => (
-                                  <li key={index}>{detail}</li>
-                                ))}
-                              </ul>
-                            )}
+                <div className="space-y-6">
+                  {education.map(edu => (
+                    <div 
+                      key={edu.id} 
+                      className="bg-white dark:bg-gray-800 text-card-foreground rounded-lg shadow-md border border-border p-6"
+                    >
+                      <div className="flex flex-col md:flex-row gap-6">
+                        <div className="md:w-1/6 flex justify-center">
+                          <div className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center">
+                            <GraduationCap size={24} className="text-primary" />
                           </div>
                         </div>
-                      )}
+                        
+                        <div className="md:w-5/6">
+                          <h3 className="text-xl font-semibold">{edu.institution}</h3>
+                          <h4 className="text-primary font-medium mb-2">{edu.degree}</h4>
+                          {edu.honors && <p className="text-foreground mb-2">{edu.honors}</p>}
+                          <div className="flex items-center text-muted-foreground">
+                            <Calendar size={16} className="mr-2" />
+                            <span>{edu.period}</span>
+                          </div>
+                          
+                          {edu.field && <p className="mt-2">Field: {edu.field}</p>}
+                          {edu.location && <p className="mt-1">Location: {edu.location}</p>}
+                          {edu.gpa && <p className="mt-1">GPA: {edu.gpa}</p>}
+                          
+                          {edu.description && (
+                            <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+                              <p>{edu.description}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-center text-muted-foreground text-xl py-10">
-                    No education information has been added yet.
-                  </div>
-                )}
+                  ))}
+                </div>
               </section>
               
               {/* Certifications Section */}
@@ -128,24 +173,18 @@ const EducationPage = async () => {
                   Certifications
                 </h2>
                 
-                {certifications.length === 0 ? (
-                  <div className="text-center text-muted-foreground text-xl py-10">
-                    No certifications have been added yet.
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {certifications.map((cert) => (
-                      <div 
-                        key={cert.id} 
-                        className="bg-white dark:bg-gray-800 text-card-foreground rounded-lg shadow-md border border-border p-6 hover:shadow-lg transition-shadow"
-                      >
-                        <h3 className="text-lg font-semibold mb-3">{cert.title}</h3>
-                        <p className="text-primary mb-1">{cert.organization}</p>
-                        <p className="text-muted-foreground text-sm">{cert.year}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {certifications.map((cert) => (
+                    <div 
+                      key={cert.id} 
+                      className="bg-white dark:bg-gray-800 text-card-foreground rounded-lg shadow-md border border-border p-6 hover:shadow-lg transition-shadow"
+                    >
+                      <h3 className="text-lg font-semibold mb-3">{cert.title}</h3>
+                      <p className="text-primary mb-1">{cert.organization}</p>
+                      <p className="text-muted-foreground text-sm">{cert.year}</p>
+                    </div>
+                  ))}
+                </div>
               </section>
             </>
           )}
