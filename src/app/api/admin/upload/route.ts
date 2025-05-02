@@ -2,50 +2,9 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { put } from '@vercel/blob';
 import { v4 as uuidv4 } from 'uuid';
-import fs from 'fs';
-
-// Make directories recursively with proper error handling
-async function ensureDir(dir: string): Promise<boolean> {
-  console.log(`🔍 Ensuring directory exists: ${dir}`);
-  try {
-    if (!fs.existsSync(dir)) {
-      console.log(`📂 Creating directory: ${dir}`);
-      await mkdir(dir, { recursive: true, mode: 0o777 });
-      
-      // Double-check it was created
-      if (!fs.existsSync(dir)) {
-        console.error(`❌ Failed to create directory: ${dir}`);
-        return false;
-      }
-      
-      // Set permissions explicitly
-      fs.chmodSync(dir, 0o777);
-      console.log(`✅ Directory created and permissions set: ${dir}`);
-    } else {
-      console.log(`✅ Directory already exists: ${dir}`);
-      // Update permissions on existing directory
-      fs.chmodSync(dir, 0o777);
-    }
-    
-    // Test write permissions
-    const testFile = path.join(dir, '.test-write');
-    try {
-      await writeFile(testFile, 'test');
-      fs.unlinkSync(testFile); // Clean up test file
-      console.log(`✅ Write permissions confirmed for: ${dir}`);
-      return true;
-    } catch (error: any) {
-      console.error(`❌ Write permission test failed: ${error.message}`);
-      return false;
-    }
-  } catch (error: any) {
-    console.error(`❌ Error ensuring directory: ${error.message}`);
-    return false;
-  }
-}
+import path from 'path';
 
 export async function POST(request: NextRequest) {
   console.log("🔍 Upload API called");
@@ -74,76 +33,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create unique filename
+    // Create unique filename with appropriate extension
     const fileExtension = path.extname(file.name);
     const fileName = `${uuidv4()}${fileExtension}`;
     console.log(`🏷️ Generated filename: ${fileName}`);
     
-    // Get absolute path to the uploads directory
-    const cwd = process.cwd();
-    console.log(`📂 Current working directory: ${cwd}`);
-    
-    // Create path to public directory
-    const publicDir = path.join(cwd, 'public');
-    if (!(await ensureDir(publicDir))) {
-      return NextResponse.json(
-        { error: 'Server lacks permission to write to public directory' },
-        { status: 500 }
-      );
-    }
-    
-    // Create path to uploads directory
-    const uploadsDir = path.join(publicDir, 'uploads');
-    if (!(await ensureDir(uploadsDir))) {
-      return NextResponse.json(
-        { error: 'Server lacks permission to write to uploads directory' },
-        { status: 500 }
-      );
-    }
-
-    // Convert file to buffer
-    console.log(`📄 Converting file to buffer`);
-    const buffer = Buffer.from(await file.arrayBuffer());
-    console.log(`✅ Buffer created, size: ${buffer.length} bytes`);
-    
-    // Full path where the file will be saved
-    const filePath = path.join(uploadsDir, fileName);
-    console.log(`📄 Target file path: ${filePath}`);
-    
     try {
-      // Save file to uploads directory
-      console.log(`💾 Writing file to disk...`);
-      await writeFile(filePath, buffer);
-      console.log(`✅ File written successfully`);
+      // Upload to Vercel Blob Storage
+      console.log(`☁️ Uploading to Vercel Blob Storage...`);
+      const blob = await put(fileName, file, {
+        access: 'public',
+        addRandomSuffix: false, // Use our generated UUID
+      });
       
-      // Verify the file was written
-      if (fs.existsSync(filePath)) {
-        const stats = fs.statSync(filePath);
-        console.log(`✅ File verified on disk, size: ${stats.size} bytes`);
-      } else {
-        console.error(`❌ File verification failed - file doesn't exist after write`);
-        return NextResponse.json(
-          { error: 'File write verification failed' },
-          { status: 500 }
-        );
-      }
-    } catch (writeError: any) {
-      console.error(`❌ Error writing file: ${writeError}`);
+      console.log(`✅ File uploaded successfully to Blob Storage: ${blob.url}`);
+      
+      // Return the URL to the uploaded file
+      return NextResponse.json({ 
+        imageUrl: blob.url,
+        success: true
+      });
+    } catch (uploadError: any) {
+      console.error(`❌ Error uploading to Blob Storage:`, uploadError);
       return NextResponse.json(
-        { error: `Error saving file: ${writeError.message}` },
+        { error: `Error uploading to Blob Storage: ${uploadError.message}` },
         { status: 500 }
       );
     }
-    
-    // Return the URL to the uploaded file
-    const imageUrl = `/uploads/${fileName}`;
-    console.log(`🔗 File uploaded successfully, URL: ${imageUrl}`);
-    return NextResponse.json({ 
-      imageUrl,
-      success: true
-    });
   } catch (error: any) {
-    console.error(`❌ Unhandled error in upload process: ${error}`);
+    console.error(`❌ Unhandled error in upload process:`, error);
     return NextResponse.json(
       { error: `Error uploading image: ${error.message}` },
       { status: 500 }
