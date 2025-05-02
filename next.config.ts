@@ -24,14 +24,14 @@ const nextConfig: NextConfig = {
   },
   // Ensure trailing slashes are handled properly
   trailingSlash: false,
-  // Use standalone output for Vercel deployment
-  output: 'standalone',
+  // Use server-side rendering for API routes
+  // output: 'export' removed to support dynamic routes
   // Directory for output files
   distDir: '.next',
-  // Disable dynamic API routes and middleware for static export
+  // Configure for hybrid rendering
   experimental: {
-    // This helps with static exports
-    appDocumentPreloading: false,
+    // This helps with supporting dynamic API routes
+    appDocumentPreloading: true,
   }
 }
 

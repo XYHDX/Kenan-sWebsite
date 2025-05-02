@@ -1,5 +1,5 @@
-// Add dynamic export for static site generation
-export const dynamic = 'force-static';
+// Add dynamic export for allowing file uploads
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';

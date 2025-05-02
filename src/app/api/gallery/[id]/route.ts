@@ -12,6 +12,9 @@ interface GalleryItem {
   date?: string;
 }
 
+// Enable dynamic API functionality
+export const dynamic = 'force-dynamic';
+
 // GET: Retrieve a specific gallery item by ID
 export async function GET(
   request: NextRequest,

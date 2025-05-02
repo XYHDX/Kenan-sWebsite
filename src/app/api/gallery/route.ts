@@ -1,3 +1,6 @@
+// Enable dynamic API functionality
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { redis } from '@/lib/redis';
 import { STORAGE_KEYS } from '@/lib/localStorage';
