@@ -115,12 +115,12 @@ const ProfileEditor = () => {
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
-      // Try file upload first
+      // Try Redis-based image upload
       let imageUrl = '';
       let useDataUrl = false;
       
       try {
-        // Upload the image to the server
+        // Upload the image to the server using Redis storage
         console.log('Sending request to /api/admin/upload');
         const response = await fetch('/api/admin/upload', {
           method: 'POST',

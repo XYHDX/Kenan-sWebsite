@@ -76,7 +76,7 @@ const GalleryPreview = async () => {
     <section className="py-12 bg-white dark:bg-gray-900" id="gallery-section">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-primary">Case Gallery</h2>
+          <h2 className="text-3xl font-bold text-primary">Cases Gallery</h2>
           <Link 
             href="/gallery" 
             className="flex items-center text-primary font-medium hover:underline transition-all hover:text-primary/90"
