@@ -80,15 +80,6 @@ const ExperiencePreview = () => {
             </div>
           ))}
         </div>
-        
-        <div className="mt-8 text-center">
-          <Link 
-            href="/experience"
-            className="inline-flex items-center justify-center rounded-md bg-primary text-white font-medium px-6 py-3 hover:bg-primary/90 transition-colors"
-          >
-            View Full Experience <ArrowRight size={16} className="ml-2" />
-          </Link>
-        </div>
       </div>
     </section>
   );

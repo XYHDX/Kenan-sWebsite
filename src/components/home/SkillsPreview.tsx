@@ -31,15 +31,6 @@ const SkillsPreview = () => {
             ))}
           </ul>
         </div>
-        
-        <div className="mt-8 text-center">
-          <Link 
-            href="/skills"
-            className="inline-flex items-center justify-center rounded-md bg-primary text-white font-medium px-6 py-3 hover:bg-primary/90 transition-colors"
-          >
-            View All Skills <ArrowRight size={16} className="ml-2" />
-          </Link>
-        </div>
       </div>
     </section>
   );

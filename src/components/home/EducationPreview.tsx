@@ -1,4 +1,4 @@
-import { GraduationCap, Calendar } from 'lucide-react';
+import { GraduationCap, Calendar, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 const EducationPreview = () => {
@@ -28,15 +28,15 @@ const EducationPreview = () => {
   ];
 
   return (
-    <section className="py-12 bg-gray-100 dark:bg-gray-900">
+    <section className="py-12 bg-gray-100 dark:bg-gray-900" id="education-section">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-primary">Education</h2>
           <Link 
             href="/education" 
-            className="flex items-center text-primary hover:text-primary/90 transition-colors"
+            className="flex items-center text-primary font-medium hover:underline transition-all hover:text-primary/90"
           >
-            See More <GraduationCap size={16} className="ml-1" />
+            See All <ArrowRight size={16} className="ml-1" />
           </Link>
         </div>
         

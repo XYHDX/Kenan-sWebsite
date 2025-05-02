@@ -13,13 +13,13 @@ const AchievementsPreview = () => {
   ];
 
   return (
-    <section className="py-12 bg-gray-100 dark:bg-gray-900">
+    <section className="py-12 bg-gray-100 dark:bg-gray-900" id="achievements-section">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-primary">Achievements & Awards</h2>
           <Link 
             href="/achievements" 
-            className="flex items-center text-primary hover:text-primary/90 transition-colors"
+            className="flex items-center text-primary font-medium hover:underline transition-all hover:text-primary/90"
           >
             See All <ArrowRight size={16} className="ml-1" />
           </Link>
