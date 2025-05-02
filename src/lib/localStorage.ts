@@ -72,6 +72,7 @@ export const STORAGE_KEYS = {
   SKILLS: 'kenan_skills_data',
   ACHIEVEMENTS: 'kenan_achievements_data',
   PUBLICATIONS: 'kenan_publications_data',
+  GALLERY: 'kenan_gallery_data',
   CONTACT: 'kenan_contact_data',
   MESSAGES: 'kenan_contact_messages',
   SETTINGS: 'kenan_site_settings'

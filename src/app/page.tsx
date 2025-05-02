@@ -5,7 +5,7 @@ import Hero from '@/components/home/Hero';
 import PersonalDetails from '@/components/home/PersonalDetails';
 import ProfessionalSummary from '@/components/home/ProfessionalSummary';
 import ExperiencePreview from '@/components/home/ExperiencePreview';
-import SkillsPreview from '@/components/home/SkillsPreview';
+import GalleryPreview from '@/components/home/GalleryPreview';
 import AchievementsPreview from '@/components/home/AchievementsPreview';
 import EducationPreview from '@/components/home/EducationPreview';
 import Publications from '@/components/home/Publications';
@@ -35,7 +35,7 @@ export default function Home() {
         <div id="sections" className="space-y-0">
           <EducationPreview />
           <ExperiencePreview />
-          <SkillsPreview />
+          <GalleryPreview />
           <AchievementsPreview />
           <Publications />
           <AdditionalInformation />
