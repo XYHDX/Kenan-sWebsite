@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { Camera, Plus, Trash2, Edit, Save, X, Upload } from 'lucide-react';
+import { Camera, Plus, Trash2, Edit, Save, X, Upload, AlertCircle } from 'lucide-react';
 import { STORAGE_KEYS } from '@/lib/localStorage';
 
 interface GalleryItem {
@@ -13,6 +13,8 @@ interface GalleryItem {
   afterImagePath: string;
   date?: string;
 }
+
+const MAX_GALLERY_ITEMS = 6; // Maximum number of cases allowed
 
 const AdminGalleryPage = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
@@ -27,6 +29,12 @@ const AdminGalleryPage = () => {
   });
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState<{before: boolean, after: boolean}>({before: false, after: false});
+  const beforeFileInputRef = useRef<HTMLInputElement>(null);
+  const afterFileInputRef = useRef<HTMLInputElement>(null);
+  const editBeforeFileInputRef = useRef<HTMLInputElement>(null);
+  const editAfterFileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   // Fetch gallery items
   useEffect(() => {
@@ -51,6 +59,10 @@ const AdminGalleryPage = () => {
   }, []);
 
   const handleAddNew = () => {
+    if (galleryItems.length >= MAX_GALLERY_ITEMS) {
+      alert(`Maximum limit of ${MAX_GALLERY_ITEMS} cases reached. Please delete an existing case before adding a new one.`);
+      return;
+    }
     setIsAddingNew(true);
     setEditingItem(null);
   };
@@ -64,15 +76,18 @@ const AdminGalleryPage = () => {
       afterImagePath: '/images/profile-pic.png',
       date: new Date().toISOString().split('T')[0]
     });
+    setUploadError(null);
   };
 
   const handleEdit = (item: GalleryItem) => {
     setEditingItem(item);
     setIsAddingNew(false);
+    setUploadError(null);
   };
 
   const handleCancelEdit = () => {
     setEditingItem(null);
+    setUploadError(null);
   };
 
   const handleDelete = async (id: string | number) => {
@@ -189,9 +204,80 @@ const AdminGalleryPage = () => {
     }
   };
 
-  const handleUploadImage = async (type: 'before' | 'after') => {
-    alert(`Image upload functionality should be implemented here for ${type} image`);
-    // Add your image upload functionality here
+  const handleUploadImage = async (type: 'before' | 'after', isEdit = false) => {
+    // Trigger file input click
+    if (type === 'before') {
+      if (isEdit) {
+        editBeforeFileInputRef.current?.click();
+      } else {
+        beforeFileInputRef.current?.click();
+      }
+    } else {
+      if (isEdit) {
+        editAfterFileInputRef.current?.click();
+      } else {
+        afterFileInputRef.current?.click();
+      }
+    }
+  };
+
+  const uploadFile = async (file: File, type: 'before' | 'after', isEdit = false) => {
+    setUploadError(null);
+    
+    // Set the uploading state for the corresponding image type
+    setIsUploading(prev => ({...prev, [type]: true}));
+    
+    try {
+      // Create form data for the file upload
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      // Send the file to the upload API
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to upload image');
+      }
+      
+      const data = await response.json();
+      
+      // Update the state with the new image URL
+      if (isEdit && editingItem) {
+        setEditingItem({
+          ...editingItem,
+          [`${type}ImagePath`]: data.imageUrl
+        });
+      } else {
+        setNewItem({
+          ...newItem,
+          [`${type}ImagePath`]: data.imageUrl
+        });
+      }
+    } catch (error: any) {
+      console.error(`Error uploading ${type} image:`, error);
+      setUploadError(error.message || `Failed to upload ${type} image`);
+    } finally {
+      setIsUploading(prev => ({...prev, [type]: false}));
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'before' | 'after', isEdit = false) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      
+      // Check if the file is an image
+      if (!file.type.startsWith('image/')) {
+        setUploadError('Please select an image file (JPEG, PNG, etc.)');
+        return;
+      }
+      
+      // Upload the file
+      uploadFile(file, type, isEdit);
+    }
   };
 
   return (
@@ -201,12 +287,28 @@ const AdminGalleryPage = () => {
           <h1 className="text-2xl font-bold">Case Gallery Items</h1>
           <button
             onClick={handleAddNew}
-            disabled={isAddingNew}
+            disabled={isAddingNew || galleryItems.length >= MAX_GALLERY_ITEMS}
             className="bg-primary text-primary-foreground px-4 py-2 rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus size={16} className="mr-2" /> Add New Case
           </button>
         </div>
+
+        {galleryItems.length >= MAX_GALLERY_ITEMS && !isAddingNew && !editingItem && (
+          <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md flex items-start">
+            <AlertCircle className="w-5 h-5 text-amber-500 mt-0.5 mr-2 flex-shrink-0" />
+            <p className="text-amber-800 dark:text-amber-200">
+              Maximum limit of {MAX_GALLERY_ITEMS} cases reached. Please delete an existing case before adding a new one.
+            </p>
+          </div>
+        )}
+
+        {uploadError && (
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md flex items-start">
+            <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
+            <p className="text-red-800 dark:text-red-200">{uploadError}</p>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="text-center py-8">Loading gallery items...</div>
@@ -247,7 +349,7 @@ const AdminGalleryPage = () => {
                   
                   {/* Before Image */}
                   <div>
-                    <label htmlFor="beforeImagePath" className="block text-sm font-medium mb-1">Before Image Path *</label>
+                    <label htmlFor="beforeImagePath" className="block text-sm font-medium mb-1">Before Image *</label>
                     <div className="flex">
                       <input
                         type="text"
@@ -261,16 +363,35 @@ const AdminGalleryPage = () => {
                       <button 
                         className="bg-secondary px-4 py-2 rounded-r-md flex items-center"
                         onClick={() => handleUploadImage('before')}
+                        disabled={isUploading.before}
                       >
-                        <Upload size={16} className="mr-1" /> Upload
+                        {isUploading.before ? 'Uploading...' : (
+                          <><Upload size={16} className="mr-1" /> Upload</>
+                        )}
                       </button>
+                      <input 
+                        type="file" 
+                        ref={beforeFileInputRef} 
+                        className="hidden" 
+                        accept="image/*"
+                        onChange={(e) => handleFileChange(e, 'before')}
+                      />
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">Enter the path to the "before" image or upload a new one.</p>
+                    {newItem.beforeImagePath && (
+                      <div className="mt-2">
+                        <img 
+                          src={newItem.beforeImagePath} 
+                          alt="Before Preview" 
+                          className="h-20 w-auto object-cover rounded-md border border-gray-200 dark:border-gray-700" 
+                        />
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">Upload a "before" image from your device.</p>
                   </div>
                   
                   {/* After Image */}
                   <div>
-                    <label htmlFor="afterImagePath" className="block text-sm font-medium mb-1">After Image Path *</label>
+                    <label htmlFor="afterImagePath" className="block text-sm font-medium mb-1">After Image *</label>
                     <div className="flex">
                       <input
                         type="text"
@@ -284,11 +405,30 @@ const AdminGalleryPage = () => {
                       <button 
                         className="bg-secondary px-4 py-2 rounded-r-md flex items-center"
                         onClick={() => handleUploadImage('after')}
+                        disabled={isUploading.after}
                       >
-                        <Upload size={16} className="mr-1" /> Upload
+                        {isUploading.after ? 'Uploading...' : (
+                          <><Upload size={16} className="mr-1" /> Upload</>
+                        )}
                       </button>
+                      <input 
+                        type="file" 
+                        ref={afterFileInputRef} 
+                        className="hidden" 
+                        accept="image/*"
+                        onChange={(e) => handleFileChange(e, 'after')}
+                      />
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">Enter the path to the "after" image or upload a new one.</p>
+                    {newItem.afterImagePath && (
+                      <div className="mt-2">
+                        <img 
+                          src={newItem.afterImagePath} 
+                          alt="After Preview" 
+                          className="h-20 w-auto object-cover rounded-md border border-gray-200 dark:border-gray-700" 
+                        />
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">Upload an "after" image from your device.</p>
                   </div>
                   
                   <div>
@@ -306,7 +446,7 @@ const AdminGalleryPage = () => {
                   <div className="flex space-x-3 pt-2">
                     <button
                       onClick={handleSaveNew}
-                      disabled={isSaving}
+                      disabled={isSaving || isUploading.before || isUploading.after}
                       className="bg-primary text-primary-foreground px-4 py-2 rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Save size={16} className="mr-2" /> {isSaving ? 'Saving...' : 'Save'}
@@ -357,7 +497,7 @@ const AdminGalleryPage = () => {
                   
                   {/* Before Image */}
                   <div>
-                    <label htmlFor="edit-beforeImagePath" className="block text-sm font-medium mb-1">Before Image Path *</label>
+                    <label htmlFor="edit-beforeImagePath" className="block text-sm font-medium mb-1">Before Image *</label>
                     <div className="flex">
                       <input
                         type="text"
@@ -370,16 +510,35 @@ const AdminGalleryPage = () => {
                       />
                       <button 
                         className="bg-secondary px-4 py-2 rounded-r-md flex items-center"
-                        onClick={() => handleUploadImage('before')}
+                        onClick={() => handleUploadImage('before', true)}
+                        disabled={isUploading.before}
                       >
-                        <Upload size={16} className="mr-1" /> Upload
+                        {isUploading.before ? 'Uploading...' : (
+                          <><Upload size={16} className="mr-1" /> Upload</>
+                        )}
                       </button>
+                      <input 
+                        type="file" 
+                        ref={editBeforeFileInputRef} 
+                        className="hidden" 
+                        accept="image/*"
+                        onChange={(e) => handleFileChange(e, 'before', true)}
+                      />
                     </div>
+                    {editingItem.beforeImagePath && (
+                      <div className="mt-2">
+                        <img 
+                          src={editingItem.beforeImagePath} 
+                          alt="Before Preview" 
+                          className="h-20 w-auto object-cover rounded-md border border-gray-200 dark:border-gray-700" 
+                        />
+                      </div>
+                    )}
                   </div>
                   
                   {/* After Image */}
                   <div>
-                    <label htmlFor="edit-afterImagePath" className="block text-sm font-medium mb-1">After Image Path *</label>
+                    <label htmlFor="edit-afterImagePath" className="block text-sm font-medium mb-1">After Image *</label>
                     <div className="flex">
                       <input
                         type="text"
@@ -392,11 +551,30 @@ const AdminGalleryPage = () => {
                       />
                       <button 
                         className="bg-secondary px-4 py-2 rounded-r-md flex items-center"
-                        onClick={() => handleUploadImage('after')}
+                        onClick={() => handleUploadImage('after', true)}
+                        disabled={isUploading.after}
                       >
-                        <Upload size={16} className="mr-1" /> Upload
+                        {isUploading.after ? 'Uploading...' : (
+                          <><Upload size={16} className="mr-1" /> Upload</>
+                        )}
                       </button>
+                      <input 
+                        type="file" 
+                        ref={editAfterFileInputRef} 
+                        className="hidden" 
+                        accept="image/*"
+                        onChange={(e) => handleFileChange(e, 'after', true)}
+                      />
                     </div>
+                    {editingItem.afterImagePath && (
+                      <div className="mt-2">
+                        <img 
+                          src={editingItem.afterImagePath} 
+                          alt="After Preview" 
+                          className="h-20 w-auto object-cover rounded-md border border-gray-200 dark:border-gray-700" 
+                        />
+                      </div>
+                    )}
                   </div>
                   
                   <div>
@@ -414,7 +592,7 @@ const AdminGalleryPage = () => {
                   <div className="flex space-x-3 pt-2">
                     <button
                       onClick={handleSaveEdit}
-                      disabled={isSaving}
+                      disabled={isSaving || isUploading.before || isUploading.after}
                       className="bg-primary text-primary-foreground px-4 py-2 rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Save size={16} className="mr-2" /> {isSaving ? 'Saving...' : 'Save'}
