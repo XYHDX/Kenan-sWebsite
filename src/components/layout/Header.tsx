@@ -26,8 +26,8 @@ const Header = () => {
           <Image 
             src="/images/logo.png" 
             alt="Kenan Younes Saoud" 
-            width={75} 
-            height={50} 
+            width={35} 
+            height={35} 
             className="h-auto"
           />
           <span className="ml-4 text-xl font-light text-primary dark:text-primary">KENAN SAOUD</span>
