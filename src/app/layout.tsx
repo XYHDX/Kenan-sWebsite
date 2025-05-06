@@ -24,7 +24,7 @@ const defaultSettings: SiteSettings = {
   siteLanguage: 'en',
   enableDarkMode: false,
   enableSEO: true,
-  customTheme: 'blue',
+  customTheme: 'green',
   maintenanceMode: false,
 };
 
@@ -104,7 +104,7 @@ export default function RootLayout({
                 (function() {
                   try {
                     const storedSettings = localStorage.getItem('site_settings');
-                    let theme = 'blue'; // Default theme
+                    let theme = 'green'; // Default theme
                     if (storedSettings) {
                       const settings = JSON.parse(storedSettings);
                       if (settings && settings.customTheme) {
@@ -132,7 +132,7 @@ export default function RootLayout({
                   } catch (error) {
                     console.error('Error applying theme from localStorage:', error);
                     // Apply default theme and remove dark mode as fallback
-                    document.documentElement.classList.add('theme-blue');
+                    document.documentElement.classList.add('theme-green');
                     // document.documentElement.classList.add('dark'); // Removed fallback dark
                   }
                 })();
@@ -164,7 +164,7 @@ export default function RootLayout({
               (function() {
                 try {
                   const storedSettings = localStorage.getItem('site_settings');
-                  let theme = 'blue'; // Default theme
+                  let theme = 'green'; // Default theme
                   if (storedSettings) {
                     const settings = JSON.parse(storedSettings);
                     if (settings && settings.customTheme) {
@@ -192,7 +192,7 @@ export default function RootLayout({
                 } catch (error) {
                   console.error('Error applying theme from localStorage:', error);
                   // Apply default theme and remove dark mode as fallback
-                  document.documentElement.classList.add('theme-blue');
+                  document.documentElement.classList.add('theme-green');
                   // document.documentElement.classList.add('dark'); // Removed fallback dark
                 }
               })();

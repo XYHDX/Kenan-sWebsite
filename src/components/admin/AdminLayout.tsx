@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import { Bell, User, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
-import ThemeSwitcher from '@/components/ThemeSwitcher';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS } from '@/lib/localStorage';
 
@@ -16,7 +15,7 @@ interface AdminLayoutProps {
 const AdminLayout = ({ children, activePage }: AdminLayoutProps) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [settings] = useLocalStorage(STORAGE_KEYS.SETTINGS, {
-    customTheme: 'blue',
+    customTheme: 'green',
   });
   
   // Force re-render when theme changes
@@ -40,7 +39,6 @@ const AdminLayout = ({ children, activePage }: AdminLayoutProps) => {
             </h1>
             
             <div className="flex items-center space-x-4">
-              <ThemeSwitcher />
               <Link href="/" className="text-gray-600 dark:text-gray-300 hover:text-theme-primary flex items-center" target="_blank">
                 <span className="mr-1">View Site</span>
                 <ExternalLink size={16} />

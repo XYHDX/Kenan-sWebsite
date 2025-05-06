@@ -78,19 +78,19 @@ const Footer = () => {
             <h3 className="text-xl font-semibold mb-4">Contact</h3>
             <ul className="space-y-3">
               <li className="flex items-center">
-                <Mail size={18} className="mr-3 text-blue-500" />
-                <a href={`mailto:${contactData.email}`} className="hover:text-blue-400 transition-colors">
+                <Mail size={18} className="mr-3 text-theme-primary" />
+                <a href={`mailto:${contactData.email}`} className="hover:text-theme-primary transition-colors">
                   {contactData.email}
                 </a>
               </li>
               <li className="flex items-center">
-                <Phone size={18} className="mr-3 text-blue-500" />
-                <a href={`tel:${contactData.phone}`} className="hover:text-blue-400 transition-colors">
+                <Phone size={18} className="mr-3 text-theme-primary" />
+                <a href={`tel:${contactData.phone}`} className="hover:text-theme-primary transition-colors">
                   {contactData.phone}
                 </a>
               </li>
               <li className="flex items-start">
-                <MapPin size={18} className="mr-3 mt-1 text-blue-500" />
+                <MapPin size={18} className="mr-3 mt-1 text-theme-primary" />
                 <span>{contactData.location}</span>
               </li>
             </ul>
@@ -102,7 +102,7 @@ const Footer = () => {
             <ul className="space-y-2">
               {navLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="hover:text-blue-400 transition-colors">
+                  <Link href={link.href} className="hover:text-theme-primary transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -118,7 +118,7 @@ const Footer = () => {
                 href={contactData.linkedinUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="bg-gray-800 hover:bg-blue-600 p-3 rounded-full transition-colors"
+                className="bg-gray-800 hover:bg-theme-primary p-3 rounded-full transition-colors"
                 aria-label="LinkedIn"
               >
                 <Linkedin size={20} />
@@ -127,7 +127,7 @@ const Footer = () => {
                 href={contactData.instagramUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="bg-gray-800 hover:bg-blue-600 p-3 rounded-full transition-colors"
+                className="bg-gray-800 hover:bg-theme-primary p-3 rounded-full transition-colors"
                 aria-label="Instagram"
               >
                 <Instagram size={20} />
