@@ -12,7 +12,7 @@ import {
   Image as ImageIcon 
 } from 'lucide-react';
 import { saveToLocalStorage, getFromLocalStorage, STORAGE_KEYS } from '@/lib/localStorage';
-import ThemeSwitcher from '@/components/ThemeSwitcher';
+import { applyTheme } from '@/lib/themeUtils';
 
 interface SiteSettings {
   siteName: string;
@@ -35,7 +35,7 @@ const defaultSettings: SiteSettings = {
   enablePublicProfile: true,
   enableSEO: true,
   maintenanceMode: false,
-  customTheme: 'blue',
+  customTheme: 'green',
   maxItemsPerPage: 10
 };
 
@@ -73,11 +73,20 @@ const SettingsPage = () => {
     setSaveMessage('');
 
     try {
+      // Always set theme to green regardless of what might be in formData
+      const updatedFormData = {
+        ...formData,
+        customTheme: 'green'
+      };
+      
       // In a real implementation, this would make an API call to save the data
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Save to localStorage for persistence
-      saveToLocalStorage(STORAGE_KEYS.SETTINGS, formData);
+      saveToLocalStorage(STORAGE_KEYS.SETTINGS, updatedFormData);
+      
+      // Apply theme immediately
+      applyTheme('green');
       
       setSaveMessage('Settings updated successfully!');
     } catch {
@@ -141,13 +150,6 @@ const SettingsPage = () => {
                     <option value="fr">French</option>
                     <option value="es">Spanish</option>
                   </select>
-                </div>
-                
-                <div className="mb-4">
-                  <label htmlFor="customTheme" className="block text-sm font-medium text-gray-700 mb-1">
-                    Color Theme
-                  </label>
-                  <ThemeSwitcher className="w-full" />
                 </div>
               </div>
               

@@ -1,6 +1,9 @@
 {
   "/api/admin/profile/route": "app/api/admin/profile/route.js",
   "/api/contact/data/route": "app/api/contact/data/route.js",
-  "/api/images/[filename]/route": "app/api/images/[filename]/route.js",
-  "/page": "app/page.js"
+  "/api/admin/publications/route": "app/api/admin/publications/route.js",
+  "/page": "app/page.js",
+  "/admin/settings/page": "app/admin/settings/page.js",
+  "/admin/publications/page": "app/admin/publications/page.js",
+  "/admin/profile/page": "app/admin/profile/page.js"
 }

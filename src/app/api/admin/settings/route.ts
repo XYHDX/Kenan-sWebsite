@@ -33,9 +33,13 @@ export async function GET() {
       enablePublicProfile: true,
       enableSEO: true,
       maintenanceMode: false,
-      customTheme: 'default',
+      customTheme: 'green',
       maxItemsPerPage: 10
     };
+    
+    // Ensure theme is always green regardless of what's stored
+    settings.customTheme = 'green';
+    
     return NextResponse.json(settings);
   } catch (error) {
     console.error('🔥 GET /api/admin/settings failed:', error);
@@ -52,6 +56,9 @@ export async function POST(request: NextRequest) {
     if (!settings.siteName) {
       return NextResponse.json({ error: 'Site name is required' }, { status: 400 });
     }
+    
+    // Force green theme
+    settings.customTheme = 'green';
     
     await redis.set(REDIS_SETTINGS_KEY, settings);
     return NextResponse.json({ message: 'Settings saved successfully' }, { status: 200 });
