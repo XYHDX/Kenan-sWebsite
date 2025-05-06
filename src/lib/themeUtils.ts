@@ -44,7 +44,7 @@ export const applyTheme = (theme: string): void => {
       document.documentElement.classList.add(`theme-${theme}`);
       
       // Force a refresh to ensure CSS variables are applied
-      // forceThemeRefresh();
+      forceThemeRefresh();
       
       // Dispatch a custom event to notify components of theme change
       window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));

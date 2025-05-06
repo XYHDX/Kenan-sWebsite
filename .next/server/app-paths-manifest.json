@@ -1,9 +1,17 @@
 {
   "/api/admin/profile/route": "app/api/admin/profile/route.js",
   "/api/contact/data/route": "app/api/contact/data/route.js",
+  "/api/admin/contact/route": "app/api/admin/contact/route.js",
   "/api/admin/publications/route": "app/api/admin/publications/route.js",
+  "/api/admin/achievements/route": "app/api/admin/achievements/route.js",
+  "/api/gallery/route": "app/api/gallery/route.js",
+  "/api/admin/education/route": "app/api/admin/education/route.js",
   "/page": "app/page.js",
+  "/admin/page": "app/admin/page.js",
   "/admin/settings/page": "app/admin/settings/page.js",
+  "/admin/contact/page": "app/admin/contact/page.js",
   "/admin/publications/page": "app/admin/publications/page.js",
-  "/admin/profile/page": "app/admin/profile/page.js"
+  "/admin/gallery/page": "app/admin/gallery/page.js",
+  "/admin/achievements/page": "app/admin/achievements/page.js",
+  "/admin/certifications/page": "app/admin/certifications/page.js"
 }
