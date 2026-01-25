@@ -49,9 +49,22 @@ export async function GET() {
       showContactForm: typeof contact.showContactForm === 'boolean' ? contact.showContactForm : true
     };
 
-    return NextResponse.json(publicContact);
+    return NextResponse.json(publicContact, {
+      headers: {
+        'Cache-Control': 'no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
   } catch (error) {
     console.error('🔥 GET /api/contact/data failed:', error);
-    return NextResponse.json(defaultContactData, { status: 200 });
+    return NextResponse.json(defaultContactData, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
   }
 } 

@@ -1,5 +1,5 @@
 // Add dynamic export for static site generation
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 import { redis } from '@/lib/redis'; // Import the shared Redis client
 import { NextRequest, NextResponse } from 'next/server';
@@ -34,11 +34,11 @@ const defaultContactData = {
 export async function GET() {
   try {
     const contact = await redis.get<Contact>(REDIS_CONTACT_KEY);
-    
+
     if (!contact || !contact.email) {
       return NextResponse.json(defaultContactData);
     }
-    
+
     // Fill in any missing fields with defaults
     const completeContact = {
       email: contact.email || defaultContactData.email,
@@ -49,7 +49,7 @@ export async function GET() {
       showContactForm: typeof contact.showContactForm === 'boolean' ? contact.showContactForm : true,
       emailNotifications: typeof contact.emailNotifications === 'boolean' ? contact.emailNotifications : true
     };
-    
+
     return NextResponse.json(completeContact);
   } catch (error) {
     console.error('🔥 GET /api/admin/contact failed:', error);
@@ -61,25 +61,25 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const contact: Contact = await request.json();
-    
+
     // Validate required fields
     if (!contact.email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
-    
+
     // Ensure all boolean fields are properly set
     const sanitizedContact = {
       ...contact,
       showContactForm: typeof contact.showContactForm === 'boolean' ? contact.showContactForm : true,
       emailNotifications: typeof contact.emailNotifications === 'boolean' ? contact.emailNotifications : true
     };
-    
+
     // Save to Redis
     await redis.set(REDIS_CONTACT_KEY, sanitizedContact);
-    
+
     // Also log for debugging
     console.log('Saving contact data to Redis:', sanitizedContact);
-    
+
     return NextResponse.json({ message: 'Contact information saved successfully' }, { status: 200 });
   } catch (error) {
     console.error("🔥 POST /api/admin/contact failed:", error);
