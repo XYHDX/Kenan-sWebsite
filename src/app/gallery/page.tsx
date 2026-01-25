@@ -96,8 +96,8 @@ const GalleryPage = async () => {
     ];
   }
 
-  // Limit to exactly 60 cases
-  galleryItems = galleryItems.slice(0, 60);
+  // Limit to exactly 15 cases
+  galleryItems = galleryItems.slice(0, 15);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 text-foreground">

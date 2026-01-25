@@ -14,7 +14,7 @@ interface GalleryItem {
   date?: string;
 }
 
-const MAX_GALLERY_ITEMS = 60; // Maximum number of cases allowed
+const MAX_GALLERY_ITEMS = 15; // Maximum number of cases allowed
 
 const AdminGalleryPage = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
