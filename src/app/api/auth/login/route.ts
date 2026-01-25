@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 
+interface LoginRequest {
+    email?: string;
+    password?: string;
+}
+
 export async function POST(request: Request) {
     try {
-        const body = await request.json();
+        const body = await request.json() as LoginRequest;
         const { email, password } = body;
 
         // Get credentials from environment variables
