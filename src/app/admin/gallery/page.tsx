@@ -14,7 +14,7 @@ interface GalleryItem {
   date?: string;
 }
 
-const MAX_GALLERY_ITEMS = 6; // Maximum number of cases allowed
+const MAX_GALLERY_ITEMS = 60; // Maximum number of cases allowed
 
 const AdminGalleryPage = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
@@ -29,7 +29,7 @@ const AdminGalleryPage = () => {
   });
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploading, setIsUploading] = useState<{before: boolean, after: boolean}>({before: false, after: false});
+  const [isUploading, setIsUploading] = useState<{ before: boolean, after: boolean }>({ before: false, after: false });
   const beforeFileInputRef = useRef<HTMLInputElement>(null);
   const afterFileInputRef = useRef<HTMLInputElement>(null);
   const editBeforeFileInputRef = useRef<HTMLInputElement>(null);
@@ -174,7 +174,7 @@ const AdminGalleryPage = () => {
 
       if (response.ok) {
         const updatedItem = await response.json() as GalleryItem;
-        setGalleryItems(prev => 
+        setGalleryItems(prev =>
           prev.map(item => item.id === updatedItem.id ? updatedItem : item)
         );
         setEditingItem(null);
@@ -190,7 +190,7 @@ const AdminGalleryPage = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    
+
     if (editingItem) {
       setEditingItem({
         ...editingItem,
@@ -223,38 +223,38 @@ const AdminGalleryPage = () => {
 
   const uploadFile = async (file: File, type: 'before' | 'after', isEdit = false) => {
     setUploadError(null);
-    
+
     // Set the uploading state for the corresponding image type
-    setIsUploading(prev => ({...prev, [type]: true}));
-    
+    setIsUploading(prev => ({ ...prev, [type]: true }));
+
     try {
       // Create form data for the file upload
       const formData = new FormData();
       formData.append('file', file);
-      
+
       // Send the file to the upload API
       const response = await fetch('/api/admin/upload', {
         method: 'POST',
         body: formData,
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json() as { error?: string };
         console.error(`Error response from upload API:`, errorData);
         throw new Error(errorData.error || 'Failed to upload image');
       }
-      
-      const data = await response.json() as { 
+
+      const data = await response.json() as {
         imageUrl?: string;
         success?: boolean;
       };
-      
+
       if (!data.imageUrl) {
         throw new Error('No image URL returned from server');
       }
-      
+
       console.log(`Upload successful, received URL: ${data.imageUrl}`);
-      
+
       // Update the state with the new image URL
       if (isEdit && editingItem) {
         setEditingItem({
@@ -270,40 +270,40 @@ const AdminGalleryPage = () => {
     } catch (error: any) {
       console.error(`Error uploading ${type} image:`, error);
       setUploadError(error.message || `Failed to upload ${type} image`);
-      
+
       // Show more detailed error to help debugging
       if (error instanceof Error) {
         console.error('Error details:', error.stack);
       }
     } finally {
-      setIsUploading(prev => ({...prev, [type]: false}));
+      setIsUploading(prev => ({ ...prev, [type]: false }));
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'before' | 'after', isEdit = false) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      
+
       // Check if the file is an image
       if (!file.type.startsWith('image/')) {
         setUploadError('Please select an image file (JPEG, PNG, etc.)');
         return;
       }
-      
+
       // Check file size (max 2MB)
       const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
       if (file.size > MAX_FILE_SIZE) {
         setUploadError(`Image size exceeds maximum allowed (2MB). Selected file is ${(file.size / (1024 * 1024)).toFixed(2)}MB`);
         return;
       }
-      
+
       // Upload the file
       uploadFile(file, type, isEdit);
     }
   };
 
   return (
-    <AdminLayout activePage="gallery">      
+    <AdminLayout activePage="gallery">
       <div className="p-6">
         <div className="flex justify-between mb-8">
           <h1 className="text-2xl font-bold">Case Gallery Items</h1>
@@ -342,7 +342,7 @@ const AdminGalleryPage = () => {
                 <h2 className="text-xl font-semibold mb-4 flex items-center">
                   <Camera size={20} className="mr-2" /> Add New Case
                 </h2>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label htmlFor="title" className="block text-sm font-medium mb-1">Title *</label>
@@ -356,7 +356,7 @@ const AdminGalleryPage = () => {
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <label htmlFor="description" className="block text-sm font-medium mb-1">Description</label>
                     <textarea
@@ -368,7 +368,7 @@ const AdminGalleryPage = () => {
                       rows={3}
                     />
                   </div>
-                  
+
                   {/* Before Image */}
                   <div>
                     <label htmlFor="beforeImagePath" className="block text-sm font-medium mb-1">Before Image *</label>
@@ -382,7 +382,7 @@ const AdminGalleryPage = () => {
                         className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-l-md dark:bg-gray-700"
                         required
                       />
-                      <button 
+                      <button
                         className="bg-secondary px-4 py-2 rounded-r-md flex items-center"
                         onClick={() => handleUploadImage('before')}
                         disabled={isUploading.before}
@@ -391,26 +391,26 @@ const AdminGalleryPage = () => {
                           <><Upload size={16} className="mr-1" /> Upload</>
                         )}
                       </button>
-                      <input 
-                        type="file" 
-                        ref={beforeFileInputRef} 
-                        className="hidden" 
+                      <input
+                        type="file"
+                        ref={beforeFileInputRef}
+                        className="hidden"
                         accept="image/*"
                         onChange={(e) => handleFileChange(e, 'before')}
                       />
                     </div>
                     {newItem.beforeImagePath && (
                       <div className="mt-2">
-                        <img 
-                          src={newItem.beforeImagePath} 
-                          alt="Before Preview" 
-                          className="h-20 w-auto object-cover rounded-md border border-gray-200 dark:border-gray-700" 
+                        <img
+                          src={newItem.beforeImagePath}
+                          alt="Before Preview"
+                          className="h-20 w-auto object-cover rounded-md border border-gray-200 dark:border-gray-700"
                         />
                       </div>
                     )}
                     <p className="text-xs text-muted-foreground mt-1">Upload a "before" image from your device.</p>
                   </div>
-                  
+
                   {/* After Image */}
                   <div>
                     <label htmlFor="afterImagePath" className="block text-sm font-medium mb-1">After Image *</label>
@@ -424,7 +424,7 @@ const AdminGalleryPage = () => {
                         className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-l-md dark:bg-gray-700"
                         required
                       />
-                      <button 
+                      <button
                         className="bg-secondary px-4 py-2 rounded-r-md flex items-center"
                         onClick={() => handleUploadImage('after')}
                         disabled={isUploading.after}
@@ -433,26 +433,26 @@ const AdminGalleryPage = () => {
                           <><Upload size={16} className="mr-1" /> Upload</>
                         )}
                       </button>
-                      <input 
-                        type="file" 
-                        ref={afterFileInputRef} 
-                        className="hidden" 
+                      <input
+                        type="file"
+                        ref={afterFileInputRef}
+                        className="hidden"
                         accept="image/*"
                         onChange={(e) => handleFileChange(e, 'after')}
                       />
                     </div>
                     {newItem.afterImagePath && (
                       <div className="mt-2">
-                        <img 
-                          src={newItem.afterImagePath} 
-                          alt="After Preview" 
-                          className="h-20 w-auto object-cover rounded-md border border-gray-200 dark:border-gray-700" 
+                        <img
+                          src={newItem.afterImagePath}
+                          alt="After Preview"
+                          className="h-20 w-auto object-cover rounded-md border border-gray-200 dark:border-gray-700"
                         />
                       </div>
                     )}
                     <p className="text-xs text-muted-foreground mt-1">Upload an "after" image from your device.</p>
                   </div>
-                  
+
                   <div>
                     <label htmlFor="date" className="block text-sm font-medium mb-1">Date</label>
                     <input
@@ -464,7 +464,7 @@ const AdminGalleryPage = () => {
                       className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
                     />
                   </div>
-                  
+
                   <div className="flex space-x-3 pt-2">
                     <button
                       onClick={handleSaveNew}
@@ -483,14 +483,14 @@ const AdminGalleryPage = () => {
                 </div>
               </div>
             )}
-            
+
             {/* Edit Form */}
             {editingItem && (
               <div className="bg-white dark:bg-gray-800 border border-border rounded-lg p-6 mb-8">
                 <h2 className="text-xl font-semibold mb-4 flex items-center">
                   <Edit size={20} className="mr-2" /> Edit Gallery Item
                 </h2>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label htmlFor="edit-title" className="block text-sm font-medium mb-1">Title *</label>
@@ -504,7 +504,7 @@ const AdminGalleryPage = () => {
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <label htmlFor="edit-description" className="block text-sm font-medium mb-1">Description</label>
                     <textarea
@@ -516,7 +516,7 @@ const AdminGalleryPage = () => {
                       rows={3}
                     />
                   </div>
-                  
+
                   {/* Before Image */}
                   <div>
                     <label htmlFor="edit-beforeImagePath" className="block text-sm font-medium mb-1">Before Image *</label>
@@ -530,7 +530,7 @@ const AdminGalleryPage = () => {
                         className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-l-md dark:bg-gray-700"
                         required
                       />
-                      <button 
+                      <button
                         className="bg-secondary px-4 py-2 rounded-r-md flex items-center"
                         onClick={() => handleUploadImage('before', true)}
                         disabled={isUploading.before}
@@ -539,25 +539,25 @@ const AdminGalleryPage = () => {
                           <><Upload size={16} className="mr-1" /> Upload</>
                         )}
                       </button>
-                      <input 
-                        type="file" 
-                        ref={editBeforeFileInputRef} 
-                        className="hidden" 
+                      <input
+                        type="file"
+                        ref={editBeforeFileInputRef}
+                        className="hidden"
                         accept="image/*"
                         onChange={(e) => handleFileChange(e, 'before', true)}
                       />
                     </div>
                     {editingItem.beforeImagePath && (
                       <div className="mt-2">
-                        <img 
-                          src={editingItem.beforeImagePath} 
-                          alt="Before Preview" 
-                          className="h-20 w-auto object-cover rounded-md border border-gray-200 dark:border-gray-700" 
+                        <img
+                          src={editingItem.beforeImagePath}
+                          alt="Before Preview"
+                          className="h-20 w-auto object-cover rounded-md border border-gray-200 dark:border-gray-700"
                         />
                       </div>
                     )}
                   </div>
-                  
+
                   {/* After Image */}
                   <div>
                     <label htmlFor="edit-afterImagePath" className="block text-sm font-medium mb-1">After Image *</label>
@@ -571,7 +571,7 @@ const AdminGalleryPage = () => {
                         className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-l-md dark:bg-gray-700"
                         required
                       />
-                      <button 
+                      <button
                         className="bg-secondary px-4 py-2 rounded-r-md flex items-center"
                         onClick={() => handleUploadImage('after', true)}
                         disabled={isUploading.after}
@@ -580,25 +580,25 @@ const AdminGalleryPage = () => {
                           <><Upload size={16} className="mr-1" /> Upload</>
                         )}
                       </button>
-                      <input 
-                        type="file" 
-                        ref={editAfterFileInputRef} 
-                        className="hidden" 
+                      <input
+                        type="file"
+                        ref={editAfterFileInputRef}
+                        className="hidden"
                         accept="image/*"
                         onChange={(e) => handleFileChange(e, 'after', true)}
                       />
                     </div>
                     {editingItem.afterImagePath && (
                       <div className="mt-2">
-                        <img 
-                          src={editingItem.afterImagePath} 
-                          alt="After Preview" 
-                          className="h-20 w-auto object-cover rounded-md border border-gray-200 dark:border-gray-700" 
+                        <img
+                          src={editingItem.afterImagePath}
+                          alt="After Preview"
+                          className="h-20 w-auto object-cover rounded-md border border-gray-200 dark:border-gray-700"
                         />
                       </div>
                     )}
                   </div>
-                  
+
                   <div>
                     <label htmlFor="edit-date" className="block text-sm font-medium mb-1">Date</label>
                     <input
@@ -610,7 +610,7 @@ const AdminGalleryPage = () => {
                       className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
                     />
                   </div>
-                  
+
                   <div className="flex space-x-3 pt-2">
                     <button
                       onClick={handleSaveEdit}
@@ -629,7 +629,7 @@ const AdminGalleryPage = () => {
                 </div>
               </div>
             )}
-            
+
             {/* Gallery Items List */}
             <div className="bg-white dark:bg-gray-800 border border-border rounded-lg overflow-hidden">
               <div className="overflow-x-auto">
@@ -656,10 +656,10 @@ const AdminGalleryPage = () => {
                         <tr key={item.id} className="hover:bg-muted/50">
                           <td className="px-6 py-4 whitespace-nowrap">{item.title}</td>
                           <td className="px-6 py-4">
-                            {item.description ? 
-                              (item.description.length > 30 ? 
-                                `${item.description.substring(0, 30)}...` : 
-                                item.description) : 
+                            {item.description ?
+                              (item.description.length > 30 ?
+                                `${item.description.substring(0, 30)}...` :
+                                item.description) :
                               '-'}
                           </td>
                           <td className="px-6 py-4">
