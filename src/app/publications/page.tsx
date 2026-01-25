@@ -17,6 +17,8 @@ export const metadata = {
   description: 'View my published works and research in dental implantology and related fields.'
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function PublicationsPage() {
   // Fetch publications directly from Upstash Redis on the server
   let publications: Publication[] = [];

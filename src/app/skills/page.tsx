@@ -31,6 +31,7 @@ const getCategoryIcon = (category: string) => {
 };
 
 // Make the component async to fetch data
+export const dynamic = 'force-dynamic';
 const SkillsPage = async () => {
   // Fetch skills directly from Upstash Redis on the server
   let skills: Skill[] = [];
@@ -48,7 +49,7 @@ const SkillsPage = async () => {
 
   // Group skills by category
   const groupedSkills: Record<string, Skill[]> = {};
-  
+
   skills.forEach(skill => {
     if (!groupedSkills[skill.category]) {
       groupedSkills[skill.category] = [];
@@ -75,7 +76,7 @@ const SkillsPage = async () => {
                     {getCategoryIcon(category)}
                     <h2 className="text-2xl font-semibold ml-2">{category}</h2>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {categorySkills.map((skill) => (
                       <div key={skill.id} className="flex flex-col">
@@ -83,14 +84,14 @@ const SkillsPage = async () => {
                           <span className="font-semibold text-lg">{skill.name}</span>
                           <span className="text-muted-foreground">{skill.level}%</span>
                         </div>
-                        
+
                         <div className="w-full bg-secondary rounded-full h-2.5 mb-2">
-                          <div 
-                            className="bg-primary h-2.5 rounded-full" 
+                          <div
+                            className="bg-primary h-2.5 rounded-full"
                             style={{ width: `${skill.level}%` }}
                           ></div>
                         </div>
-                        
+
                         {skill.description && (
                           <p className="text-muted-foreground text-sm mt-1">{skill.description}</p>
                         )}
