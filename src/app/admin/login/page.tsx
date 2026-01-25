@@ -23,11 +23,11 @@ const LoginPage = () => {
   useEffect(() => {
     const storedAttempts = localStorage.getItem('loginAttempts');
     const storedLockTime = localStorage.getItem('lockedUntil');
-    
+
     if (storedAttempts) {
       setLoginAttempts(parseInt(storedAttempts));
     }
-    
+
     if (storedLockTime) {
       const lockTime = parseInt(storedLockTime);
       if (lockTime > Date.now()) {
@@ -66,33 +66,36 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Check if account is locked
     if (lockedUntil && lockedUntil > Date.now()) {
       return;
     }
-    
+
     setIsLoading(true);
     setError('');
 
     try {
-      // In production, use environment variables and a server API call
-      // const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL; 
-      
-      // For demo purposes only - in production, NEVER use hardcoded credentials or expose in client-side code
-      // Replace this with a serverless function or API route to validate credentials securely
-      if (email === 'yahyademeriah@gmail.com' && password === 'admin123') {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
         // Successful login - reset attempts
         setLoginAttempts(0);
         localStorage.removeItem('loginAttempts');
         localStorage.removeItem('lockedUntil');
-        
+
         // Set authentication token (in a real app, this would be a JWT)
         sessionStorage.setItem('isLoggedIn', 'true');
         if (rememberMe) {
           localStorage.setItem('isLoggedIn', 'true');
         }
-        
+
         // Redirect to admin dashboard
         window.location.href = '/admin';
       } else {
@@ -100,7 +103,7 @@ const LoginPage = () => {
         const newAttempts = loginAttempts + 1;
         setLoginAttempts(newAttempts);
         localStorage.setItem('loginAttempts', newAttempts.toString());
-        
+
         // Lock account after max attempts
         if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
           const lockTime = Date.now() + LOCKOUT_TIME;
@@ -129,7 +132,7 @@ const LoginPage = () => {
             Sign in to manage your CV website
           </p>
         </div>
-        
+
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
             <div className="flex">
@@ -139,13 +142,13 @@ const LoginPage = () => {
             </div>
           </div>
         )}
-        
+
         {lockedUntil && lockedUntil > Date.now() ? (
           <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
             <div className="flex">
               <div className="ml-3">
                 <p className="text-sm text-yellow-700">
-                  Account locked due to too many failed attempts. 
+                  Account locked due to too many failed attempts.
                   <br />Try again in {timeRemaining}.
                 </p>
               </div>
@@ -166,7 +169,7 @@ const LoginPage = () => {
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  style={{color: '#1f2937'}}
+                  style={{ color: '#1f2937' }}
                 />
               </div>
               <div className="relative">
@@ -181,7 +184,7 @@ const LoginPage = () => {
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  style={{color: '#1f2937'}}
+                  style={{ color: '#1f2937' }}
                 />
                 <button
                   type="button"
@@ -223,16 +226,15 @@ const LoginPage = () => {
               <button
                 type="submit"
                 disabled={isLoading || (lockedUntil !== null && lockedUntil > Date.now())}
-                className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                  isLoading || (lockedUntil !== null && lockedUntil > Date.now()) 
-                    ? 'bg-blue-400' 
+                className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${isLoading || (lockedUntil !== null && lockedUntil > Date.now())
+                    ? 'bg-blue-400'
                     : 'bg-blue-600 hover:bg-blue-700'
-                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
               >
                 {isLoading ? 'Signing in...' : 'Sign in'}
               </button>
             </div>
-            
+
             <div className="text-center mt-4">
               <Link href="/" className="font-medium text-blue-600 hover:text-blue-500">
                 Return to website
