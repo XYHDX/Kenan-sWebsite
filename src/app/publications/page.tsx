@@ -17,7 +17,7 @@ export const metadata = {
   description: 'View my published works and research in dental implantology and related fields.'
 };
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Revalidate every hour
 
 export default async function PublicationsPage() {
   // Fetch publications directly from Upstash Redis on the server
@@ -60,7 +60,7 @@ export default async function PublicationsPage() {
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">Publications</h1>
-          
+
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden mb-8">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Research Publications & Studies</h2>
@@ -68,7 +68,7 @@ export default async function PublicationsPage() {
                 My published works in the field of dental implantology, oral and maxillofacial surgery, and related subjects.
               </p>
             </div>
-            
+
             <div className="divide-y divide-gray-200 dark:divide-gray-700">
               {publications.map((publication) => (
                 <div key={publication.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
@@ -78,21 +78,21 @@ export default async function PublicationsPage() {
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{publication.title}</h3>
-                      
+
                       {publication.year && (
                         <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
                           <CalendarIcon className="h-4 w-4 mr-1" />
                           <span>Published: {publication.year}</span>
                         </div>
                       )}
-                      
+
                       {publication.description && (
                         <p className="text-gray-600 dark:text-gray-300">{publication.description}</p>
                       )}
-                      
+
                       {publication.pdfUrl && (
                         <div className="mt-4">
-                          <Link 
+                          <Link
                             href={publication.pdfUrl}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -108,7 +108,7 @@ export default async function PublicationsPage() {
               ))}
             </div>
           </div>
-          
+
           <div className="text-center">
             <Link href="/" className="text-primary hover:text-primary/90 transition-colors">
               Back to Home

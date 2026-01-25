@@ -31,7 +31,7 @@ const getCategoryIcon = (category: string) => {
 };
 
 // Make the component async to fetch data
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Revalidate every hour
 const SkillsPage = async () => {
   // Fetch skills directly from Upstash Redis on the server
   let skills: Skill[] = [];
