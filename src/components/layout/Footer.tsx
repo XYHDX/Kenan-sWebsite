@@ -28,10 +28,10 @@ const Footer = () => {
   // Use our custom hook to get contact data from localStorage as fallback
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [localContactData, , isLocalLoading] = useLocalStorage<ContactData>(
-    STORAGE_KEYS.CONTACT, 
+    STORAGE_KEYS.CONTACT,
     defaultContactData
   );
-  
+
   // State for API data
   const [contactData, setContactData] = useState<ContactData>(defaultContactData);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,16 +39,43 @@ const Footer = () => {
   // Fetch contact data from API
   useEffect(() => {
     const fetchContactData = async () => {
+      // If we have valid local data that differs from default, use it immediately
+      // This ensures the admin sees their changes instantly
+      if (JSON.stringify(localContactData) !== JSON.stringify(defaultContactData)) {
+        setContactData(localContactData);
+      }
+
       setIsLoading(true);
       try {
-        const response = await fetch('/api/contact/data');
+        const response = await fetch('/api/contact/data', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
+
         if (response.ok) {
           const data = await response.json() as ContactData;
-          setContactData({
-            ...data,
-            linkedinUrl: data.linkedinUrl || defaultContactData.linkedinUrl,
-            instagramUrl: data.instagramUrl || defaultContactData.instagramUrl
-          });
+
+          // Only update from API if:
+          // 1. Local data is default (user hasn't edited anything)
+          // 2. OR API data is different from default (meaning we actually have DB data)
+          const isApiDefault = data.email === defaultContactData.email &&
+            data.phone === defaultContactData.phone;
+
+          if (!isApiDefault) {
+            setContactData({
+              ...data,
+              linkedinUrl: data.linkedinUrl || defaultContactData.linkedinUrl,
+              instagramUrl: data.instagramUrl || defaultContactData.instagramUrl
+            });
+          } else if (JSON.stringify(localContactData) !== JSON.stringify(defaultContactData)) {
+            // If API is default but we have local changes, keep local changes
+            setContactData(localContactData);
+          } else {
+            // Both are default, set data to defaults (or API data)
+            setContactData(data);
+          }
         } else {
           // Fallback to localStorage if API fails
           setContactData(localContactData);
@@ -114,18 +141,18 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-semibold mb-4">Connect</h3>
             <div className="flex space-x-4">
-              <a 
-                href={contactData.linkedinUrl} 
-                target="_blank" 
+              <a
+                href={contactData.linkedinUrl}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="bg-gray-800 hover:bg-theme-primary p-3 rounded-full transition-colors"
                 aria-label="LinkedIn"
               >
                 <Linkedin size={20} />
               </a>
-              <a 
-                href={contactData.instagramUrl} 
-                target="_blank" 
+              <a
+                href={contactData.instagramUrl}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="bg-gray-800 hover:bg-theme-primary p-3 rounded-full transition-colors"
                 aria-label="Instagram"

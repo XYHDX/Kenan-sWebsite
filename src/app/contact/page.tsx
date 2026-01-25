@@ -55,10 +55,10 @@ const ContactPage = () => {
 
   // Keep the localStorage hook for fallback
   const [localContactInfo, , isLoadingLocalStorage] = useLocalStorage<ContactData>(
-    STORAGE_KEYS.CONTACT, 
+    STORAGE_KEYS.CONTACT,
     defaultContactData
   );
-  
+
   // Add state for API-fetched contact data
   const [contactInfo, setContactInfo] = useState<ContactData>(defaultContactData);
   const [isLoading, setIsLoading] = useState(true);
@@ -66,12 +66,31 @@ const ContactPage = () => {
   // Fetch contact data from API
   useEffect(() => {
     const fetchContactData = async () => {
+      // If we have valid local data that differs from default, use it immediately
+      if (JSON.stringify(localContactInfo) !== JSON.stringify(defaultContactData)) {
+        setContactInfo(localContactInfo);
+      }
+
       setIsLoading(true);
       try {
-        const response = await fetch('/api/contact/data');
+        const response = await fetch('/api/contact/data', {
+          cache: 'no-store'
+        });
+
         if (response.ok) {
           const data = await response.json() as ContactData;
-          setContactInfo(data);
+
+          // Logic to prioritize local data if API returns defaults (similar to Footer)
+          const isApiDefault = data.email === defaultContactData.email &&
+            data.phone === defaultContactData.phone;
+
+          if (!isApiDefault) {
+            setContactInfo(data);
+          } else if (JSON.stringify(localContactInfo) !== JSON.stringify(defaultContactData)) {
+            setContactInfo(localContactInfo);
+          } else {
+            setContactInfo(data);
+          }
         } else {
           // Fallback to localStorage if API fails
           setContactInfo(localContactInfo);
@@ -94,7 +113,7 @@ const ContactPage = () => {
     if (!formData.email.trim()) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
     if (!formData.message.trim()) newErrors.message = 'Message is required';
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -109,12 +128,12 @@ const ContactPage = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsSubmitting(true);
     setSubmitStatus(null);
-    
+
     try {
       // Send data to the API endpoint
       const response = await fetch('/api/contact', {
@@ -124,20 +143,20 @@ const ContactPage = () => {
         },
         body: JSON.stringify(formData),
       });
-      
-      const data = await response.json() as { 
-        success?: boolean; 
-        message?: string; 
-        error?: string 
+
+      const data = await response.json() as {
+        success?: boolean;
+        message?: string;
+        error?: string
       };
-      
+
       if (response.ok && data.success) {
         setSubmitStatus({ success: true, message: data.message || 'Your message has been sent successfully!' });
         setFormData({ name: '', email: '', subject: '', message: '' });
       } else {
-        setSubmitStatus({ 
-          success: false, 
-          message: data.error || 'Failed to send message. Please try again.' 
+        setSubmitStatus({
+          success: false,
+          message: data.error || 'Failed to send message. Please try again.'
         });
       }
     } catch (_error) {
@@ -284,7 +303,7 @@ const ContactPage = () => {
                 </form>
               </div>
             )}
-            
+
             {!isLoading && !contactInfo.showContactForm && (
               <div className="text-center text-gray-500 dark:text-gray-400 italic">Contact form is currently disabled.</div>
             )}
