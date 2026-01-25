@@ -12,7 +12,6 @@ const AdminSidebar = ({ activePage }: { activePage: string }) => {
     { name: 'Profile', icon: <User size={20} />, path: '/admin/profile' },
     { name: 'Experience', icon: <Briefcase size={20} />, path: '/admin/experience' },
     { name: 'Education', icon: <GraduationCap size={20} />, path: '/admin/education' },
-    { name: 'Certifications', icon: <Award size={20} />, path: '/admin/certifications' },
     { name: 'Gallery', icon: <Camera size={20} />, path: '/admin/gallery' },
     { name: 'Achievements', icon: <Trophy size={20} />, path: '/admin/achievements' },
     { name: 'Publications', icon: <Book size={20} />, path: '/admin/publications' },
@@ -24,25 +23,24 @@ const AdminSidebar = ({ activePage }: { activePage: string }) => {
     <div className={`bg-gray-900 text-white h-full min-h-screen ${collapsed ? 'w-20' : 'w-64'} transition-all duration-300 flex flex-col`}>
       <div className="p-4 border-b border-gray-800 flex items-center justify-between">
         <h2 className={`font-bold text-xl ${collapsed ? 'hidden' : 'block'}`}>Admin Panel</h2>
-        <button 
-          onClick={() => setCollapsed(!collapsed)} 
+        <button
+          onClick={() => setCollapsed(!collapsed)}
           className="text-gray-400 hover:text-white"
         >
           {collapsed ? '→' : '←'}
         </button>
       </div>
-      
+
       <nav className="flex-grow py-6">
         <ul className="space-y-2">
           {menuItems.map((item) => (
             <li key={item.name}>
-              <Link 
+              <Link
                 href={item.path}
-                className={`flex items-center px-4 py-3 ${
-                  activePage === item.name.toLowerCase() 
-                    ? 'bg-theme-primary text-theme-primary-text' 
+                className={`flex items-center px-4 py-3 ${activePage === item.name.toLowerCase()
+                    ? 'bg-theme-primary text-theme-primary-text'
                     : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                } transition-colors rounded-lg mx-2`}
+                  } transition-colors rounded-lg mx-2`}
               >
                 <span className="mr-3">{item.icon}</span>
                 <span className={collapsed ? 'hidden' : 'block'}>{item.name}</span>
@@ -51,9 +49,9 @@ const AdminSidebar = ({ activePage }: { activePage: string }) => {
           ))}
         </ul>
       </nav>
-      
+
       <div className="p-4 border-t border-gray-800">
-        <Link 
+        <Link
           href="/admin/logout"
           className="flex items-center text-gray-300 hover:text-white transition-colors"
         >

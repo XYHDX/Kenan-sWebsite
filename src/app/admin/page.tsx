@@ -12,7 +12,7 @@ interface Stat {
   icon: React.ReactNode;
 }
 
-interface Update { 
+interface Update {
   section: string;
   date: string;
   status: string;
@@ -25,7 +25,7 @@ const AdminDashboard = () => {
     { title: 'Total Sections', value: '7', icon: <Users size={24} className="text-green-600" /> },
     { title: 'Site Views', value: '0', icon: <Eye size={24} className="text-purple-600" /> },
   ]);
-  
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [recentUpdates, _setRecentUpdates] = useState<Update[]>([
     { section: 'Profile', date: 'April 9, 2025', status: 'Created' },
@@ -78,43 +78,36 @@ const AdminDashboard = () => {
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
           <h2 className="text-lg font-medium text-gray-900 mb-4 text-gray-800">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Link 
-              href="/admin/profile" 
+            <Link
+              href="/admin/profile"
               className="bg-blue-50 hover:bg-blue-100 text-blue-700 p-4 rounded-lg flex items-center justify-between transition-colors"
             >
               <span>Edit Profile</span>
               <ArrowUp size={16} className="transform rotate-45" />
             </Link>
-            <Link 
-              href="/admin/experience" 
+            <Link
+              href="/admin/experience"
               className="bg-green-50 hover:bg-green-100 text-green-700 p-4 rounded-lg flex items-center justify-between transition-colors"
             >
               <span>Update Experience</span>
               <ArrowUp size={16} className="transform rotate-45" />
             </Link>
-            <Link 
-              href="/admin/education" 
+            <Link
+              href="/admin/education"
               className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 p-4 rounded-lg flex items-center justify-between transition-colors"
             >
               <span>Manage Education</span>
               <ArrowUp size={16} className="transform rotate-45" />
             </Link>
-            <Link 
-              href="/admin/certifications" 
-              className="bg-pink-50 hover:bg-pink-100 text-pink-700 p-4 rounded-lg flex items-center justify-between transition-colors"
-            >
-              <span>Manage Certifications</span>
-              <ArrowUp size={16} className="transform rotate-45" />
-            </Link>
-            <Link 
-              href="/admin/skills" 
+            <Link
+              href="/admin/skills"
               className="bg-purple-50 hover:bg-purple-100 text-purple-700 p-4 rounded-lg flex items-center justify-between transition-colors"
             >
               <span>Manage Skills</span>
               <ArrowUp size={16} className="transform rotate-45" />
             </Link>
-            <Link 
-              href="/admin/achievements" 
+            <Link
+              href="/admin/achievements"
               className="bg-yellow-50 hover:bg-yellow-100 text-yellow-700 p-4 rounded-lg flex items-center justify-between transition-colors"
             >
               <span>Add Achievements</span>

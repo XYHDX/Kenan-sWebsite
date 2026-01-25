@@ -58,20 +58,20 @@ const defaultEducation: Education[] = [
 
 // Default certifications
 const defaultCertifications: Certification[] = [
-  { 
-    id: 1, 
-    title: 'Course in ethitic veneers and smile designe', 
+  {
+    id: 1,
+    title: 'Course in ethitic veneers and smile designe',
     organization: 'Dental Academy',
     year: '2023'
   },
-  { 
-    id: 2, 
+  {
+    id: 2,
     title: 'Courses in dental implantology (Implant Direct system, Bio-tem system, Megagen system)',
     organization: 'Implantology Institute',
     year: '2022'
   },
-  { 
-    id: 3, 
+  {
+    id: 3,
     title: 'Certified from NHCPS in ACLS (Advanced Cardiac life support)',
     organization: 'NHCPS',
     year: '2021'
@@ -89,11 +89,11 @@ const EducationPage = async () => {
     // Fetch education from Upstash Redis using shared client
     const educationResult = await redis.get<Education[]>(REDIS_EDUCATION_KEY);
     education = educationResult || [];
-    
+
     // Fetch certifications from Upstash Redis
     const certificationsResult = await redis.get<Certification[]>(REDIS_CERTIFICATIONS_KEY);
     certifications = certificationsResult || [];
-    
+
     console.log("Fetched education:", education);
     console.log("Fetched certifications:", certifications);
   } catch (err) {
@@ -105,7 +105,7 @@ const EducationPage = async () => {
   if (!education || education.length === 0) {
     education = defaultEducation;
   }
-  
+
   if (!certifications || certifications.length === 0) {
     certifications = defaultCertifications;
   }
@@ -116,7 +116,7 @@ const EducationPage = async () => {
       <main className="flex-grow py-12 bg-gray-100 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-bold text-center mb-12 text-primary dark:text-primary">Education & Certifications</h1>
-          
+
           {error ? (
             <div className="text-center text-destructive text-xl py-10">{error}</div>
           ) : (
@@ -127,11 +127,11 @@ const EducationPage = async () => {
                   <GraduationCap size={24} className="mr-2 text-primary" />
                   Education
                 </h2>
-                
+
                 <div className="space-y-6">
                   {education.map(edu => (
-                    <div 
-                      key={edu.id} 
+                    <div
+                      key={edu.id}
                       className="bg-white dark:bg-gray-800 text-card-foreground rounded-lg shadow-md border border-border p-6"
                     >
                       <div className="flex flex-col md:flex-row gap-6">
@@ -140,7 +140,7 @@ const EducationPage = async () => {
                             <GraduationCap size={24} className="text-primary" />
                           </div>
                         </div>
-                        
+
                         <div className="md:w-5/6">
                           <h3 className="text-xl font-semibold">{edu.institution}</h3>
                           <h4 className="text-primary font-medium mb-2">{edu.degree}</h4>
@@ -149,11 +149,11 @@ const EducationPage = async () => {
                             <Calendar size={16} className="mr-2" />
                             <span>{edu.period}</span>
                           </div>
-                          
+
                           {edu.field && <p className="mt-2">Field: {edu.field}</p>}
                           {edu.location && <p className="mt-1">Location: {edu.location}</p>}
                           {edu.gpa && <p className="mt-1">GPA: {edu.gpa}</p>}
-                          
+
                           {edu.description && (
                             <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
                               <p>{edu.description}</p>
@@ -165,27 +165,8 @@ const EducationPage = async () => {
                   ))}
                 </div>
               </section>
-              
-              {/* Certifications Section */}
-              <section>
-                <h2 className="text-2xl font-semibold mb-6 flex items-center">
-                  <Award size={24} className="mr-2 text-primary" />
-                  Certifications
-                </h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {certifications.map((cert) => (
-                    <div 
-                      key={cert.id} 
-                      className="bg-white dark:bg-gray-800 text-card-foreground rounded-lg shadow-md border border-border p-6 hover:shadow-lg transition-shadow"
-                    >
-                      <h3 className="text-lg font-semibold mb-3">{cert.title}</h3>
-                      <p className="text-primary mb-1">{cert.organization}</p>
-                      <p className="text-muted-foreground text-sm">{cert.year}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
+
+              {/* Certifications Section Removed as per request */}
             </>
           )}
         </div>
