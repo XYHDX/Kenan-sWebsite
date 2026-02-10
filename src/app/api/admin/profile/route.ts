@@ -14,6 +14,10 @@ interface ProfileData {
   location: string;
   summary: string;
   profileImage?: string;
+  dateOfBirth?: string;
+  maritalStatus?: string;
+  nationality?: string;
+  instagram?: string;
 }
 
 // Default profile data for fallback
@@ -24,7 +28,11 @@ const defaultProfile: ProfileData = {
   phone: '09639666005656',
   location: 'Damascus, Syria',
   summary: 'Specialized dental surgeon with PhD degree and extensive experience in oral and maxillofacial surgery (OMFS) and dental implantology.',
-  profileImage: '/images/profile-pic.png'
+  profileImage: '/images/profile-pic.png',
+  dateOfBirth: '11/5/1993',
+  maritalStatus: 'Single',
+  nationality: 'Syrian',
+  instagram: 'Kenan.saoud'
 };
 
 // GET Handler: Fetch profile data from Redis
@@ -32,7 +40,7 @@ export async function GET() {
   try {
     console.log('🔍 GET /api/admin/profile: Fetching profile data from Redis');
     const profileData = await redis.get<ProfileData>(STORAGE_KEYS.PROFILE);
-    
+
     if (!profileData || !profileData.name) {
       console.log('ℹ️ No profile data found in Redis, returning default profile');
       return NextResponse.json(defaultProfile, {
@@ -43,12 +51,12 @@ export async function GET() {
         }
       });
     }
-    
+
     console.log('✅ Profile data found:', Object.keys(profileData));
     if (profileData.profileImage) {
       console.log('🖼️ Profile image found:', profileData.profileImage);
     }
-    
+
     return NextResponse.json(profileData, {
       headers: {
         'Cache-Control': 'no-store, must-revalidate',
@@ -60,7 +68,7 @@ export async function GET() {
     console.error('❌ Error fetching profile data:', error);
     return NextResponse.json(
       defaultProfile,
-      { 
+      {
         status: 200,
         headers: {
           'Cache-Control': 'no-store, must-revalidate',
@@ -77,7 +85,7 @@ export async function POST(request: NextRequest) {
   try {
     console.log('🔍 POST /api/admin/profile: Saving profile data to Redis');
     const profileData = await request.json() as ProfileData;
-    
+
     // Validate required fields
     if (!profileData.name || !profileData.title || !profileData.email) {
       console.error('❌ Missing required fields in profile data');
@@ -86,20 +94,20 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     console.log('📝 Profile data to save:', Object.keys(profileData));
     if (profileData.profileImage) {
-      console.log('🖼️ Profile image URL:', 
-        profileData.profileImage.length > 100 
-          ? profileData.profileImage.substring(0, 100) + '...' 
+      console.log('🖼️ Profile image URL:',
+        profileData.profileImage.length > 100
+          ? profileData.profileImage.substring(0, 100) + '...'
           : profileData.profileImage
       );
     }
-    
+
     // Save profile data to Redis
     const saveResult = await redis.set(STORAGE_KEYS.PROFILE, profileData);
     console.log('💾 Redis save result:', saveResult);
-    
+
     // Double-check that the data was saved
     const verifyData = await redis.get<ProfileData>(STORAGE_KEYS.PROFILE);
     if (!verifyData || !verifyData.name) {
@@ -109,9 +117,9 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-    
+
     console.log('✅ Profile data saved and verified successfully');
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: 'Profile updated successfully',
       success: true
     });

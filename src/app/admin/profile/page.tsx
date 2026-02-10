@@ -14,6 +14,10 @@ interface ProfileData {
   location: string;
   summary: string;
   profileImage?: string;
+  dateOfBirth?: string;
+  maritalStatus?: string;
+  nationality?: string;
+  instagram?: string;
 }
 
 const ProfileEditor = () => {
@@ -21,7 +25,7 @@ const ProfileEditor = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Default profile data (will be overwritten by API data)
   const [formData, setFormData] = useState<ProfileData>({
     name: 'Yahya Demeriah',
@@ -30,7 +34,11 @@ const ProfileEditor = () => {
     phone: '+963 956 633 888',
     location: 'Masaken Barzeh, Damascus, Syria',
     summary: 'Results-driven IT Engineer and Robotics Specialist with over 3 years of experience leading teams, designing robotic systems, and optimizing IT infrastructures. Demonstrated success in mentoring junior engineers and students, and recognized for implementing robust IT solutions. Skilled in emerging technologies and cross-functional collaboration to drive innovation.',
-    profileImage: '/images/profile-pic.png'
+    profileImage: '/images/profile-pic.png',
+    dateOfBirth: '11/5/1993',
+    maritalStatus: 'Single',
+    nationality: 'Syrian',
+    instagram: 'Kenan.saoud'
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -44,11 +52,11 @@ const ProfileEditor = () => {
         // Try to get data from API first
         const response = await fetch('/api/admin/profile');
         console.log('Profile API response status:', response.status);
-        
+
         if (response.ok) {
           const data = await response.json() as ProfileData | Record<string, never>;
           console.log('Profile data from API:', data);
-          
+
           // Only update state if we got valid data
           if (data && 'name' in data && data.name) {
             setFormData(data as ProfileData);
@@ -110,7 +118,7 @@ const ProfileEditor = () => {
     setSaveMessage('');
     try {
       console.log('Starting image upload for file:', file.name);
-      
+
       // Create FormData for file upload
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
@@ -118,7 +126,7 @@ const ProfileEditor = () => {
       // Try Redis-based image upload
       let imageUrl = '';
       let useDataUrl = false;
-      
+
       try {
         // Upload the image to the server using Redis storage
         console.log('Sending request to /api/admin/upload');
@@ -128,15 +136,15 @@ const ProfileEditor = () => {
         });
 
         console.log('Upload response status:', response.status);
-        
+
         // Get the response data
-        const responseData = await response.json() as { 
+        const responseData = await response.json() as {
           imageUrl?: string;
           error?: string;
           success?: boolean;
         };
         console.log('Upload response data:', responseData);
-        
+
         if (!response.ok) {
           throw new Error(responseData.error || 'Failed to upload image');
         }
@@ -144,25 +152,25 @@ const ProfileEditor = () => {
         if (!responseData.imageUrl) {
           throw new Error('No image URL returned from server');
         }
-        
+
         imageUrl = responseData.imageUrl;
       } catch (uploadError) {
         console.warn('Server file upload failed, falling back to data URL:', uploadError);
-        
+
         // Fallback to data URL if file upload fails
         return new Promise<void>((resolve) => {
           const fallbackReader = new FileReader();
           fallbackReader.onloadend = async () => {
             imageUrl = fallbackReader.result as string;
             useDataUrl = true;
-            
+
             // Update formData with the data URL
             const updatedFormData = {
               ...formData,
               profileImage: imageUrl
             };
             setFormData(updatedFormData);
-            
+
             // Automatically save to backend when using data URL
             try {
               await saveProfileData(updatedFormData);
@@ -171,14 +179,14 @@ const ProfileEditor = () => {
               console.error('Error saving profile with data URL:', saveError);
               setSaveMessage('Image stored as data URL (client-side only). Click Save Changes to persist.');
             }
-            
+
             setIsUploading(false);
             resolve();
           };
           fallbackReader.readAsDataURL(file);
         });
       }
-      
+
       if (!useDataUrl) {
         // Update formData with the new image URL
         const updatedFormData = {
@@ -186,7 +194,7 @@ const ProfileEditor = () => {
           profileImage: imageUrl
         };
         setFormData(updatedFormData);
-        
+
         // Automatically save to backend when upload succeeds
         try {
           await saveProfileData(updatedFormData);
@@ -199,7 +207,7 @@ const ProfileEditor = () => {
     } catch (error) {
       console.error('Error handling image:', error);
       setSaveMessage('Failed to upload image. Please try again. ' + (error instanceof Error ? error.message : ''));
-      
+
       // Reset the preview if there was an error
       setImagePreview(null);
     } finally {
@@ -224,7 +232,7 @@ const ProfileEditor = () => {
     if (!response.ok) {
       throw new Error('Failed to save profile');
     }
-    
+
     return;
   };
 
@@ -362,13 +370,79 @@ const ProfileEditor = () => {
                 </div>
               </div>
 
+              {/* Personal Details Section */}
+              <div className="mb-8 border-t border-gray-200 pt-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Personal Details</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="mb-4">
+                    <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-1">
+                      Date of Birth
+                    </label>
+                    <input
+                      type="text"
+                      id="dateOfBirth"
+                      name="dateOfBirth"
+                      value={formData.dateOfBirth || ''}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
+                      placeholder="e.g. 11/5/1993"
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label htmlFor="maritalStatus" className="block text-sm font-medium text-gray-700 mb-1">
+                      Marital Status
+                    </label>
+                    <input
+                      type="text"
+                      id="maritalStatus"
+                      name="maritalStatus"
+                      value={formData.maritalStatus || ''}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
+                      placeholder="e.g. Single"
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label htmlFor="nationality" className="block text-sm font-medium text-gray-700 mb-1">
+                      Nationality
+                    </label>
+                    <input
+                      type="text"
+                      id="nationality"
+                      name="nationality"
+                      value={formData.nationality || ''}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
+                      placeholder="e.g. Syrian"
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label htmlFor="instagram" className="block text-sm font-medium text-gray-700 mb-1">
+                      Instagram
+                    </label>
+                    <input
+                      type="text"
+                      id="instagram"
+                      name="instagram"
+                      value={formData.instagram || ''}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800"
+                      placeholder="e.g. Kenan.saoud"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <div className="mb-6">
                   <label htmlFor="profile-image" className="block text-sm font-medium text-gray-700 mb-1">
                     Profile Image
                   </label>
                   <div className="flex flex-col items-center">
-                    <div 
+                    <div
                       className="relative w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-md mb-4 cursor-pointer"
                       onClick={handleImageClick}
                     >
@@ -425,9 +499,8 @@ const ProfileEditor = () => {
               <button
                 type="submit"
                 disabled={isSaving || isUploading}
-                className={`flex items-center px-6 py-2 rounded-md text-white ${
-                  isSaving || isUploading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
-                } transition-colors`}
+                className={`flex items-center px-6 py-2 rounded-md text-white ${isSaving || isUploading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+                  } transition-colors`}
               >
                 {isSaving ? 'Saving...' : 'Save Changes'}
                 {!isSaving && <Save size={18} className="ml-2" />}
