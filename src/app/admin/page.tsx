@@ -23,7 +23,7 @@ const AdminDashboard = () => {
   const [stats, _setStats] = useState<Stat[]>([
     { title: 'Last Updated', value: 'April 9, 2025', icon: <Clock size={24} className="text-gray-600" /> },
     { title: 'Total Sections', value: '7', icon: <Users size={24} className="text-green-600" /> },
-    { title: 'Site Views', value: '0', icon: <Eye size={24} className="text-purple-600" /> },
+    { title: 'Site Views', value: 'Loading...', icon: <Eye size={24} className="text-purple-600" /> },
   ]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -36,18 +36,20 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // Fetch stats and updates from an API
-        // Example:
-        // const statsResponse = await fetch('/api/stats');
-        // const statsData = await statsResponse.json();
-        // setStats(statsData);
-
-        // const updatesResponse = await fetch('/api/updates');
-        // const updatesData = await updatesResponse.json();
-        // setRecentUpdates(updatesData);
+        // Fetch site stats
+        const response = await fetch('/api/stats');
+        if (response.ok) {
+          const data = await response.json() as { success: boolean; views: number };
+          if (data.success) {
+            _setStats(prevStats => prevStats.map(stat =>
+              stat.title === 'Site Views'
+                ? { ...stat, value: data.views.toString() }
+                : stat
+            ));
+          }
+        }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        // Keep using the default data if the API call fails
       }
     };
     fetchDashboardData();

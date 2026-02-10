@@ -7,6 +7,7 @@ import './globals.css';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS } from '@/lib/localStorage';
 import { applyTheme } from '@/lib/themeUtils';
+import SiteTracker from '@/components/SiteTracker';
 
 interface SiteSettings {
   siteName: string;
@@ -89,8 +90,8 @@ export default function RootLayout({
 
   if (!isLoadingSettings && settings.maintenanceMode && pathname && !pathname.startsWith('/admin')) {
     return (
-      <html 
-        lang={settings.siteLanguage || defaultSettings.siteLanguage} 
+      <html
+        lang={settings.siteLanguage || defaultSettings.siteLanguage}
         className={combinedClasses}
         suppressHydrationWarning
       >
@@ -148,8 +149,8 @@ export default function RootLayout({
   }
 
   return (
-    <html 
-      lang={settings.siteLanguage || defaultSettings.siteLanguage} 
+    <html
+      lang={settings.siteLanguage || defaultSettings.siteLanguage}
       className={combinedClasses}
       suppressHydrationWarning
     >
@@ -201,7 +202,12 @@ export default function RootLayout({
         />
       </head>
       <body className={`${raleway.variable} antialiased`}>
-        {!isLoadingSettings ? children : null}
+        {!isLoadingSettings ? (
+          <>
+            <SiteTracker />
+            {children}
+          </>
+        ) : null}
       </body>
     </html>
   );
